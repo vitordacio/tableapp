@@ -6,7 +6,7 @@ import { IUserRepository } from '@repositories/UserRepository/IUserRepository';
 import { AppError } from '@utils/AppError';
 
 import { isEmail } from '@utils/validations';
-import { ILoginUserDTO, ILoginUserResponse } from './LoginUserDTO';
+import { ILoginDTO, ILoginResponse } from './LoginDTO';
 
 @injectable()
 class LoginUserService {
@@ -18,10 +18,7 @@ class LoginUserService {
     private hashProvider: IHashProvider,
   ) {}
 
-  async execute({
-    login,
-    password,
-  }: ILoginUserDTO): Promise<ILoginUserResponse> {
+  async execute({ login, password }: ILoginDTO): Promise<ILoginResponse> {
     const user = isEmail(login)
       ? await this.userRepository.findByEmail(login, 'user')
       : await this.userRepository.findByUsername(login);

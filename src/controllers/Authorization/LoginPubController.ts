@@ -1,19 +1,19 @@
 import { instanceToInstance } from 'class-transformer';
 import { Request, Response } from 'express';
 import { container } from 'tsyringe';
-import { LoginUserService } from '@services/Authorization/Login/LoginUserService';
+import { LoginPubService } from '@services/Authorization/Login/LoginPubService';
 
-class LoginUserController {
-  private loginUserService: LoginUserService;
+class LoginPubController {
+  private loginPubService: LoginPubService;
 
   constructor() {
-    this.loginUserService = container.resolve(LoginUserService);
+    this.loginPubService = container.resolve(LoginPubService);
   }
 
   async handle(req: Request, res: Response): Promise<Response> {
     const { login, password } = req.body;
 
-    const { accessToken, user } = await this.loginUserService.execute({
+    const { accessToken, user } = await this.loginPubService.execute({
       login,
       password,
     });
@@ -35,4 +35,4 @@ class LoginUserController {
   }
 }
 
-export { LoginUserController };
+export { LoginPubController };

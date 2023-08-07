@@ -146,7 +146,7 @@ class UserRepository implements IUserRepository {
 
   async findById(id: string): Promise<User | undefined> {
     const user = await this.ormRepository.findOne({
-      relations: ['permissions', 'vehicles', 'address'],
+      // relations: ['permissions', 'vehicles', 'address'],
       where: { id_user: id },
     });
 
@@ -164,6 +164,10 @@ class UserRepository implements IUserRepository {
 
   async delete(id: string): Promise<void> {
     await this.ormRepository.delete(id);
+  }
+
+  async remove(entitie: User): Promise<void> {
+    await this.ormRepository.softRemove(entitie);
   }
 }
 

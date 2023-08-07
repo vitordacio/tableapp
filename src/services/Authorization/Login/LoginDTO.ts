@@ -1,11 +1,11 @@
 import { User } from '@entities/User/User';
 
-export interface ILoginUserResponse {
+export interface ILoginResponse {
   user: User;
   accessToken: string;
 }
 
-export interface ILoginUserDTO {
+export interface ILoginDTO {
   login: string;
   password: string;
 }
