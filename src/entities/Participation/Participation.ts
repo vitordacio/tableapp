@@ -11,34 +11,38 @@ import {
 import { Exclude } from 'class-transformer';
 import { User } from '@entities/User/User';
 import { ParticipationType } from '@entities/ParticipationType/ParticipationType';
-import { Meeting } from '@entities/Meeting/Meeting';
+import { Event } from '@entities/Event/Event';
 
 @Entity('participations')
 class Participation {
   @PrimaryColumn('uuid')
   id_participation: string;
 
-  @Column({ default: false })
-  going: boolean;
+  @Column({ default: true })
+  confirmed: boolean;
 
-  @Column({ nullable: true })
-  description: string;
-
-  @Column({ nullable: false })
-  meeting_id: string;
-
-  @ManyToOne(() => Meeting, meeting => meeting.participations)
-  @JoinColumn({ name: 'meeting_id' })
-  meeting: Meeting;
-
-  @Column({ nullable: false })
+  @Column()
   user_id: string;
 
   @ManyToOne(() => User, user => user.participations)
   @JoinColumn({ name: 'user_id' })
   user: User;
 
-  @Column({ nullable: false })
+  @Column()
+  event_id: string;
+
+  @ManyToOne(() => Event, event => event.participations)
+  @JoinColumn({ name: 'event_id' })
+  event: Event;
+
+  @Column()
+  allowed_by?: string;
+
+  @ManyToOne(() => User, user => user.participation_allows)
+  @JoinColumn({ name: 'allowed_by' })
+  allower: User;
+
+  @Column()
   type_id: string;
 
   @ManyToOne(() => ParticipationType, type => type.participations)

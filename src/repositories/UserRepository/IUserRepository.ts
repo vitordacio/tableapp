@@ -11,4 +11,5 @@ export interface IUserRepository {
   findByDocument(doc: string, role?: string): Promise<User | undefined>;
   findByRole(role: string): Promise<User[]>;
   delete(id: string): Promise<void>;
+  remove(entitie: User): Promise<void>;
 }

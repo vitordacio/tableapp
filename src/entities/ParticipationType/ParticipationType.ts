@@ -15,10 +15,10 @@ class ParticipationType {
   @PrimaryColumn('uuid')
   id_participation_type: string;
 
-  @Column({ nullable: false })
+  @Column()
   type: string;
 
-  @Column({ nullable: false })
+  @Column()
   type_name: string;
 
   @OneToMany(() => Participation, participation => participation.type)

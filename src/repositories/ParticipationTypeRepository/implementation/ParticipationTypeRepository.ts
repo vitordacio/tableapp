@@ -1,7 +1,7 @@
 // import { Brackets, getRepository, Repository } from 'typeorm';
 import { getRepository, Repository } from 'typeorm';
-import { IParticipationType } from '@entities/ParticipationType/IParticipationType';
 import { ParticipationType } from '@entities/ParticipationType/ParticipationType';
+import { IParticipationType } from '@entities/ParticipationType/IParticipationType';
 import { IParticipationTypeRepository } from '../IParticipationTypeRepository';
 
 class ParticipationTypeRepository implements IParticipationTypeRepository {
@@ -12,37 +12,40 @@ class ParticipationTypeRepository implements IParticipationTypeRepository {
   }
 
   create(data: IParticipationType): ParticipationType {
-    const participationType = this.ormRepository.create({
+    const participation = this.ormRepository.create({
       id_participation_type: data.id,
       type: data.type,
       type_name: data.type_name,
     });
 
-    return participationType;
+    return participation;
   }
 
-  async save(participationType: ParticipationType): Promise<ParticipationType> {
-    const newParticipationType = await this.ormRepository.save(
-      participationType,
-    );
+  async save(participation: ParticipationType): Promise<ParticipationType> {
+    const newParticipationType = await this.ormRepository.save(participation);
 
     return newParticipationType;
   }
 
   async findById(id: string): Promise<ParticipationType | undefined> {
     const participationType = await this.ormRepository.findOne({
-      where: { id_event_interaction: id },
+      where: { id_participation_type: id },
     });
 
     return participationType;
   }
 
-  async findByUserAndEvent(
-    user_id: string,
-    event_id: string,
-  ): Promise<ParticipationType | undefined> {
+  async findIndex(): Promise<ParticipationType[]> {
+    const participationTypes = await this.ormRepository.find({
+      order: { created_at: 'DESC' },
+    });
+
+    return participationTypes;
+  }
+
+  async findByType(type: string): Promise<ParticipationType | undefined> {
     const participationType = await this.ormRepository.findOne({
-      where: { user_id, event_id },
+      where: { type },
     });
 
     return participationType;

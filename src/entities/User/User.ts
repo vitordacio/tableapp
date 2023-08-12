@@ -5,62 +5,61 @@ import {
   DeleteDateColumn,
   Entity,
   OneToMany,
-  OneToOne,
   PrimaryColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { Participation } from '@entities/Participation/Participation';
 import { Address } from '@entities/Address/Address';
-import { Meeting } from '@entities/Meeting/Meeting';
+import { Event } from '@entities/Event/Event';
+import { Follow } from '@entities/Follows/Follows';
 
 @Entity('users')
 class User {
   @PrimaryColumn('uuid')
   id_user: string;
 
-  @Column({ nullable: false })
+  @Column()
   email: string;
 
-  @Column({ unique: true, nullable: false })
+  @Column({ unique: true })
   username: string;
 
   @Column()
   @Exclude()
   password: string;
 
-  @Column({ nullable: true })
-  name: string;
+  @Column()
+  name?: string;
 
-  @Column({ nullable: true })
-  phone: string;
+  @Column()
+  phone?: string;
 
-  @Column({ nullable: true })
-  avatar: string;
+  @Column()
+  avatar?: string;
 
   @Column({ default: 'user' })
   role_name: string;
 
-  @Column({ nullable: true })
-  address_id: string;
+  @Column()
+  address_id?: string;
 
-  // @OneToOne(() => Address, address => address.user, {
-  //   cascade: ['insert', 'recover', 'remove', 'update'],
-  //   eager: true,
-  //   nullable: true,
-  // })
-  // @JoinColumn({ name: 'address_id' })
-  // address: Address;
   @OneToMany(() => Address, address => address.user)
   addresses: Address[];
 
-  @OneToOne(() => Meeting, meeting => meeting.owner, {
-    cascade: true,
-    nullable: true,
-  })
-  meeting: Meeting;
+  @OneToMany(() => Event, event => event.owner)
+  events: Event[];
 
   @OneToMany(() => Participation, participation => participation.user)
   participations: Participation[];
+
+  @OneToMany(() => Participation, participation => participation.allower)
+  participation_allows: Participation[];
+
+  @OneToMany(() => Follow, follow => follow.follower)
+  followers: Follow[];
+
+  @OneToMany(() => Follow, follow => follow.following)
+  following: Follow[];
 
   @CreateDateColumn()
   created_at: Date;
