@@ -2,9 +2,11 @@ import { IUser } from '../../entities/User/IUser';
 import { User } from '../../entities/User/User';
 
 export interface IUserRepository {
-  save(user: User): Promise<User>;
   create(data: IUser): User;
+  save(user: User): Promise<User>;
+  saveMany(users: User[]): Promise<User[]>;
   findById(id: string): Promise<User | undefined>;
+  findIndex(): Promise<User[]>;
   findByEmail(email: string, role?: string): Promise<User | undefined>;
   findByUsername(username: string): Promise<User | undefined>;
   findByPhone(phone: string, role?: string): Promise<User | undefined>;

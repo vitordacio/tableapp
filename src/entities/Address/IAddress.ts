@@ -1,8 +1,8 @@
+import { Event } from '@entities/Event/Event';
 import { User } from '@entities/User/User';
 
 export interface IAddress {
   id: string;
-  name: string;
   zip?: string;
   street?: string;
   uf?: string;
@@ -11,5 +11,6 @@ export interface IAddress {
   number?: string;
   lat?: number;
   long?: number;
-  user: User;
+  user?: User;
+  event?: Event;
 }

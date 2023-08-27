@@ -4,14 +4,17 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  JoinColumn,
   OneToMany,
+  OneToOne,
   PrimaryColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { Participation } from '@entities/Participation/Participation';
-import { Address } from '@entities/Address/Address';
 import { Event } from '@entities/Event/Event';
-import { Follow } from '@entities/Follows/Follows';
+import { Friendship } from '@entities/Friendship/Friendship';
+import { Address } from '@entities/Address/Address';
+import { Notification } from '@entities/Notification/Notification';
 
 @Entity('users')
 class User {
@@ -29,22 +32,49 @@ class User {
   password: string;
 
   @Column()
-  name?: string;
+  name: string;
 
-  @Column()
-  phone?: string;
+  @Column({ nullable: true })
+  phone: string;
 
-  @Column()
-  avatar?: string;
+  @Column({ nullable: true })
+  avatar: string;
 
   @Column({ default: 'user' })
   role_name: string;
 
-  @Column()
-  address_id?: string;
+  @Column({ default: false })
+  private: boolean;
 
-  @OneToMany(() => Address, address => address.user)
-  addresses: Address[];
+  @Column({ nullable: true })
+  CNPJ: string;
+
+  @Column({ nullable: true })
+  age: number;
+
+  @Column({ nullable: true })
+  gender: string;
+
+  @Column({ nullable: true })
+  google_id: string;
+
+  @Column({ default: 0 })
+  friends: number;
+
+  @OneToMany(() => Friendship, friendship => friendship.sender)
+  sentFriendRequests: Friendship[];
+
+  @OneToMany(() => Friendship, friendship => friendship.receiver)
+  receivedFriendRequests: Friendship[];
+
+  // @ManyToMany(() => User, user => user.friends)
+  // friends: User[];
+
+  @OneToMany(() => Notification, notification => notification.user)
+  notifications_received: Notification[];
+
+  @OneToMany(() => Notification, notification => notification.sender)
+  notifications_sent: Notification[];
 
   @OneToMany(() => Event, event => event.owner)
   events: Event[];
@@ -52,14 +82,17 @@ class User {
   @OneToMany(() => Participation, participation => participation.user)
   participations: Participation[];
 
-  @OneToMany(() => Participation, participation => participation.allower)
-  participation_allows: Participation[];
+  @OneToMany(() => Participation, participation => participation.reviwer)
+  participation_reviews: Participation[];
 
-  @OneToMany(() => Follow, follow => follow.follower)
-  followers: Follow[];
+  @Column({ nullable: true })
+  address_id: string;
 
-  @OneToMany(() => Follow, follow => follow.following)
-  following: Follow[];
+  @OneToOne(() => Address, address => address.user, {
+    cascade: true,
+  })
+  @JoinColumn({ name: 'address_id' })
+  address: Address;
 
   @CreateDateColumn()
   created_at: Date;

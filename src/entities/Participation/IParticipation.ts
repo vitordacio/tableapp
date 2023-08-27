@@ -1,12 +1,12 @@
-import { User } from '@entities/User/User';
-import { Event } from '@entities/Event/Event';
-import { IParticipationType } from '@entities/ParticipationType/IParticipationType';
-
 export interface IParticipation {
   id: string;
-  user: User;
-  confirmed?: boolean;
-  event: Event;
-  type: IParticipationType;
-  allower?: User;
+  type: string;
+  user_id: string;
+  event_id: string;
+  in?: boolean;
+  confirmed_by_user?: boolean;
+  reviwed_by_user?: boolean;
+  confirmed_by_event?: boolean;
+  reviwed_by_event?: boolean;
+  reviwer_id?: string;
 }

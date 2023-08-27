@@ -1,20 +1,23 @@
 import { Request, Response, Router } from 'express';
 import { verifyToken } from '../middlewares/verifyToken';
 
-import { createTypeMiddleware } from '../middlewares/validators/Type/createType';
-import { createTableMiddleware } from '../middlewares/validators/Event/createTable';
-
-import { createEventTypeController } from '../main/EventType/createEventType';
-import { findEventTypeIndexController } from '../main/EventType/findEventTypeIndex';
-import { deleteEventTypeController } from '../main/EventType/deleteEventType';
-
 import { findEventIndexController } from '../main/Event/findEventIndex';
 import { findEventByIdController } from '../main/Event/findEventById';
-import { createTableController } from '../main/Event/Table/createTable';
-import { deleteTableController } from '../main/Event/Table/deleteTable';
-import { findTableIndexController } from '../main/Event/Table/findTableIndex';
+import { createEventController } from '../main/Event/createEvent';
+import { deleteEventController } from '../main/Event/deleteEvent';
+import { createEventMiddleware } from '../middlewares/validators/Event/createEvent';
+import { updateEventMiddleware } from '../middlewares/validators/Event/updateEvent';
+import { updateEventController } from '../main/Event/updateEvent';
 
 const eventRouter = Router();
+
+eventRouter.post(
+  '/event',
+  [verifyToken, createEventMiddleware],
+  async (req: Request, res: Response) => {
+    return createEventController.handle(req, res);
+  },
+);
 
 eventRouter.get('/event', verifyToken, async (req: Request, res: Response) => {
   return findEventIndexController.handle(req, res);
@@ -28,56 +31,20 @@ eventRouter.get(
   },
 );
 
-eventRouter.post(
-  '/table',
-  [verifyToken, createTableMiddleware],
+eventRouter.put(
+  '/event/:id',
+  [verifyToken, updateEventMiddleware],
   async (req: Request, res: Response) => {
-    return createTableController.handle(req, res);
+    return updateEventController.handle(req, res);
   },
 );
 
 eventRouter.delete(
-  '/table/:id',
+  '/event/:id',
   verifyToken,
   async (req: Request, res: Response) => {
-    return deleteTableController.handle(req, res);
+    return deleteEventController.handle(req, res);
   },
 );
-
-eventRouter.get('/table', verifyToken, async (req: Request, res: Response) => {
-  return findTableIndexController.handle(req, res);
-});
-
-eventRouter.post(
-  '/event_type',
-  [verifyToken, createTypeMiddleware],
-  async (req: Request, res: Response) => {
-    return createEventTypeController.handle(req, res);
-  },
-);
-
-eventRouter.get(
-  '/event_type',
-  verifyToken,
-  async (req: Request, res: Response) => {
-    return findEventTypeIndexController.handle(req, res);
-  },
-);
-
-eventRouter.delete(
-  '/event_type/:id',
-  verifyToken,
-  async (req: Request, res: Response) => {
-    return deleteEventTypeController.handle(req, res);
-  },
-);
-
-// EventRouter.put(
-//   '/user',
-//   [verifyToken, updateUserMiddleware],
-//   async (req: Request, res: Response) => {
-//     return updateUserController.handle(req, res);
-//   },
-// );
 
 export { eventRouter };

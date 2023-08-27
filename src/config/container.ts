@@ -9,23 +9,21 @@ import { HashProvider } from '@providers/HashProvider/implementation/HashProvide
 import { IEventRepository } from '@repositories/EventRepository/IEventRepository';
 import { EventRepository } from '@repositories/EventRepository/implementation/EventRepository';
 
-import { IEventTypeRepository } from '@repositories/EventTypeRepository/IEventTypeRepository';
-import { EventTypeRepository } from '@repositories/EventTypeRepository/implementation/EventTypeRepository';
-
 import { IParticipationRepository } from '@repositories/ParticipationRepository/IParticipationRepository';
 import { ParticipationRepository } from '@repositories/ParticipationRepository/implementation/ParticipationRepository';
 
-import { IParticipationTypeRepository } from '@repositories/ParticipationTypeRepository/IParticipationTypeRepository';
-import { ParticipationTypeRepository } from '@repositories/ParticipationTypeRepository/implementation/ParticipationTypeRepository';
+import { IAddressRepository } from '@repositories/AddressRepository/IAddressRepository';
+import { AddressRepository } from '@repositories/AddressRepository/implementation/AddressRepository';
+
+import { IFriendshipRepository } from '@repositories/FriendshipRepository/IFriendshipRepository';
+import { FriendshipRepository } from '@repositories/FriendshipRepository/implementation/FriendshipRepository';
+import { INotificationRepository } from '@repositories/NotificationRepository/INotificationRepository';
+import { NotificationRepository } from '@repositories/NotificationRepository/implementation/NotificationRepository';
 
 container.registerSingleton<IUserRepository>('UserRepository', UserRepository);
 container.registerSingleton<IEventRepository>(
   'EventRepository',
   EventRepository,
-);
-container.registerSingleton<IEventTypeRepository>(
-  'EventTypeRepository',
-  EventTypeRepository,
 );
 
 container.registerSingleton<IParticipationRepository>(
@@ -33,40 +31,19 @@ container.registerSingleton<IParticipationRepository>(
   ParticipationRepository,
 );
 
-container.registerSingleton<IParticipationTypeRepository>(
-  'ParticipationTypeRepository',
-  ParticipationTypeRepository,
+container.registerSingleton<IAddressRepository>(
+  'AddressRepository',
+  AddressRepository,
 );
-
-// container.registerSingleton<IAddressRepository>(
-//   'AddressRepository',
-//   AddressRepository,
-// );
 
 container.registerSingleton<IHashProvider>('HashProvider', HashProvider);
 
-// container.registerSingleton<IRoleRepository>('RoleRepository', RoleRepository);
+container.registerSingleton<IFriendshipRepository>(
+  'FriendshipRepository',
+  FriendshipRepository,
+);
 
-// container.registerSingleton<IMailProvider>('MailProvider', MailProvider);
-
-// container.registerSingleton<INotificationRepository>(
-//   'NotificationRepository',
-//   NotificationRepository,
-// );
-
-// container.registerSingleton<IAssessmentRepository>(
-//   'AssessmentRepository',
-//   AssessmentRepository,
-// );
-
-// container.registerSingleton<IImageRepository>(
-//   'ImageRepository',
-//   ImageRepository,
-// );
-
-// container.registerSingleton<IBannerRepository>(
-//   'BannerRepository',
-//   BannerRepository,
-// );
-
-// container.registerSingleton<IPubRepository>('PubRepository', PubRepository);
+container.registerSingleton<INotificationRepository>(
+  'NotificationRepository',
+  NotificationRepository,
+);

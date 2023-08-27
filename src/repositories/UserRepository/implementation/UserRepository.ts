@@ -47,6 +47,14 @@ class UserRepository implements IUserRepository {
       email: data.email,
       username: data.username,
       password: data.password,
+      name: data.name,
+      phone: data.phone,
+      avatar: data.avatar,
+      role_name: data.role_name,
+      age: data.age,
+      gender: data.gender,
+      google_id: data.google_id,
+      private: data.private,
     });
 
     return user;
@@ -56,6 +64,21 @@ class UserRepository implements IUserRepository {
     const newUser = await this.ormRepository.save(user);
 
     return newUser;
+  }
+
+  async saveMany(users: User[]): Promise<User[]> {
+    const newUsers = await this.ormRepository.save(users);
+
+    return newUsers;
+  }
+
+  async findIndex(): Promise<User[]> {
+    const users = await this.ormRepository.find({
+      // relations: ['totalAcceptedFriends'],
+      order: { created_at: 'DESC' },
+    });
+
+    return users;
   }
 
   async findByEmail(email: string, role?: string): Promise<User | undefined> {
@@ -71,6 +94,7 @@ class UserRepository implements IUserRepository {
     const user = await this.ormRepository.findOne({
       // relations: ['permissions', 'vehicles', 'address'],
       where: { username },
+      withDeleted: true,
     });
 
     return user;

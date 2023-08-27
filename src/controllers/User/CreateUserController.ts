@@ -12,9 +12,10 @@ class CreateUserController {
   }
 
   async handle(req: Request, res: Response): Promise<Response> {
-    const { email, username, password } = req.body;
+    const { name, email, username, password } = req.body;
 
     const userInstance = await this.createUserService.execute({
+      name,
       email,
       username,
       password,

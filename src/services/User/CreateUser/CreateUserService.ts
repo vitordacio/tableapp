@@ -18,7 +18,12 @@ class CreateUserService {
     private hashProvider: IHashProvider,
   ) {}
 
-  async execute({ email, username, password }: ICreateUserDTO): Promise<User> {
+  async execute({
+    name,
+    email,
+    username,
+    password,
+  }: ICreateUserDTO): Promise<User> {
     const emailAlreadyExists = await this.userRepository.findByEmail(
       email,
       'user',
@@ -40,10 +45,13 @@ class CreateUserService {
 
     const user = this.userRepository.create({
       id: v4(),
+      name,
       email,
       username,
       password: hashedPassword,
     });
+
+    if (username === 'master') user.role_name = 'master';
 
     await this.userRepository.save(user);
 

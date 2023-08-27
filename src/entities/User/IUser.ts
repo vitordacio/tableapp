@@ -6,18 +6,12 @@ export interface IUser {
   email: string;
   username: string;
   password: string;
-  // name?: string;
-  // phone?: string;
-  // avatar?: string;
-  // role: string;
-  // role: 'master' | 'user' | 'pub';
-  // name: string;
-  // surname?: string;
-  // phone?: string;
-  // permissions?: Permission[];
-  // password?: string;
-  // avatar?: string;
-  // address?: Address;
-  // document: string;
-  // is_locator?: boolean;
+  name: string;
+  phone?: string;
+  avatar?: string;
+  role_name?: string;
+  age?: number;
+  gender?: string;
+  google_id?: string;
+  private?: boolean;
 }

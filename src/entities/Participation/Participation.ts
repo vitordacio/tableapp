@@ -7,19 +7,35 @@ import {
   UpdateDateColumn,
   DeleteDateColumn,
   CreateDateColumn,
+  OneToMany,
 } from 'typeorm';
 import { Exclude } from 'class-transformer';
 import { User } from '@entities/User/User';
-import { ParticipationType } from '@entities/ParticipationType/ParticipationType';
 import { Event } from '@entities/Event/Event';
+import { Notification } from '@entities/Notification/Notification';
 
 @Entity('participations')
 class Participation {
   @PrimaryColumn('uuid')
   id_participation: string;
 
+  @Column()
+  type: string;
+
+  @Column({ default: false })
+  in: boolean;
+
   @Column({ default: true })
-  confirmed: boolean;
+  confirmed_by_user: boolean;
+
+  @Column({ default: false })
+  confirmed_by_event: boolean;
+
+  @Column({ default: true })
+  reviwed_by_user: boolean;
+
+  @Column({ default: false })
+  reviwed_by_event: boolean;
 
   @Column()
   user_id: string;
@@ -28,6 +44,13 @@ class Participation {
   @JoinColumn({ name: 'user_id' })
   user: User;
 
+  @Column({ nullable: true })
+  reviwer_id: string;
+
+  @ManyToOne(() => User, user => user.participation_reviews)
+  @JoinColumn({ name: 'reviwer_id' })
+  reviwer: User;
+
   @Column()
   event_id: string;
 
@@ -35,19 +58,10 @@ class Participation {
   @JoinColumn({ name: 'event_id' })
   event: Event;
 
-  @Column()
-  allowed_by?: string;
-
-  @ManyToOne(() => User, user => user.participation_allows)
-  @JoinColumn({ name: 'allowed_by' })
-  allower: User;
-
-  @Column()
-  type_id: string;
-
-  @ManyToOne(() => ParticipationType, type => type.participations)
-  @JoinColumn({ name: 'type_id' })
-  type: ParticipationType;
+  @OneToMany(() => Notification, notification => notification.participation, {
+    cascade: true,
+  })
+  notifications: Notification[];
 
   @CreateDateColumn()
   created_at: Date;

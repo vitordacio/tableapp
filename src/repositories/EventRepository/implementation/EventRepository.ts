@@ -14,18 +14,23 @@ class EventRepository implements IEventRepository {
   create(data: IEvent): Event {
     const event = this.ormRepository.create({
       id_event: data.id,
-      type_id: data.type_id,
-      owner_id: data.owner_id,
+      owner: data.owner,
+      type: data.type,
       name: data.name,
       location: data.location,
+      date: data.date,
       time: data.time,
+      finish_date: data.finish_date,
+      finish_time: data.finish_time,
+      img_url: data.finish_time,
+      address: data.address,
+      additional: data.additional,
       club_name: data.club_name,
       performer: data.performer,
-      additional: data.additional,
       drink_preferences: data.drink_preferences,
-      age_limit: data.age_limit,
-      free_woman: data.free_woman,
-      free_man: data.free_man,
+      age_limit: data.age_limit || 0,
+      free_ticket: data.free_ticket || 0,
+      private: data.private,
     });
 
     return event;
@@ -39,17 +44,8 @@ class EventRepository implements IEventRepository {
 
   async findById(id: string): Promise<Event | undefined> {
     const event = await this.ormRepository.findOne({
-      relations: ['type', 'address', 'owner', 'participations'],
+      relations: ['address', 'owner', 'participations'],
       where: { id_event: id },
-    });
-
-    return event;
-  }
-
-  async findByIdAndType(id: string, type: string): Promise<Event | undefined> {
-    const event = await this.ormRepository.findOne({
-      relations: ['participations', 'type'],
-      where: { id_event: id, type: { type } },
     });
 
     return event;
@@ -57,17 +53,112 @@ class EventRepository implements IEventRepository {
 
   async findIndexByType(type: string): Promise<Event[]> {
     const events = await this.ormRepository.find({
-      relations: ['type', 'participations'],
-      where: { type: { type } },
+      relations: ['participations'],
+      where: { type },
       order: { created_at: 'DESC' },
     });
 
     return events;
   }
 
+  // async findByCoordinates(
+  //   lat: number,
+  //   long: number,
+  //   radius: number,
+  //   services?: string,
+  // ): Promise<Workshop[]> {
+  //   const workshops = await this.ormRepository
+  //     .createQueryBuilder('workshop')
+  //     .leftJoinAndSelect('workshop.address', 'address')
+  //     .leftJoinAndSelect('workshop.child_services', 'services')
+  //     .leftJoinAndSelect('services.service', 'masterservices')
+  //     .leftJoinAndSelect(
+  //       'workshop.partners',
+  //       'partners',
+  //       'partners.active = true',
+  //     )
+  //     .leftJoinAndSelect(
+  //       'workshop.banners',
+  //       'banners',
+  //       'banners.type = :type',
+  //       { type: 'profile' },
+  //     )
+  //     .leftJoinAndSelect('partners.address', 'partner_address')
+  //     .where(
+  //       `(6371 * acos( cos(radians(address.lat)) * cos(radians(${lat})) * cos(radians(address.long) - radians(${long})) + sin(radians(address.lat)) * sin(radians(${lat})))) <= ${radius}`,
+  //     )
+  //     .andWhere(
+  //       new Brackets(qb => {
+  //         qb.where(
+  //           '(:nullService::text IS NULL OR LOWER(services.name) ~~ :queryServices OR LOWER(workshop.fantasy_name) ~~ :workshopName)',
+  //           {
+  //             queryServices: `%${services}%`,
+  //             workshopName: `%${services}%`,
+  //             nullService: services,
+  //           },
+  //         );
+
+  //         qb.andWhere('workshop.active = true');
+
+  //         return qb;
+  //       }),
+  //     )
+  //     .getMany();
+
+  //   return workshops;
+  // }
+
+  // async findClosest(
+  //   lat: number,
+  //   long: number,
+  //   services?: string,
+  // ): Promise<Workshop[]> {
+  //   const subQuery = `SELECT (6371 * acos( cos(radians(addresses.lat)) * cos(radians(${lat})) * cos(radians(addresses.long) - radians(${long})) + sin(radians(addresses.lat)) * sin(radians(${lat})))) AS distance FROM workshops LEFT JOIN addresses ON workshops.address_id = addresses.id_address WHERE workshops.id_workshop = workshop.id_workshop`;
+
+  //   const workshops = await this.ormRepository
+  //     .createQueryBuilder('workshop')
+  //     .leftJoinAndSelect('workshop.address', 'address')
+  //     .leftJoinAndSelect('workshop.child_services', 'services')
+  //     .leftJoinAndSelect('services.service', 'masterservices')
+  //     .leftJoinAndSelect(
+  //       'workshop.partners',
+  //       'partners',
+  //       'partners.active = true',
+  //     )
+  //     .leftJoinAndSelect(
+  //       'workshop.banners',
+  //       'banners',
+  //       'banners.type = :type',
+  //       { type: 'profile' },
+  //     )
+  //     .leftJoinAndSelect('partners.address', 'partner_address')
+  //     .where(
+  //       new Brackets(qb => {
+  //         qb.where(
+  //           '(:nullService::text IS NULL OR LOWER(services.name) ~~ :queryServices OR LOWER(workshop.fantasy_name) ~~ :workshopName)',
+  //           {
+  //             queryServices: `%${services}%`,
+  //             workshopName: `%${services}%`,
+  //             nullService: services,
+  //           },
+  //         );
+
+  //         qb.andWhere('workshop.active = true');
+
+  //         return qb;
+  //       }),
+  //     )
+  //     .addSelect(`(${subQuery})`, 'distance')
+  //     .orderBy('distance', 'ASC')
+  //     .take(1)
+  //     .getMany();
+
+  //   return workshops;
+  // }
+
   async findIndex(): Promise<Event[]> {
     const events = await this.ormRepository.find({
-      relations: ['type', 'participations'],
+      relations: ['participations', 'address', 'owner'],
       order: { created_at: 'DESC' },
     });
 

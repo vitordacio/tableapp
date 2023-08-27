@@ -4,7 +4,7 @@ import { instanceToPlain } from 'class-transformer';
 import { hasPermission } from '@utils/hasPermission';
 import { AppError } from '@utils/AppError';
 import { pubPerm, userPerm } from '@config/constants';
-import { FindEventIndexService } from '@services/Event/FindEventIndexService';
+import { FindEventIndexService } from '@services/Event/FindTable/FindEventIndexService';
 
 class FindEventIndexController {
   private findEventIndexService: FindEventIndexService;

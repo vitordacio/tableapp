@@ -1,8 +1,8 @@
 import { celebrate, Segments, Joi } from 'celebrate';
-import validator from 'cpf-cnpj-validator';
+// import validator from 'cpf-cnpj-validator';
 
-const JoiCnpj = Joi.extend(validator);
-const JoiCpf = Joi.extend(validator);
+// const JoiCnpj = Joi.extend(validator);
+// const JoiCpf = Joi.extend(validator);
 
 export const updateUserMiddleware = celebrate({
   [Segments.BODY]: {
@@ -25,26 +25,5 @@ export const updateUserMiddleware = celebrate({
     //   district: Joi.string().label('bairro'),
     //   number: Joi.string().allow('').label('numero'),
     // }).label('endereço'),
-  },
-});
-
-export const selfUpdateUserMiddleware = celebrate({
-  [Segments.BODY]: {
-    email: Joi.string().email(),
-    phone: Joi.string().min(8).max(15).label('telefone'),
-    newPassword: Joi.string().label('nova senha').allow(''),
-    oldPassword: Joi.string().label('senha antiga'),
-    name: Joi.string().label('nome'),
-    surname: Joi.string().label('sobrenome'),
-    document: [JoiCnpj.document().cnpj(), JoiCpf.document().cpf()],
-    address: Joi.object({
-      id_address: Joi.string(),
-      zip: Joi.string().required().label('cep'),
-      street: Joi.string().required().label('rua'),
-      uf: Joi.string().required().label('uf'),
-      city: Joi.string().required().label('cidade'),
-      district: Joi.string().required().label('bairro'),
-      number: Joi.string().required().allow('').label('numero'),
-    }).label('endereço'),
   },
 });

@@ -5,9 +5,7 @@ import {
   PrimaryColumn,
   UpdateDateColumn,
   DeleteDateColumn,
-  ManyToOne,
-  JoinColumn,
-  OneToMany,
+  OneToOne,
 } from 'typeorm';
 
 import { Exclude } from 'class-transformer';
@@ -19,42 +17,42 @@ class Address {
   @PrimaryColumn('uuid')
   id_address: string;
 
-  @Column()
-  name: string;
+  @Column({ nullable: true })
+  zip: string;
 
-  @Column()
-  zip?: string;
+  @Column({ nullable: true })
+  street: string;
 
-  @Column()
-  street?: string;
+  @Column({ nullable: true })
+  uf: string;
 
-  @Column()
-  uf?: string;
+  @Column({ nullable: true })
+  city: string;
 
-  @Column()
-  city?: string;
+  @Column({ nullable: true })
+  district: string;
 
-  @Column()
-  district?: string;
+  @Column({ nullable: true })
+  number: string;
 
-  @Column()
-  number?: string;
+  @Column({ nullable: true, precision: 10, scale: 6, type: 'numeric' })
+  lat: number;
 
-  @Column({ precision: 10, scale: 6, type: 'numeric' })
-  lat?: number;
+  @Column({ nullable: true, precision: 10, scale: 6, type: 'numeric' })
+  long: number;
 
-  @Column({ precision: 10, scale: 6, type: 'numeric' })
-  long?: number;
+  // @OneToMany(() => Event, event => event.type)
+  // events: Event[];
 
-  @Column()
-  user_id: string;
-
-  @ManyToOne(() => User, user => user.addresses)
-  @JoinColumn({ name: 'user_id' })
+  @OneToOne(() => User, user => user.address, {
+    orphanedRowAction: 'delete',
+  })
   user: User;
 
-  @OneToMany(() => Event, event => event.type)
-  events: Event[];
+  @OneToOne(() => Event, event => event.address, {
+    orphanedRowAction: 'delete',
+  })
+  event: Event;
 
   @CreateDateColumn()
   created_at: Date;

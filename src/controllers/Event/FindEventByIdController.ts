@@ -4,7 +4,7 @@ import { instanceToPlain } from 'class-transformer';
 import { hasPermission } from '@utils/hasPermission';
 import { AppError } from '@utils/AppError';
 import { pubPerm, userPerm } from '@config/constants';
-import { FindEventByIdService } from '@services/Event/Table/FindTable/FindEventByIdService';
+import { FindEventByIdService } from '@services/Event/FindTable/FindEventByIdService';
 
 class FindEventByIdController {
   private findEventByIdService: FindEventByIdService;

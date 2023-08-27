@@ -8,12 +8,12 @@ import {
   OneToMany,
   JoinColumn,
   ManyToOne,
+  OneToOne,
 } from 'typeorm';
 import { Exclude } from 'class-transformer';
 import { User } from '@entities/User/User';
 import { Participation } from '@entities/Participation/Participation';
 import { Address } from '@entities/Address/Address';
-import { EventType } from '@entities/EventType/EventType';
 
 @Entity('events')
 class Event {
@@ -21,28 +21,46 @@ class Event {
   id_event: string;
 
   @Column()
+  type: string;
+
+  @Column()
   name: string;
 
   @Column()
   location: string;
 
-  @Column()
+  @Column({ type: 'date' })
+  date: Date;
+
+  @Column({ type: 'time' })
   time: Date;
 
-  @Column()
-  additional?: string;
+  @Column({ type: 'date' })
+  finish_date: Date;
 
-  @Column()
-  club_name?: string;
+  @Column({ type: 'time' })
+  finish_time: Date;
 
-  @Column()
-  performer?: string;
+  @Column({ default: true })
+  actived: boolean;
 
-  @Column()
-  drink_preferences?: string;
+  @Column({ nullable: true })
+  additional: string;
 
-  @Column()
-  age_limit?: number;
+  @Column({ nullable: true })
+  club_name: string;
+
+  @Column({ nullable: true })
+  performer: string;
+
+  @Column({ nullable: true })
+  drink_preferences: string;
+
+  @Column({ nullable: true })
+  img_url: string;
+
+  @Column({ default: 0 })
+  age_limit: number;
 
   @Column({ default: 0 })
   free_ticket: number;
@@ -57,22 +75,18 @@ class Event {
   @JoinColumn({ name: 'owner_id' })
   owner: User;
 
-  @Column()
-  type_id: string;
-
-  @ManyToOne(() => EventType, type => type.events)
-  @JoinColumn({ name: 'type_id' })
-  type: EventType;
-
   @Column({ nullable: true })
   address_id: string;
 
-  @ManyToOne(() => Address, address => address.events)
+  @OneToOne(() => Address, address => address.event, {
+    cascade: true,
+  })
   @JoinColumn({ name: 'address_id' })
   address: Address;
 
   @OneToMany(() => Participation, participation => participation.event, {
-    cascade: true,
+    cascade: ['insert', 'recover', 'remove', 'update'],
+    eager: true,
   })
   participations: Participation[];
 

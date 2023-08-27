@@ -1,0 +1,27 @@
+import { container } from 'tsyringe';
+import { Request, Response } from 'express';
+import { instanceToPlain } from 'class-transformer';
+import { hasPermission } from '@utils/hasPermission';
+import { AppError } from '@utils/AppError';
+import { masterPerm } from '@config/constants';
+import { FindUserIndexService } from '@services/User/FindUser/FindUserIndexService';
+
+class FindUserIndexController {
+  private findUserIndexService: FindUserIndexService;
+
+  constructor() {
+    this.findUserIndexService = container.resolve(FindUserIndexService);
+  }
+
+  async handle(req: Request, res: Response): Promise<Response> {
+    if (!hasPermission(req.user, masterPerm)) {
+      throw new AppError('Operação não permitida.', 403);
+    }
+
+    const UserInstance = await this.findUserIndexService.execute();
+
+    return res.status(201).json(instanceToPlain(UserInstance));
+  }
+}
+
+export { FindUserIndexController };
