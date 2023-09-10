@@ -6,7 +6,7 @@ import { IParticipationRepository } from '@repositories/ParticipationRepository/
 import { AppError } from '@utils/AppError';
 
 @injectable()
-class FindParticipationByUserService {
+class FindParticipationsByUserService {
   constructor(
     @inject('ParticipationRepository')
     private participationRepository: IParticipationRepository,
@@ -27,4 +27,4 @@ class FindParticipationByUserService {
   }
 }
 
-export { FindParticipationByUserService };
+export { FindParticipationsByUserService };

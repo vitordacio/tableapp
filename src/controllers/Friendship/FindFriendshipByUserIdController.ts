@@ -4,13 +4,15 @@ import { instanceToPlain } from 'class-transformer';
 import { hasPermission } from '@utils/hasPermission';
 import { AppError } from '@utils/AppError';
 import { pubPerm, userPerm } from '@config/constants';
-import { FindEventByIdService } from '@services/Event/FindEvent/FindEventByIdService';
+import { FindFriendshipByUserIdService } from '@services/Friendship/FindFriendship/FindFriendshipByUserIdService';
 
-class FindEventByIdController {
-  private findEventByIdService: FindEventByIdService;
+class FindFriendshipByUserIdController {
+  private findFriendshipByUserIdService: FindFriendshipByUserIdService;
 
   constructor() {
-    this.findEventByIdService = container.resolve(FindEventByIdService);
+    this.findFriendshipByUserIdService = container.resolve(
+      FindFriendshipByUserIdService,
+    );
   }
 
   async handle(req: Request, res: Response): Promise<Response> {
@@ -23,10 +25,13 @@ class FindEventByIdController {
       throw new AppError('Operação não permitida.', 403);
     }
 
-    const eventInstance = await this.findEventByIdService.execute(id);
+    const friendshipInstance = await this.findFriendshipByUserIdService.execute(
+      id,
+      req.user,
+    );
 
-    return res.status(201).json(instanceToPlain(eventInstance));
+    return res.status(201).json(instanceToPlain(friendshipInstance));
   }
 }
 
-export { FindEventByIdController };
+export { FindFriendshipByUserIdController };

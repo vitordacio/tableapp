@@ -61,51 +61,55 @@ class EventRepository implements IEventRepository {
     return events;
   }
 
-  // async findByCoordinates(
-  //   lat: number,
-  //   long: number,
-  //   radius: number,
-  //   services?: string,
-  // ): Promise<Workshop[]> {
-  //   const workshops = await this.ormRepository
-  //     .createQueryBuilder('workshop')
-  //     .leftJoinAndSelect('workshop.address', 'address')
-  //     .leftJoinAndSelect('workshop.child_services', 'services')
-  //     .leftJoinAndSelect('services.service', 'masterservices')
-  //     .leftJoinAndSelect(
-  //       'workshop.partners',
-  //       'partners',
-  //       'partners.active = true',
-  //     )
-  //     .leftJoinAndSelect(
-  //       'workshop.banners',
-  //       'banners',
-  //       'banners.type = :type',
-  //       { type: 'profile' },
-  //     )
-  //     .leftJoinAndSelect('partners.address', 'partner_address')
-  //     .where(
-  //       `(6371 * acos( cos(radians(address.lat)) * cos(radians(${lat})) * cos(radians(address.long) - radians(${long})) + sin(radians(address.lat)) * sin(radians(${lat})))) <= ${radius}`,
-  //     )
-  //     .andWhere(
-  //       new Brackets(qb => {
-  //         qb.where(
-  //           '(:nullService::text IS NULL OR LOWER(services.name) ~~ :queryServices OR LOWER(workshop.fantasy_name) ~~ :workshopName)',
-  //           {
-  //             queryServices: `%${services}%`,
-  //             workshopName: `%${services}%`,
-  //             nullService: services,
-  //           },
-  //         );
+  // async findByWorkshop(
+  //   workshopId: string,
+  //   initialDate?: string,
+  //   finalDate?: string,
+  // ): Promise<Transaction[]> {
+  //   const queryBuilder = this.ormRepository
+  //     .createQueryBuilder('transaction')
+  //     .where('transaction.workshop_id = :id', {
+  //       id: workshopId,
+  //     });
 
-  //         qb.andWhere('workshop.active = true');
+  //   if (initialDate && finalDate) {
+  //     queryBuilder
+  //       .andWhere(
+  //         '( :nullInitialDate::text IS NULL OR :initialDate <= transaction.due_date )',
+  //         { nullInitialDate: initialDate, initialDate },
+  //       )
+  //       .andWhere(
+  //         '( :nullFinalDate::text IS NULL OR :finalDate >= transaction.due_date )',
+  //         {
+  //           nullFinalDate: finalDate,
+  //           finalDate,
+  //         },
+  //       );
+  //   } else if (initialDate) {
+  //     queryBuilder.andWhere(
+  //       '( :nullInitialDate::text IS NULL OR :initialDate <= transaction.due_date )',
+  //       { nullInitialDate: initialDate, initialDate },
+  //     );
+  //   } else if (finalDate) {
+  //     queryBuilder.andWhere(
+  //       '( :nullFinalDate::text IS NULL OR :finalDate >= transaction.due_date )',
+  //       {
+  //         nullFinalDate: finalDate,
+  //         finalDate,
+  //       },
+  //     );
+  //   }
 
-  //         return qb;
-  //       }),
-  //     )
+  //   const transactions = await queryBuilder
+  //     .select([
+  //       'transaction.total',
+  //       'transaction.due_date',
+  //       'transaction.type',
+  //       'transaction.finished',
+  //     ])
   //     .getMany();
 
-  //   return workshops;
+  //   return transactions;
   // }
 
   // async findClosest(

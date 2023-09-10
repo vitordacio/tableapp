@@ -1,8 +1,7 @@
-import { User } from '@entities/User/User';
-
 export interface IFriendship {
   id: string;
-  sender: User;
-  receiver: User;
+  sender_id: string;
+  receiver_id: string;
+  reviwed_by_receiver?: boolean;
   accepted?: boolean;
 }

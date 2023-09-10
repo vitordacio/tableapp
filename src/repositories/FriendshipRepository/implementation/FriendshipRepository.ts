@@ -14,9 +14,9 @@ class FriendshipRepository implements IFriendshipRepository {
   create(data: IFriendship): Friendship {
     const friendship = this.ormRepository.create({
       id_friendship: data.id,
-      sender: data.sender,
-      receiver: data.receiver,
-      accepted: data.accepted,
+      sender_id: data.sender_id,
+      receiver_id: data.receiver_id,
+      reviwed_by_receiver: data.reviwed_by_receiver,
     });
 
     return friendship;
@@ -37,13 +37,21 @@ class FriendshipRepository implements IFriendshipRepository {
     return friendship;
   }
 
-  async findBySenderAndReceiver(
-    sender_id: string,
-    receiver_id: string,
+  async findByUserId(
+    user_id: string,
+    friend_id: string,
   ): Promise<Friendship | undefined> {
-    const friendship = await this.ormRepository.findOne({
-      where: { sender_id, receiver_id },
-    });
+    const queryBuilder = this.ormRepository.createQueryBuilder('friendship');
+
+    const friendship = await queryBuilder
+      .where(
+        '(friendship.sender_id = :user_id AND friendship.receiver_id = :friend_id) OR (friendship.sender_id = :friend_id AND friendship.receiver_id = :user_id)',
+        {
+          user_id,
+          friend_id,
+        },
+      )
+      .getOne();
 
     return friendship;
   }

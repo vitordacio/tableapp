@@ -63,11 +63,20 @@ class ParticipationRepository implements IParticipationRepository {
     return participations;
   }
 
+  async findByEventId(event_id: string): Promise<Participation[]> {
+    const participations = await this.ormRepository.find({
+      relations: ['user'],
+      where: { event_id },
+    });
+
+    return participations;
+  }
+
   async findByUser(user_id: string): Promise<Participation[]> {
     const participations = await this.ormRepository.find({
-      relations: ['user', 'event'],
+      relations: ['event'],
       order: { created_at: 'DESC' },
-      where: { user_id },
+      where: { user_id, in: true },
     });
 
     return participations;

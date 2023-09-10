@@ -2,51 +2,32 @@ import { Request, Response, Router } from 'express';
 
 import { verifyToken } from '../middlewares/verifyToken';
 
-import { createRequestController } from '../main/Participation/createRequest';
-import { createRequestMiddleware } from '../middlewares/validators/Participation/createRequest';
+import { createParticipationByUserController } from '../main/Participation/createParticipationByUser';
+import { createParticipationByUserMiddleware } from '../middlewares/validators/Participation/createParticipationByUser';
 import { findParticipationByIdController } from '../main/Participation/findParticipationById';
 import { deleteParticipationController } from '../main/Participation/deleteParticipation';
-import { findParticipationByUserController } from '../main/Participation/findParticipationByUser';
+import { findParticipationsByUserController } from '../main/Participation/findParticipationsByUser';
 import { findParticipationByEventIdController } from '../main/Participation/findParticipationByEventId';
 
-import { createInviteController } from '../main/Participation/createInvite';
-import { createResponseByEventController } from '../main/Participation/createResponseByEvent';
-import { createInviteMiddleware } from '../middlewares/validators/Participation/createInvite';
-import { createResponseByEventMiddleware } from '../middlewares/validators/Participation/createResponseByEvent';
-import { createResponseInviteMiddleware } from '../middlewares/validators/Participation/createResponseInvite';
-import { createResponseInviteController } from '../main/Participation/createResponseInvite';
+import { createParticipationByEventMiddleware } from '../middlewares/validators/Participation/createParticipationByEvent';
+import { createParticipationByEventController } from '../main/Participation/createParticipationByEvent';
+import { findParticipationsRequestController } from '../main/Participation/findParticipationsRequest';
 
 const participationRouter = Router();
 
 participationRouter.post(
-  '/participation/request',
-  [verifyToken, createRequestMiddleware],
+  '/participation/user',
+  [verifyToken, createParticipationByUserMiddleware],
   async (req: Request, res: Response) => {
-    return createRequestController.handle(req, res);
+    return createParticipationByUserController.handle(req, res);
   },
 );
 
 participationRouter.post(
-  '/participation/response',
-  [verifyToken, createResponseByEventMiddleware],
+  '/participation/event',
+  [verifyToken, createParticipationByEventMiddleware],
   async (req: Request, res: Response) => {
-    return createResponseByEventController.handle(req, res);
-  },
-);
-
-participationRouter.post(
-  '/participation/request/invite',
-  [verifyToken, createInviteMiddleware],
-  async (req: Request, res: Response) => {
-    return createInviteController.handle(req, res);
-  },
-);
-
-participationRouter.post(
-  '/participation/response/invite',
-  [verifyToken, createResponseInviteMiddleware],
-  async (req: Request, res: Response) => {
-    return createResponseInviteController.handle(req, res);
+    return createParticipationByEventController.handle(req, res);
   },
 );
 
@@ -62,15 +43,23 @@ participationRouter.get(
   '/participation',
   verifyToken,
   async (req: Request, res: Response) => {
-    return findParticipationByUserController.handle(req, res);
+    return findParticipationsByUserController.handle(req, res);
   },
 );
 
 participationRouter.get(
-  '/participation/event/:event_id',
+  '/participation/user/:event_id',
   verifyToken,
   async (req: Request, res: Response) => {
     return findParticipationByEventIdController.handle(req, res);
+  },
+);
+
+participationRouter.get(
+  '/participation/requests/:event_id',
+  verifyToken,
+  async (req: Request, res: Response) => {
+    return findParticipationsRequestController.handle(req, res);
   },
 );
 

@@ -22,11 +22,11 @@ class CreateRequestService {
   ) {}
 
   async execute({ friend_id, user }: ICreateRequestDTO): Promise<Friendship> {
-    // let friendship: Friendship | undefined;
+    let friendship;
     const foundUser = await this.userRepository.findById(user.id);
 
     if (!foundUser) {
-      throw new AppError('Não autorizado.', 403);
+      throw new AppError('Token expirado, realize login novamente.', 403);
     }
 
     const friend = await this.userRepository.findById(friend_id);
@@ -35,61 +35,22 @@ class CreateRequestService {
       throw new AppError('Usuário não encontrado.', 404);
     }
 
-    const [userSent, friendSent] = await Promise.all([
-      this.friendshipRepository.findBySenderAndReceiver(
-        foundUser.id_user,
-        friend.id_user,
-      ),
-      this.friendshipRepository.findBySenderAndReceiver(
-        friend.id_user,
-        foundUser.id_user,
-      ),
-    ]);
+    friendship = await this.friendshipRepository.findByUserId(
+      user.id,
+      friend_id,
+    );
 
-    if (userSent || friendSent) {
+    if (friendship) {
       throw new AppError('Solicitação já existe.', 400);
     }
 
-    const friendship = this.friendshipRepository.create({
+    friendship = this.friendshipRepository.create({
       id: v4(),
-      sender: foundUser,
-      receiver: friend,
+      sender_id: foundUser.id_user,
+      receiver_id: friend.id_user,
     });
 
-    // const alreadySent = await this.friendshipRepository.findBySenderAndReceiver(
-    //   foundUser.id_user,
-    //   friend.id_user,
-    // );
-
-    // if (alreadySent) {
-    //   throw new AppError('Solicitação já enviada.', 400);
-    // }
-
-    // friendship = await this.friendshipRepository.findBySenderAndReceiver(
-    //   friend.id_user,
-    //   foundUser.id_user,
-    // );
-
-    // if (friendship?.accepted) {
-    //   throw new AppError('Usuários já são amigos.', 403);
-    // }
-
-    // if (friendship) {
-    //   friendship.accepted = true;
-    //   foundUser.friends += 1;
-    //   friend.friends += 1;
-    //   await this.userRepository.saveMany([foundUser, friend]);
-    // } else {
-    //   friendship = this.friendshipRepository.create({
-    //     id: v4(),
-    //     sender: foundUser,
-    //     receiver: friend,
-    //   });
-    // }
-
     await this.friendshipRepository.save(friendship);
-
-    // notificaçao para dono
 
     const notifcation = this.notificationRepository.create({
       id: v4(),

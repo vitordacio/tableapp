@@ -10,6 +10,7 @@ export interface IParticipationRepository {
     event_id: string,
   ): Promise<Participation | undefined>;
   findIndex(): Promise<Participation[]>;
+  findByEventId(event_id: string): Promise<Participation[]>;
   findByUser(user_id: string): Promise<Participation[]>;
   findByUserAndEvent(
     user_id: string,

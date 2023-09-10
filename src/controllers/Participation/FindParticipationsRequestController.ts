@@ -4,17 +4,19 @@ import { instanceToPlain } from 'class-transformer';
 import { hasPermission } from '@utils/hasPermission';
 import { AppError } from '@utils/AppError';
 import { pubPerm, userPerm } from '@config/constants';
-import { CreateResponseInviteService } from '@services/Participation/CreateResponseInvite/CreateResponseInviteService';
+import { FindParticipationsRequestService } from '@services/Participation/FindParticipation/FindParticipationsRequestService';
 
-class CreateResponseInviteController {
-  private createResponseService: CreateResponseInviteService;
+class FindParticipationsRequestController {
+  private findParticipationsRequestService: FindParticipationsRequestService;
 
   constructor() {
-    this.createResponseService = container.resolve(CreateResponseInviteService);
+    this.findParticipationsRequestService = container.resolve(
+      FindParticipationsRequestService,
+    );
   }
 
   async handle(req: Request, res: Response): Promise<Response> {
-    const { participation_id, confirmed_by_user } = req.body;
+    const { event_id } = req.params;
 
     if (
       !hasPermission(req.user, userPerm) &&
@@ -23,14 +25,11 @@ class CreateResponseInviteController {
       throw new AppError('Operação não permitida.', 403);
     }
 
-    const participationInstance = await this.createResponseService.execute({
-      participation_id,
-      confirmed_by_user,
-      user: req.user,
-    });
+    const participationInstance =
+      await this.findParticipationsRequestService.execute(event_id, req.user);
 
     return res.status(201).json(instanceToPlain(participationInstance));
   }
 }
 
-export { CreateResponseInviteController };
+export { FindParticipationsRequestController };

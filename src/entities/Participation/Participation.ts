@@ -25,13 +25,13 @@ class Participation {
   @Column({ default: false })
   in: boolean;
 
-  @Column({ default: true })
+  @Column({ default: false })
   confirmed_by_user: boolean;
 
   @Column({ default: false })
   confirmed_by_event: boolean;
 
-  @Column({ default: true })
+  @Column({ default: false })
   reviwed_by_user: boolean;
 
   @Column({ default: false })

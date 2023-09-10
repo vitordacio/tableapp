@@ -39,6 +39,9 @@ class Friendship {
   notifications: Notification[];
 
   @Column({ default: false })
+  reviwed_by_receiver: boolean;
+
+  @Column({ default: false })
   accepted: boolean;
 
   @CreateDateColumn()

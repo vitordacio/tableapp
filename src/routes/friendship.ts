@@ -6,6 +6,7 @@ import { findFriendshipByIdController } from '../main/Friendship/findFriendshipB
 import { deleteFriendshipController } from '../main/Friendship/deleteFriendship';
 import { createResponseController } from '../main/Friendship/createResponse';
 import { createResponseMiddleware } from '../middlewares/validators/Friendship/createResponse';
+import { findFriendshipByUserIdController } from '../main/Friendship/findFriendshipByUserId';
 
 const friendshipRouter = Router();
 
@@ -22,6 +23,14 @@ friendshipRouter.post(
   [verifyToken, createResponseMiddleware],
   async (req: Request, res: Response) => {
     return createResponseController.handle(req, res);
+  },
+);
+
+friendshipRouter.get(
+  '/friendship/user/:id',
+  verifyToken,
+  async (req: Request, res: Response) => {
+    return findFriendshipByUserIdController.handle(req, res);
   },
 );
 

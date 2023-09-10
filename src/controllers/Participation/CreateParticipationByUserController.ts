@@ -4,19 +4,19 @@ import { instanceToPlain } from 'class-transformer';
 import { hasPermission } from '@utils/hasPermission';
 import { AppError } from '@utils/AppError';
 import { pubPerm, userPerm } from '@config/constants';
-import { CreateResponseByEventService } from '@services/Participation/CreateResponse/CreateResponseByEventService';
+import { CreateParticipationByUserService } from '@services/Participation/CreateParticipationByUser/CreateParticipationByUserService';
 
-class CreateResponseByEventController {
-  private createResponseService: CreateResponseByEventService;
+class CreateParticipationByUserController {
+  private createParticipationByUserService: CreateParticipationByUserService;
 
   constructor() {
-    this.createResponseService = container.resolve(
-      CreateResponseByEventService,
+    this.createParticipationByUserService = container.resolve(
+      CreateParticipationByUserService,
     );
   }
 
   async handle(req: Request, res: Response): Promise<Response> {
-    const { participation_id, confirmed_by_event } = req.body;
+    const { event_id, confirmed_by_user } = req.body;
 
     if (
       !hasPermission(req.user, userPerm) &&
@@ -25,14 +25,15 @@ class CreateResponseByEventController {
       throw new AppError('Operação não permitida.', 403);
     }
 
-    const participationInstance = await this.createResponseService.execute({
-      participation_id,
-      confirmed_by_event,
-      user: req.user,
-    });
+    const participationInstance =
+      await this.createParticipationByUserService.execute({
+        event_id,
+        confirmed_by_user,
+        user: req.user,
+      });
 
     return res.status(201).json(instanceToPlain(participationInstance));
   }
 }
 
-export { CreateResponseByEventController };
+export { CreateParticipationByUserController };

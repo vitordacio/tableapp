@@ -1,8 +1,8 @@
 import { celebrate, Segments, Joi } from 'celebrate';
 
-export const createResponseInviteMiddleware = celebrate({
+export const createParticipationByUserMiddleware = celebrate({
   [Segments.BODY]: {
-    participation_id: Joi.string().uuid().required(),
+    event_id: Joi.string().uuid().required(),
     confirmed_by_user: Joi.boolean().required(),
   },
 });

@@ -3,17 +3,19 @@ import { Request, Response } from 'express';
 import { instanceToPlain } from 'class-transformer';
 import { hasPermission } from '@utils/hasPermission';
 import { AppError } from '@utils/AppError';
-import { pubPerm, userPerm } from '@config/constants';
-import { FindEventIndexService } from '@services/Event/FindEvent/FindEventIndexService';
+import { userPerm, pubPerm } from '@config/constants';
+import { FindUserByIdService } from '@services/User/FindUser/FindUserById';
 
-class FindEventIndexController {
-  private findEventIndexService: FindEventIndexService;
+class FindUserByIdController {
+  private findUserByIdService: FindUserByIdService;
 
   constructor() {
-    this.findEventIndexService = container.resolve(FindEventIndexService);
+    this.findUserByIdService = container.resolve(FindUserByIdService);
   }
 
   async handle(req: Request, res: Response): Promise<Response> {
+    const { id } = req.params;
+
     if (
       !hasPermission(req.user, userPerm) &&
       !hasPermission(req.user, pubPerm)
@@ -21,10 +23,10 @@ class FindEventIndexController {
       throw new AppError('Operação não permitida.', 403);
     }
 
-    const eventInstance = await this.findEventIndexService.execute();
+    const UserInstance = await this.findUserByIdService.execute(id);
 
-    return res.status(201).json(instanceToPlain(eventInstance));
+    return res.status(201).json(instanceToPlain(UserInstance));
   }
 }
 
-export { FindEventIndexController };
+export { FindUserByIdController };

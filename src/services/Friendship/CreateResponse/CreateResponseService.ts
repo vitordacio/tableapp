@@ -37,10 +37,7 @@ class CreateResponseService {
       throw new AppError('Solicitação não pertence a esse usuário.', 403);
     }
 
-    if (friendship.accepted) {
-      throw new AppError('Usuários já são amigos.', 403);
-    }
-
+    friendship.reviwed_by_receiver = true;
     friendship.accepted = accepted;
 
     if (accepted) {

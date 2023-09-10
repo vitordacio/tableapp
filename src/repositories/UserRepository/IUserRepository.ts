@@ -9,8 +9,9 @@ export interface IUserRepository {
   findIndex(): Promise<User[]>;
   findByEmail(email: string, role?: string): Promise<User | undefined>;
   findByUsername(username: string): Promise<User | undefined>;
-  findByPhone(phone: string, role?: string): Promise<User | undefined>;
-  findByDocument(doc: string, role?: string): Promise<User | undefined>;
+  findByName(name: string, page: number, limit: number): Promise<User[]>;
+  // findByPhone(phone: string, role?: string): Promise<User | undefined>;
+  // findByDocument(doc: string, role?: string): Promise<User | undefined>;
   findByRole(role: string): Promise<User[]>;
   delete(id: string): Promise<void>;
   remove(entitie: User): Promise<void>;

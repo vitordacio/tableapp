@@ -4,14 +4,14 @@ import { instanceToPlain } from 'class-transformer';
 import { hasPermission } from '@utils/hasPermission';
 import { AppError } from '@utils/AppError';
 import { pubPerm, userPerm } from '@config/constants';
-import { FindParticipationByUserService } from '@services/Participation/FindParticipation/FindParticipationByUserService';
+import { FindParticipationsByUserService } from '@services/Participation/FindParticipation/FindParticipationsByUserService';
 
-class FindParticipationByUserController {
-  private findParticipationByUserService: FindParticipationByUserService;
+class FindParticipationsByUserController {
+  private findParticipationsByUserService: FindParticipationsByUserService;
 
   constructor() {
-    this.findParticipationByUserService = container.resolve(
-      FindParticipationByUserService,
+    this.findParticipationsByUserService = container.resolve(
+      FindParticipationsByUserService,
     );
   }
 
@@ -24,10 +24,10 @@ class FindParticipationByUserController {
     }
 
     const ParticipationInstance =
-      await this.findParticipationByUserService.execute(req.user);
+      await this.findParticipationsByUserService.execute(req.user);
 
     return res.status(201).json(instanceToPlain(ParticipationInstance));
   }
 }
 
-export { FindParticipationByUserController };
+export { FindParticipationsByUserController };
