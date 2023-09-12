@@ -1,12 +1,12 @@
 import { inject, injectable } from 'tsyringe';
 
 import { v4 } from 'uuid';
-import { Friendship } from '@entities/Friendship/Friendship';
 
 import { AppError } from '@utils/AppError';
 import { IFriendshipRepository } from '@repositories/FriendshipRepository/IFriendshipRepository';
 import { IUserRepository } from '@repositories/UserRepository/IUserRepository';
 import { INotificationRepository } from '@repositories/NotificationRepository/INotificationRepository';
+import { Friendship } from '@entities/Friendship/Friendship';
 import { ICreateResponseDTO } from './CreateResponseServiceDTO';
 
 @injectable()
@@ -37,10 +37,10 @@ class CreateResponseService {
       throw new AppError('Solicitação não pertence a esse usuário.', 403);
     }
 
-    friendship.reviwed_by_receiver = true;
-    friendship.accepted = accepted;
-
-    if (accepted) {
+    // if (friendship.reviwed_by_receiver) {
+    //   throw new AppError('Solicitação já respondida.', 400);
+    // }
+    if (accepted && !friendship.accepted) {
       friendship.sender.friends += 1;
       friendship.receiver.friends += 1;
       await this.userRepository.saveMany([
@@ -51,7 +51,7 @@ class CreateResponseService {
       const notifcation = this.notificationRepository.create({
         id: v4(),
         message: `${friendship.receiver.name} aceitou o seu pedido de amizade!`,
-        type: 'friendship_response',
+        type: 'friendship',
         sent_by: user.id,
         user_id: friendship.sender.id_user,
         friendship_id: friendship.id_friendship,
@@ -59,6 +59,9 @@ class CreateResponseService {
 
       await this.notificationRepository.save(notifcation);
     }
+
+    friendship.reviwed_by_receiver = true;
+    friendship.accepted = accepted;
 
     await this.friendshipRepository.save(friendship);
 

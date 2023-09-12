@@ -1,6 +1,6 @@
 import 'reflect-metadata';
 import http from 'http';
-import dotenv from 'dotenv';
+import 'dotenv/config';
 import express, { json, Request } from 'express';
 import morgan from 'morgan';
 import 'express-async-errors';
@@ -14,8 +14,6 @@ import { globalErrorHandler } from './middlewares/globalErrorHandler';
 import { router } from './routes';
 
 const app = express();
-
-dotenv.config();
 
 app.use(cookieParser());
 
@@ -44,9 +42,6 @@ app.use(
 app.use(json());
 
 app.use(router);
-// app.get('/', (req, res) => {
-//   return res.json('aaaaaa');
-// });
 
 app.use('/public', express.static(`${__dirname}/public/uploads`));
 app.use('/files', express.static(`${__dirname}/public/files`));

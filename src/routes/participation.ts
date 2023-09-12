@@ -12,6 +12,8 @@ import { findParticipationByEventIdController } from '../main/Participation/find
 import { createParticipationByEventMiddleware } from '../middlewares/validators/Participation/createParticipationByEvent';
 import { createParticipationByEventController } from '../main/Participation/createParticipationByEvent';
 import { findParticipationsRequestController } from '../main/Participation/findParticipationsRequest';
+import { createParticipationInviteController } from '../main/Participation/createParticipationInvite';
+import { createParticipationInviteMiddleware } from '../middlewares/validators/Participation/createParticipationInvite';
 
 const participationRouter = Router();
 
@@ -28,6 +30,14 @@ participationRouter.post(
   [verifyToken, createParticipationByEventMiddleware],
   async (req: Request, res: Response) => {
     return createParticipationByEventController.handle(req, res);
+  },
+);
+
+participationRouter.post(
+  '/participation/invite',
+  [verifyToken, createParticipationInviteMiddleware],
+  async (req: Request, res: Response) => {
+    return createParticipationInviteController.handle(req, res);
   },
 );
 

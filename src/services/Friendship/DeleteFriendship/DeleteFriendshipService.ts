@@ -30,12 +30,14 @@ class DeleteFriendshipService {
 
     await this.friendshipRepository.remove(friendship);
 
-    friendship.sender.friends -= 1;
-    friendship.receiver.friends -= 1;
-    await this.userRepository.saveMany([
-      friendship.sender,
-      friendship.receiver,
-    ]);
+    if (friendship.accepted) {
+      friendship.sender.friends -= 1;
+      friendship.receiver.friends -= 1;
+      await this.userRepository.saveMany([
+        friendship.sender,
+        friendship.receiver,
+      ]);
+    }
   }
 }
 

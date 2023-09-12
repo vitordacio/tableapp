@@ -33,16 +33,14 @@ class Friendship {
   @JoinColumn({ name: 'receiver_id' })
   receiver: User;
 
-  @OneToMany(() => Notification, notification => notification.friendship, {
-    cascade: true,
-  })
-  notifications: Notification[];
-
   @Column({ default: false })
   reviwed_by_receiver: boolean;
 
   @Column({ default: false })
   accepted: boolean;
+
+  @OneToMany(() => Notification, notification => notification.friendship)
+  notifications: Notification[];
 
   @CreateDateColumn()
   created_at: Date;

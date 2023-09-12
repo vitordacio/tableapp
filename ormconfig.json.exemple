@@ -6,6 +6,9 @@
   "username": "",
   "password": "",
   "database": "",
+  "ssl": {
+    "rejectUnauthorized": false
+  },
   "synchronize": false,
   "entities": ["src/entities/*/*.ts"],
   "migrations": ["src/migrations/*.ts"],

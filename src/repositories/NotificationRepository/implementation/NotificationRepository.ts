@@ -45,6 +45,7 @@ class NotificationRepository implements INotificationRepository {
   ): Promise<Notification[]> {
     const notifications = await this.ormRepository.find({
       order: { created_at: 'DESC' },
+      relations: ['participation', 'participation.event'],
       // relations: [
       //   'workshop',
       //   'repair',

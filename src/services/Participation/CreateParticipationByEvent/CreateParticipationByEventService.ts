@@ -9,7 +9,6 @@ import { IParticipationRepository } from '@repositories/ParticipationRepository/
 import { AppError } from '@utils/AppError';
 import { hasModPermission } from '@utils/validations';
 import { INotificationRepository } from '@repositories/NotificationRepository/INotificationRepository';
-import { IEventRepository } from '@repositories/EventRepository/IEventRepository';
 import { IUserRepository } from '@repositories/UserRepository/IUserRepository';
 import { ICreateParticipationByEventDTO } from './CreateParticipationByEventServiceDTO';
 
@@ -19,9 +18,6 @@ class CreateParticipationByEventService {
     @inject('ParticipationRepository')
     private participationRepository: IParticipationRepository,
 
-    @inject('EventRepository')
-    private eventRepository: IEventRepository,
-
     @inject('UserRepository')
     private userRepository: IUserRepository,
 
@@ -30,14 +26,19 @@ class CreateParticipationByEventService {
   ) {}
 
   async execute({
-    event_id,
-    user_id,
+    participation_id,
     confirmed_by_event,
-    type,
     user,
   }: ICreateParticipationByEventDTO): Promise<Participation> {
-    let participation: Participation | undefined;
     let notification: Notification | undefined;
+
+    const participation = await this.participationRepository.findById(
+      participation_id,
+    );
+
+    if (!participation) {
+      throw new AppError('Solicitação não encontrada.', 404);
+    }
 
     const foundUser = await this.userRepository.findById(user.id);
 
@@ -45,83 +46,38 @@ class CreateParticipationByEventService {
       throw new AppError('Usuário não encontrado.', 404);
     }
 
-    const event = await this.eventRepository.findById(event_id);
-
-    if (!event) {
-      throw new AppError('Evento não encontrado.', 404);
-    }
-
-    if (user.id !== event.owner_id) {
-      const auth = hasModPermission(user.id, event.participations);
+    if (user.id !== participation.event.owner_id) {
+      const auth = hasModPermission(
+        user.id,
+        participation.event.participations,
+      );
 
       if (!auth) {
         throw new AppError('Não autorizado.', 403);
       }
     }
 
-    participation = event.participations.find(
-      eventParticipation => eventParticipation.user_id === user_id,
-    );
-
-    if (!participation) {
-      participation = this.participationRepository.create({
-        id: v4(),
-        type: type || 'user',
-        user_id,
-        event_id,
-        confirmed_by_event: true,
-        reviwed_by_event: true,
-        reviwer_id: user.id,
-      });
-
-      notification = this.notificationRepository.create({
-        id: v4(),
-        message: `${foundUser.name} te convidou para participar de ${event.name}`,
-        type: 'participation',
-        sent_by: foundUser.id_user,
-        user_id: event.owner_id,
-        participation_id: participation.id_participation,
-      });
-
-      await this.notificationRepository.save(notification);
-
-      await this.participationRepository.save(participation);
-
-      return participation;
-    }
-
     participation.confirmed_by_event = confirmed_by_event;
-    if (!participation.reviwed_by_event) participation.reviwed_by_event = true;
-    participation.reviwer_id = user.id;
     participation.in =
       participation.confirmed_by_user && participation.confirmed_by_event;
 
-    if (participation.in) {
+    if (participation.in && !participation.reviwed_by_event) {
       notification = this.notificationRepository.create({
         id: v4(),
-        message: `${foundUser.name} aprovou sua entrada em ${event.name}`,
+        message: `${foundUser.name} aprovou sua entrada em ${participation.event.name}`,
         type: 'participation',
         sent_by: foundUser.id_user,
-        user_id,
+        user_id: participation.user_id,
         participation_id: participation.id_participation,
       });
     }
 
-    if (type && participation.type !== type) {
-      participation.type = type;
-
-      notification = this.notificationRepository.create({
-        id: v4(),
-        message: `Sua participação em ${event.name} foi atualizada`,
-        type: 'participation',
-        sent_by: foundUser.id_user,
-        user_id: event.owner_id,
-        participation_id: participation.id_participation,
-      });
-    }
-    if (notification) await this.notificationRepository.save(notification);
+    if (!participation.reviwed_by_event) participation.reviwed_by_event = true;
+    participation.reviwer_id = user.id;
 
     await this.participationRepository.save(participation);
+
+    if (notification) await this.notificationRepository.save(notification);
 
     return participation;
   }

@@ -23,6 +23,14 @@ class CreateRequestService {
 
   async execute({ friend_id, user }: ICreateRequestDTO): Promise<Friendship> {
     let friendship;
+
+    if (user.id === friend_id) {
+      throw new AppError(
+        'Não é possível enviar solicitação para você mesmo.',
+        400,
+      );
+    }
+
     const foundUser = await this.userRepository.findById(user.id);
 
     if (!foundUser) {
@@ -55,7 +63,7 @@ class CreateRequestService {
     const notifcation = this.notificationRepository.create({
       id: v4(),
       message: `${foundUser.name} enviou uma solicitação de amizade`,
-      type: 'friendship_request',
+      type: 'friendship',
       sent_by: user.id,
       user_id: friend_id,
       friendship_id: friendship.id_friendship,

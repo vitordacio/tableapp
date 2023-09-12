@@ -47,10 +47,7 @@ class CreateParticipationByUserService {
     }
 
     if (user.id === event.owner_id) {
-      throw new AppError(
-        'Não é possível criar solicitação para o seu próprio evento.',
-        404,
-      );
+      throw new AppError('Você é o dono do evento.', 404);
     }
 
     participation = await this.participationRepository.findByUserAndEvent(
