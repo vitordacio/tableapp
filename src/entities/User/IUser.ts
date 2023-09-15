@@ -1,17 +1,18 @@
-// import { Address } from '@entities/Address/Address';
-// import { Permission } from '@entities/Permission/Permission';
-
 export interface IUser {
   id: string;
   email: string;
   username: string;
   password: string;
   name: string;
-  phone?: string;
-  avatar?: string;
-  role_name?: string;
+  bio?: string;
+  location?: string;
   age?: number;
   gender?: string;
-  google_id?: string;
+  picture?: string;
+  cover_photo?: string;
   private?: boolean;
+  locale?: string;
+  CNPJ?: string;
+  role_name?: string;
+  google_id?: string;
 }

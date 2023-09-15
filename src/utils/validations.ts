@@ -1,6 +1,6 @@
 import { Participation } from '@entities/Participation/Participation';
 
-function hasModPermission(
+export function hasModPermission(
   user_id: string,
   participations: Participation[],
 ): boolean {
@@ -10,9 +10,12 @@ function hasModPermission(
   );
 }
 
-function isEmail(login: string): boolean {
+export function isEmail(login: string): boolean {
   const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
   return emailRegex.test(login);
 }
 
-export { hasModPermission, isEmail };
+export function isUsername(username: string): boolean {
+  const usernameRegex = /^[a-zA-Z0-9_]+$/;
+  return usernameRegex.test(username);
+}

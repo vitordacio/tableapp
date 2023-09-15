@@ -4,7 +4,7 @@ import { instanceToPlain } from 'class-transformer';
 import { hasPermission } from '@utils/hasPermission';
 import { AppError } from '@utils/AppError';
 import { userPerm, pubPerm } from '@config/constants';
-import { FindUserByNameService } from '@services/User/FindUser/FindUsersByName';
+import { FindUserByNameService } from '@services/User/FindUser/FindUsersByNameService';
 
 class FindUserByNameController {
   private findUserByNameService: FindUserByNameService;

@@ -4,28 +4,24 @@ import { container } from 'tsyringe';
 import { userPerm } from '@config/constants';
 import { AppError } from '@utils/AppError';
 import { hasPermission } from '@utils/hasPermission';
-import { UpdateUserService } from '@services/User/UpdateUser/UpdateUserService';
+import { UpdateEmailService } from '@services/User/UpdateUser/Generals/UpdateEmailService';
 
-class UpdateUserController {
-  private updateUserService: UpdateUserService;
+class UpdateEmailController {
+  private updateEmailService: UpdateEmailService;
 
   constructor() {
-    this.updateUserService = container.resolve(UpdateUserService);
+    this.updateEmailService = container.resolve(UpdateEmailService);
   }
 
   async handle(req: Request, res: Response): Promise<Response> {
-    const { name, bio, location, age, gender } = req.body;
+    const { email } = req.body;
 
     if (!hasPermission(req.user, userPerm)) {
       throw new AppError('Operação não permitida.', 403);
     }
 
-    const user = await this.updateUserService.execute({
-      name,
-      bio,
-      location,
-      age,
-      gender,
+    const user = await this.updateEmailService.execute({
+      email,
       user: req.user,
     });
 
@@ -33,4 +29,4 @@ class UpdateUserController {
   }
 }
 
-export { UpdateUserController };
+export { UpdateEmailController };

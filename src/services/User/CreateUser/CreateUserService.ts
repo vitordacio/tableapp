@@ -6,6 +6,7 @@ import { IUserRepository } from '@repositories/UserRepository/IUserRepository';
 import { User } from '@entities/User/User';
 
 import { AppError } from '@utils/AppError';
+import { isUsername } from '@utils/validations';
 import { ICreateUserDTO } from './CreateUserServiceDTO';
 
 @injectable()
@@ -24,21 +25,20 @@ class CreateUserService {
     username,
     password,
   }: ICreateUserDTO): Promise<User> {
-    const emailAlreadyExists = await this.userRepository.findByEmail(
-      email,
-      'user',
-    );
+    const emailExists = await this.userRepository.findByEmail(email, 'user');
 
-    if (emailAlreadyExists) {
-      throw new AppError('Email já cadastrado no sistema.', 409);
+    if (emailExists) {
+      throw new AppError('Email já cadastrado no sistema.', 400);
     }
 
-    const usernameAlreadyExists = await this.userRepository.findByUsername(
-      username,
-    );
+    if (!isUsername(username)) {
+      throw new AppError('Nome de usuário inválido.', 400);
+    }
 
-    if (usernameAlreadyExists) {
-      throw new AppError('Nome de usuário já cadastrado no sistema.', 409);
+    const usernameExists = await this.userRepository.findByUsername(username);
+
+    if (usernameExists) {
+      throw new AppError('Nome de usuário já cadastrado no sistema.', 400);
     }
 
     const hashedPassword = await this.hashProvider.generateHash(password);

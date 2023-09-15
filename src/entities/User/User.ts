@@ -35,25 +35,34 @@ class User {
   name: string;
 
   @Column({ nullable: true })
-  phone: string;
+  bio: string;
 
   @Column({ nullable: true })
-  avatar: string;
-
-  @Column({ default: 'user' })
-  role_name: string;
-
-  @Column({ default: false })
-  private: boolean;
-
-  @Column({ nullable: true })
-  CNPJ: string;
+  location: string;
 
   @Column({ nullable: true })
   age: number;
 
   @Column({ nullable: true })
   gender: string;
+
+  @Column({ nullable: true })
+  picture: string;
+
+  @Column({ nullable: true })
+  cover_photo: string;
+
+  @Column({ default: false })
+  private: boolean;
+
+  @Column({ nullable: true })
+  locale: string;
+
+  @Column({ nullable: true })
+  CNPJ: string;
+
+  @Column({ default: 'user' })
+  role_name: string;
 
   @Column({ nullable: true })
   google_id: string;
@@ -66,9 +75,6 @@ class User {
 
   @OneToMany(() => Friendship, friendship => friendship.receiver)
   receivedFriendRequests: Friendship[];
-
-  // @ManyToMany(() => User, user => user.friends)
-  // friends: User[];
 
   @OneToMany(() => Notification, notification => notification.user)
   notifications_received: Notification[];

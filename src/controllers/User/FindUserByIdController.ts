@@ -4,7 +4,7 @@ import { instanceToPlain } from 'class-transformer';
 import { hasPermission } from '@utils/hasPermission';
 import { AppError } from '@utils/AppError';
 import { userPerm, pubPerm } from '@config/constants';
-import { FindUserByIdService } from '@services/User/FindUser/FindUserById';
+import { FindUserByIdService } from '@services/User/FindUser/FindUserByIdService';
 
 class FindUserByIdController {
   private findUserByIdService: FindUserByIdService;
@@ -23,9 +23,9 @@ class FindUserByIdController {
       throw new AppError('Operação não permitida.', 403);
     }
 
-    const UserInstance = await this.findUserByIdService.execute(id);
+    const userInstance = await this.findUserByIdService.execute(id);
 
-    return res.status(201).json(instanceToPlain(UserInstance));
+    return res.status(201).json(instanceToPlain(userInstance));
   }
 }
 

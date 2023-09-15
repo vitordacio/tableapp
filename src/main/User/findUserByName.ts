@@ -1,11 +1,11 @@
 import { FindUserByNameController } from '@controllers/User/FindUserByNameController';
 
-function FindUserdByNameControllerFactory() {
-  const findUserdByNameController = new FindUserByNameController();
+function FindUserByNameControllerFactory() {
+  const findUserByNameController = new FindUserByNameController();
 
-  return findUserdByNameController;
+  return findUserByNameController;
 }
 
-const findUserdByNameController = FindUserdByNameControllerFactory();
+const findUserByNameController = FindUserByNameControllerFactory();
 
-export { findUserdByNameController };
+export { findUserByNameController };

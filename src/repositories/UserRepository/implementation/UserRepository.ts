@@ -2,6 +2,7 @@
 import { Brackets, getRepository, Repository } from 'typeorm';
 import { IUser } from '@entities/User/IUser';
 import { User } from '@entities/User/User';
+import { clearUsername } from '@utils/handleUser';
 import { IUserRepository } from '../IUserRepository';
 
 class UserRepository implements IUserRepository {
@@ -18,13 +19,17 @@ class UserRepository implements IUserRepository {
       username: data.username,
       password: data.password,
       name: data.name,
-      phone: data.phone,
-      avatar: data.avatar,
-      role_name: data.role_name,
+      bio: data.bio,
+      location: data.location,
       age: data.age,
       gender: data.gender,
-      google_id: data.google_id,
+      picture: data.picture,
+      cover_photo: data.cover_photo,
       private: data.private,
+      locale: data.locale,
+      CNPJ: data.CNPJ,
+      role_name: data.role_name,
+      google_id: data.google_id,
     });
 
     return user;
@@ -52,11 +57,27 @@ class UserRepository implements IUserRepository {
   }
 
   async findByUsername(username: string): Promise<User | undefined> {
-    const user = await this.ormRepository.findOne({
-      // relations: ['permissions', 'vehicles', 'address'],
-      where: { username },
-      withDeleted: true,
-    });
+    // const user = await this.ormRepository.findOne({
+    //   where: { username },
+    //   withDeleted: true,
+    // });
+
+    // return user;
+    const query = this.ormRepository.createQueryBuilder('user').where(
+      new Brackets(qb => {
+        qb.where(
+          '(:nullService::text IS NULL OR unaccent(LOWER(user.username)) ~~ unaccent(:userName))',
+          {
+            userName: `%${clearUsername(username)}%`,
+            nullService: clearUsername(username),
+          },
+        );
+
+        return qb;
+      }),
+    );
+
+    const user = await query.getOne();
 
     return user;
   }
@@ -95,6 +116,15 @@ class UserRepository implements IUserRepository {
     const user = await this.ormRepository.findOne({
       // relations: ['permissions', 'vehicles', 'address'],
       where: { email, role_name: role },
+    });
+
+    return user;
+  }
+
+  async findByGoogleId(google_id: string): Promise<User | undefined> {
+    const user = await this.ormRepository.findOne({
+      // relations: ['permissions', 'vehicles', 'address'],
+      where: { google_id },
     });
 
     return user;
