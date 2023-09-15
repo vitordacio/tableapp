@@ -19,34 +19,52 @@ class CreateAddressPubService {
   ) {}
 
   async execute({
+    user_id,
+    lat,
+    long,
     zip,
     street,
     uf,
     city,
     district,
     number,
-    lat,
-    long,
-    user,
   }: ICreateAddressPubDTO): Promise<Address> {
-    const foundUser = await this.userRepository.findById(user.id);
+    let address: Address | undefined;
+    const foundUser = await this.userRepository.findById(user_id);
 
     if (!foundUser) {
       throw new AppError('Usuário não encontrado.', 404);
     }
 
-    const address = this.addressRepository.create({
-      id: v4(),
-      user: foundUser,
-      zip,
-      street,
-      uf,
-      city,
-      district,
-      number,
-      lat,
-      long,
-    });
+    if (foundUser.role_name !== 'pub') {
+      throw new AppError('Usuário não tem permissão.', 404);
+    }
+
+    address = await this.addressRepository.findByCoordenates(lat, long);
+
+    if (address?.user) {
+      throw new AppError('Endereço já possui usuário cadastrado.', 400);
+    }
+
+    if (!address) {
+      address = this.addressRepository.create({
+        id: v4(),
+        zip,
+        street,
+        uf,
+        city,
+        district,
+        number,
+        lat,
+        long,
+      });
+    }
+    // address.user_id = foundUser.id_user;
+    address.user = foundUser;
+
+    // const addresses = foundUser.addresses || [];
+    // foundUser.addresses = [...addresses, address];
+    // await this.userRepository.save(foundUser);
 
     await this.addressRepository.save(address);
 

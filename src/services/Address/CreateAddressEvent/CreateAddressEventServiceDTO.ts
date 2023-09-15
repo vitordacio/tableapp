@@ -1,5 +1,7 @@
 export interface ICreateAddressEventDTO {
   event_id: string;
+  lat: number;
+  long: number;
   user: AuthorizedUser<UserPerm | PubPerm>;
   zip?: string;
   street?: string;
@@ -7,6 +9,4 @@ export interface ICreateAddressEventDTO {
   city?: string;
   district?: string;
   number?: string;
-  lat?: number;
-  long?: number;
 }

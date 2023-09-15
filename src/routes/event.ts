@@ -8,6 +8,8 @@ import { deleteEventController } from '../main/Event/deleteEvent';
 import { createEventMiddleware } from '../middlewares/validators/Event/createEvent';
 import { updateEventMiddleware } from '../middlewares/validators/Event/updateEvent';
 import { updateEventController } from '../main/Event/updateEvent';
+import { findEventByLocationMiddleware } from '../middlewares/validators/Event/findEventByLocation';
+import { findEventByLocationController } from '../main/Event/findEventByLocation';
 
 const eventRouter = Router();
 
@@ -22,6 +24,14 @@ eventRouter.post(
 eventRouter.get('/event', verifyToken, async (req: Request, res: Response) => {
   return findEventIndexController.handle(req, res);
 });
+
+eventRouter.get(
+  '/event/location',
+  [verifyToken, findEventByLocationMiddleware],
+  async (req: Request, res: Response) => {
+    return findEventByLocationController.handle(req, res);
+  },
+);
 
 eventRouter.get(
   '/event/:id',

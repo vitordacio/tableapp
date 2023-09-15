@@ -14,16 +14,15 @@ class AddressRepository implements IAddressRepository {
   create(data: IAddress): Address {
     const address = this.ormRepository.create({
       id_address: data.id,
-      user: data.user,
-      event: data.event,
+      lat: data.lat,
+      long: data.long,
+      user_id: data.user_id,
       zip: data.zip,
       street: data.street,
       uf: data.uf,
       city: data.city,
       district: data.district,
       number: data.number,
-      lat: data.lat,
-      long: data.long,
     });
 
     return address;
@@ -35,9 +34,30 @@ class AddressRepository implements IAddressRepository {
     return newAddress;
   }
 
+  async findIndex(): Promise<Address[]> {
+    const addresses = await this.ormRepository.find({
+      relations: ['user', 'events'],
+    });
+
+    return addresses;
+  }
+
   async findById(id: string): Promise<Address | undefined> {
     const address = await this.ormRepository.findOne({
+      relations: ['user', 'events'],
       where: { id_address: id },
+    });
+
+    return address;
+  }
+
+  async findByCoordenates(
+    lat: number,
+    long: number,
+  ): Promise<Address | undefined> {
+    const address = await this.ormRepository.findOne({
+      relations: ['user', 'events'],
+      where: { lat, long },
     });
 
     return address;

@@ -3,7 +3,7 @@ import { Request, Response } from 'express';
 import { instanceToPlain } from 'class-transformer';
 import { hasPermission } from '@utils/hasPermission';
 import { AppError } from '@utils/AppError';
-import { pubPerm, userPerm } from '@config/constants';
+import { masterPerm } from '@config/constants';
 import { DeleteAddressService } from '@services/Address/DeleteAddress/DeleteAddressService';
 
 class DeleteAddressController {
@@ -16,17 +16,11 @@ class DeleteAddressController {
   async handle(req: Request, res: Response): Promise<Response> {
     const { id } = req.params;
 
-    if (
-      !hasPermission(req.user, userPerm) &&
-      !hasPermission(req.user, pubPerm)
-    ) {
+    if (!hasPermission(req.user, masterPerm)) {
       throw new AppError('Operação não permitida.', 403);
     }
 
-    const addressInstance = await this.deleteAddressService.execute(
-      id,
-      req.user,
-    );
+    const addressInstance = await this.deleteAddressService.execute(id);
 
     return res.status(201).json(instanceToPlain(addressInstance));
   }

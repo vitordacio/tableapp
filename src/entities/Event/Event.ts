@@ -8,7 +8,6 @@ import {
   OneToMany,
   JoinColumn,
   ManyToOne,
-  OneToOne,
 } from 'typeorm';
 import { Exclude } from 'class-transformer';
 import { User } from '@entities/User/User';
@@ -78,11 +77,15 @@ class Event {
   @Column({ nullable: true })
   address_id: string;
 
-  @OneToOne(() => Address, address => address.event, {
-    cascade: true,
-  })
+  @ManyToOne(() => Address, address => address.events)
   @JoinColumn({ name: 'address_id' })
   address: Address;
+
+  // @OneToOne(() => Address, address => address.event, {
+  //   cascade: true,
+  // })
+  // @JoinColumn({ name: 'address_id' })
+  // address: Address;
 
   @OneToMany(() => Participation, participation => participation.event, {
     cascade: ['insert', 'recover', 'remove', 'update'],

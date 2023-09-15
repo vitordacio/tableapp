@@ -12,7 +12,7 @@ class DeleteAddressService {
 
   async execute(
     address_id: string,
-    user: AuthorizedUser<UserPerm | PubPerm>,
+    // user: AuthorizedUser<UserPerm | PubPerm>,
   ): Promise<void> {
     const address = await this.addressRepository.findById(address_id);
 
@@ -20,9 +20,9 @@ class DeleteAddressService {
       throw new AppError('Endereço não encontrado.', 404);
     }
 
-    if (user.id !== address.user_id) {
-      throw new AppError('Não autorizado.', 403);
-    }
+    // if (user.id !== address.user_id) {
+    //   throw new AppError('Não autorizado.', 403);
+    // }
 
     await this.addressRepository.remove(address);
   }

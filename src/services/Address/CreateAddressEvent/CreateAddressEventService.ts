@@ -7,6 +7,7 @@ import { AppError } from '@utils/AppError';
 import { IAddressRepository } from '@repositories/AddressRepository/IAddressRepository';
 import { IEventRepository } from '@repositories/EventRepository/IEventRepository';
 import { IUserRepository } from '@repositories/UserRepository/IUserRepository';
+import { hasModPermission } from '@utils/validations';
 import { ICreateAddressEventDTO } from './CreateAddressEventServiceDTO';
 
 @injectable()
@@ -34,6 +35,7 @@ class CreateAddressEventService {
     lat,
     long,
   }: ICreateAddressEventDTO): Promise<Address> {
+    let address: Address | undefined;
     const foundUser = await this.userRepository.findById(user.id);
 
     if (!foundUser) {
@@ -46,22 +48,38 @@ class CreateAddressEventService {
       throw new AppError('Evento não encontrado.', 404);
     }
 
-    if (foundUser.id_user !== event.owner_id) {
-      throw new AppError('Não autorizado.', 403);
+    if (user.id !== event.owner_id) {
+      const auth = hasModPermission(user.id, event.participations);
+
+      if (!auth) {
+        throw new AppError('Não autorizado.', 403);
+      }
     }
 
-    const address = this.addressRepository.create({
-      id: v4(),
-      event,
-      zip,
-      street,
-      uf,
-      city,
-      district,
-      number,
-      lat,
-      long,
-    });
+    address = await this.addressRepository.findByCoordenates(lat, long);
+
+    if (!address) {
+      address = this.addressRepository.create({
+        id: v4(),
+        zip,
+        street,
+        uf,
+        city,
+        district,
+        number,
+        lat,
+        long,
+      });
+    }
+
+    const events = address.events || [];
+    address.events = [...events, event];
+
+    await this.addressRepository.save(address);
+
+    address.events = address.events.filter(
+      alreadyEvent => alreadyEvent.id_event === event.id_event,
+    );
 
     return address;
   }

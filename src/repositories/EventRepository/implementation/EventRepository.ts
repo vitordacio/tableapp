@@ -61,6 +61,50 @@ class EventRepository implements IEventRepository {
     return events;
   }
 
+  async findByCoordinates(
+    lat: number,
+    long: number,
+    set_radius?: number,
+  ): Promise<Event[]> {
+    const radius = set_radius || 50;
+    const events = await this.ormRepository
+      .createQueryBuilder('event')
+      .leftJoinAndSelect('event.address', 'address')
+      .leftJoinAndSelect('event.owner', 'owner')
+      .leftJoinAndSelect(
+        'event.participations',
+        'participations',
+        'participations.in = true',
+      )
+      .where(
+        `(6371 * acos( cos(radians(address.lat)) * cos(radians(${lat})) * cos(radians(address.long) - radians(${long})) + sin(radians(address.lat)) * sin(radians(${lat})))) <= ${radius}`,
+      )
+      .andWhere('event.actived = true')
+      .getMany();
+
+    return events;
+  }
+
+  async findClosest(lat: number, long: number): Promise<Event[]> {
+    const subQuery = `SELECT (6371 * acos( cos(radians(addresses.lat)) * cos(radians(${lat})) * cos(radians(addresses.long) - radians(${long})) + sin(radians(addresses.lat)) * sin(radians(${lat})))) AS distance FROM events LEFT JOIN addresses ON event.address_id = addresses.id_address WHERE events.id_event = event.id_event`;
+
+    const events = await this.ormRepository
+      .createQueryBuilder('event')
+      .leftJoinAndSelect('event.address', 'address')
+      .leftJoinAndSelect('event.owner', 'owner')
+      .leftJoinAndSelect(
+        'event.participations',
+        'participations',
+        'participations.in = true',
+      )
+      .addSelect(`(${subQuery})`, 'distance')
+      .orderBy('distance', 'ASC')
+      .take(10)
+      .getMany();
+
+    return events;
+  }
+
   // async findByWorkshop(
   //   workshopId: string,
   //   initialDate?: string,
@@ -110,54 +154,6 @@ class EventRepository implements IEventRepository {
   //     .getMany();
 
   //   return transactions;
-  // }
-
-  // async findClosest(
-  //   lat: number,
-  //   long: number,
-  //   services?: string,
-  // ): Promise<Workshop[]> {
-  //   const subQuery = `SELECT (6371 * acos( cos(radians(addresses.lat)) * cos(radians(${lat})) * cos(radians(addresses.long) - radians(${long})) + sin(radians(addresses.lat)) * sin(radians(${lat})))) AS distance FROM workshops LEFT JOIN addresses ON workshops.address_id = addresses.id_address WHERE workshops.id_workshop = workshop.id_workshop`;
-
-  //   const workshops = await this.ormRepository
-  //     .createQueryBuilder('workshop')
-  //     .leftJoinAndSelect('workshop.address', 'address')
-  //     .leftJoinAndSelect('workshop.child_services', 'services')
-  //     .leftJoinAndSelect('services.service', 'masterservices')
-  //     .leftJoinAndSelect(
-  //       'workshop.partners',
-  //       'partners',
-  //       'partners.active = true',
-  //     )
-  //     .leftJoinAndSelect(
-  //       'workshop.banners',
-  //       'banners',
-  //       'banners.type = :type',
-  //       { type: 'profile' },
-  //     )
-  //     .leftJoinAndSelect('partners.address', 'partner_address')
-  //     .where(
-  //       new Brackets(qb => {
-  //         qb.where(
-  //           '(:nullService::text IS NULL OR LOWER(services.name) ~~ :queryServices OR LOWER(workshop.fantasy_name) ~~ :workshopName)',
-  //           {
-  //             queryServices: `%${services}%`,
-  //             workshopName: `%${services}%`,
-  //             nullService: services,
-  //           },
-  //         );
-
-  //         qb.andWhere('workshop.active = true');
-
-  //         return qb;
-  //       }),
-  //     )
-  //     .addSelect(`(${subQuery})`, 'distance')
-  //     .orderBy('distance', 'ASC')
-  //     .take(1)
-  //     .getMany();
-
-  //   return workshops;
   // }
 
   async findIndex(): Promise<Event[]> {

@@ -7,6 +7,12 @@ export interface IEventRepository {
   findById(id: string): Promise<Event | undefined>;
   findIndexByType(type: string): Promise<Event[]>;
   findIndex(): Promise<Event[]>;
+  findByCoordinates(
+    lat: number,
+    long: number,
+    radius?: number,
+  ): Promise<Event[]>;
+  findClosest(lat: number, long: number): Promise<Event[]>;
   delete(id: string): Promise<void>;
   remove(entitie: Event): Promise<void>;
   // findByCoordinates(

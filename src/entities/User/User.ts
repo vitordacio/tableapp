@@ -4,9 +4,7 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
-  JoinColumn,
   OneToMany,
-  OneToOne,
   PrimaryColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -82,8 +80,11 @@ class User {
   @OneToMany(() => Notification, notification => notification.sender)
   notifications_sent: Notification[];
 
-  @OneToMany(() => Event, event => event.owner)
+  @OneToMany(() => Event, event => event.owner, { cascade: false })
   events: Event[];
+
+  @OneToMany(() => Address, address => address.user, { cascade: false })
+  addresses: Address[];
 
   @OneToMany(() => Participation, participation => participation.user)
   participations: Participation[];
@@ -91,14 +92,14 @@ class User {
   @OneToMany(() => Participation, participation => participation.reviwer)
   participation_reviews: Participation[];
 
-  @Column({ nullable: true })
-  address_id: string;
+  // @Column({ nullable: true })
+  // address_id: string;
 
-  @OneToOne(() => Address, address => address.user, {
-    cascade: true,
-  })
-  @JoinColumn({ name: 'address_id' })
-  address: Address;
+  // @OneToOne(() => Address, address => address.user, {
+  //   cascade: true,
+  // })
+  // @JoinColumn({ name: 'address_id' })
+  // address: Address;
 
   @CreateDateColumn()
   created_at: Date;

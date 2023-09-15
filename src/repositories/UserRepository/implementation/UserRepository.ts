@@ -56,13 +56,34 @@ class UserRepository implements IUserRepository {
     return users;
   }
 
-  async findByUsername(username: string): Promise<User | undefined> {
-    // const user = await this.ormRepository.findOne({
-    //   where: { username },
-    //   withDeleted: true,
-    // });
+  // async findProfile(user_id: string): Promise<User | undefined> {
+  //   let user: User | undefined;
+  //   const queryBuilder = this.ormRepository
+  //     .createQueryBuilder('user')
+  //     .where('user.id_user = :id', {
+  //       id: user_id,
+  //     });
 
-    // return user;
+  //   user = await queryBuilder.getOne();
+
+  //   if (user?.role_name === 'pub') {
+  //     const userData = await queryBuilder
+  //       .leftJoinAndSelect('user.events', 'events')
+  //       .leftJoin('events', 'event', 'event.address IN (:...addresses)', {
+  //         addresses: user.addresses,
+  //       })
+  //       .addSelect('event.id_event')
+  //       .getOne();
+
+  //     if (userData) {
+  //       user.events = userData.events;
+  //     }
+  //   }
+
+  //   return user;
+  // }
+
+  async findByUsername(username: string): Promise<User | undefined> {
     const query = this.ormRepository.createQueryBuilder('user').where(
       new Brackets(qb => {
         qb.where(
@@ -132,7 +153,7 @@ class UserRepository implements IUserRepository {
 
   async findById(id: string): Promise<User | undefined> {
     const user = await this.ormRepository.findOne({
-      // relations: ['permissions', 'vehicles', 'address'],
+      relations: ['addresses'],
       where: { id_user: id },
     });
 
