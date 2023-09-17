@@ -15,15 +15,4 @@ export interface IEventRepository {
   findClosest(lat: number, long: number): Promise<Event[]>;
   delete(id: string): Promise<void>;
   remove(entitie: Event): Promise<void>;
-  // findByCoordinates(
-  //   lat: number,
-  //   long: number,
-  //   radius: number,
-  //   services?: string,
-  // ): Promise<Workshop[]>;
-  // findClosest(
-  //   lat: number,
-  //   long: number,
-  //   services?: string,
-  // ): Promise<Workshop[]>;
 }

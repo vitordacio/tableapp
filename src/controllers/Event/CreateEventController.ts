@@ -22,14 +22,13 @@ class CreateEventController {
       time,
       finish_date,
       finish_time,
-      img_url,
-      club_name,
-      performer,
       additional,
       drink_preferences,
       age_limit,
       free_ticket,
       is_private,
+      club_name,
+      performer,
     } = req.body;
 
     if (
@@ -48,14 +47,13 @@ class CreateEventController {
       time,
       finish_date,
       finish_time,
-      img_url,
-      club_name,
-      performer,
       additional,
       drink_preferences,
       age_limit,
       free_ticket,
       is_private,
+      club_name,
+      performer,
     });
 
     return res.status(201).json(instanceToPlain(eventInstance));

@@ -2,15 +2,22 @@ export interface IUpdateEventDTO {
   event_id: string;
   name: string;
   location: string;
-  date: Date;
-  time: Date;
-  finish_date: Date;
-  finish_time: Date;
+  date?: string;
+  time?: string;
+  finish_date?: string;
+  finish_time?: string;
   club_name?: string;
   performer?: string;
   additional?: string;
   drink_preferences?: string;
   age_limit?: number;
   free_ticket?: number;
+  is_private?: boolean;
+  user: AuthorizedUser<UserPerm | PubPerm>;
+}
+
+export interface IUpdateEventActivedDTO {
+  event_id: string;
+  actived: boolean;
   user: AuthorizedUser<UserPerm | PubPerm>;
 }

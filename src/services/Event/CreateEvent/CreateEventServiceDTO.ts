@@ -1,12 +1,11 @@
 export interface ICreateEventDTO {
-  type: 'table' | 'party';
+  type: string;
   name: string;
   location: string;
   date?: string;
   time?: string;
   finish_date?: string;
   finish_time?: string;
-  img_url?: string;
   club_name?: string;
   performer?: string;
   additional?: string;

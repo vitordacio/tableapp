@@ -1,7 +1,7 @@
 import { instanceToPlain } from 'class-transformer';
 import { Request, Response } from 'express';
 import { container } from 'tsyringe';
-import { userPerm } from '@config/constants';
+import { userPerm, pubPerm } from '@config/constants';
 import { AppError } from '@utils/AppError';
 import { hasPermission } from '@utils/hasPermission';
 import { UpdateEventService } from '@services/Event/UpdateEvent/UpdateEventService';
@@ -28,9 +28,13 @@ class UpdateEventController {
       drink_preferences,
       age_limit,
       free_ticket,
+      is_private,
     } = req.body;
 
-    if (!hasPermission(req.user, userPerm)) {
+    if (
+      !hasPermission(req.user, userPerm) &&
+      !hasPermission(req.user, pubPerm)
+    ) {
       throw new AppError('Operação não permitida.', 403);
     }
 
@@ -43,12 +47,13 @@ class UpdateEventController {
       time,
       finish_date,
       finish_time,
-      club_name,
-      performer,
       additional,
       drink_preferences,
       age_limit,
       free_ticket,
+      is_private,
+      club_name,
+      performer,
     });
 
     return res.status(200).json(instanceToPlain(event));

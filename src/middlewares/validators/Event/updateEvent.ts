@@ -16,5 +16,6 @@ export const updateEventMiddleware = celebrate({
     drink_preferences: Joi.string().allow(''),
     age_limit: Joi.number().allow(''),
     free_ticket: Joi.number().allow(''),
+    is_private: Joi.boolean().allow(''),
   },
 });

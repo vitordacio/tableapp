@@ -29,14 +29,13 @@ class CreateEventService {
     time,
     finish_date,
     finish_time,
-    img_url,
-    club_name,
-    performer,
     additional,
     drink_preferences,
     age_limit,
     free_ticket,
     is_private,
+    club_name,
+    performer,
   }: ICreateEventDTO): Promise<Event> {
     const owner = await this.userRepository.findById(user.id);
 
@@ -44,7 +43,7 @@ class CreateEventService {
       throw new AppError('Usuário não encontrado.', 404);
     }
 
-    if (user.role === 'user' && type !== 'table') {
+    if (owner.role_name === 'user' && type !== 'table') {
       throw new AppError('Não autorizado.', 403);
     }
 
@@ -52,23 +51,22 @@ class CreateEventService {
 
     const event = this.eventRepository.create({
       id: v4(),
-      owner,
+      owner_id: owner.id_user,
       type,
       name,
       location,
       date: date || formatedDate.format('YYYY-MM-DD'),
       time: time || formatedDate.format('HH:mm'),
       finish_date:
-        finish_date || formatedDate.add(12, 'hour').format('YYYY-MM-DD'),
-      finish_time: finish_time || formatedDate.add(12, 'hour').format('HH:mm'),
-      img_url,
-      club_name,
-      performer,
+        finish_date || formatedDate.add(24, 'hour').format('YYYY-MM-DD'),
+      finish_time: finish_time || formatedDate.add(24, 'hour').format('HH:mm'),
       additional,
       drink_preferences,
       age_limit,
       free_ticket,
       private: is_private,
+      club_name: type !== 'table' ? club_name : '',
+      performer: type !== 'table' ? performer : '',
     });
 
     event.participations = [];

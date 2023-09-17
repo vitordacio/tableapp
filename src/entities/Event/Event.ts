@@ -81,12 +81,6 @@ class Event {
   @JoinColumn({ name: 'address_id' })
   address: Address;
 
-  // @OneToOne(() => Address, address => address.event, {
-  //   cascade: true,
-  // })
-  // @JoinColumn({ name: 'address_id' })
-  // address: Address;
-
   @OneToMany(() => Participation, participation => participation.event, {
     cascade: ['insert', 'recover', 'remove', 'update'],
     eager: true,

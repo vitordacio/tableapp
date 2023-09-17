@@ -77,9 +77,7 @@ class CreateAddressEventService {
 
     await this.addressRepository.save(address);
 
-    address.events = address.events.filter(
-      alreadyEvent => alreadyEvent.id_event === event.id_event,
-    );
+    address.events = [event];
 
     return address;
   }

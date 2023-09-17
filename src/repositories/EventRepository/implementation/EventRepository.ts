@@ -14,7 +14,7 @@ class EventRepository implements IEventRepository {
   create(data: IEvent): Event {
     const event = this.ormRepository.create({
       id_event: data.id,
-      owner: data.owner,
+      owner_id: data.owner_id,
       type: data.type,
       name: data.name,
       location: data.location,
@@ -22,8 +22,8 @@ class EventRepository implements IEventRepository {
       time: data.time,
       finish_date: data.finish_date,
       finish_time: data.finish_time,
-      img_url: data.finish_time,
-      address: data.address,
+      img_url: data.img_url,
+      address_id: data.address_id,
       additional: data.additional,
       club_name: data.club_name,
       performer: data.performer,
