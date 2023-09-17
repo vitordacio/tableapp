@@ -65,8 +65,10 @@ class User {
   @Column({ nullable: true })
   google_id: string;
 
-  @Column({ default: 0 })
-  friends: number;
+  // @Column({ default: 0 })
+  // friends: number;
+
+  friends: User[];
 
   @OneToMany(() => Friendship, friendship => friendship.sender)
   sentFriendRequests: Friendship[];

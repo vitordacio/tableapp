@@ -14,7 +14,7 @@ class FindFriendshipByUserIdService {
     friend_id: string,
     user: AuthorizedUser<UserPerm | PubPerm>,
   ): Promise<Friendship | undefined> {
-    const friendship = await this.friendshipRepository.findByUserId(
+    const friendship = await this.friendshipRepository.findByUserIds(
       user.id,
       friend_id,
     );

@@ -31,16 +31,19 @@ export async function generateUniqueUsername(username: string) {
   return newUsername;
 }
 
-// export async function generateUniqueUsername(username: string) {
-//   let newUsername = clearUsername(username);
-//   let unavailableUser;
+export function sortByDate(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  array: any[],
+  reference: string,
+  asc?: boolean,
+) {
+  const sorted = array || [];
 
-//   const userRepository = container.resolve(UserRepository);
+  return sorted.sort((a, b) => {
+    const dateA = new Date(a[reference]).getTime();
+    const dateB = new Date(b[reference]).getTime();
 
-//   while ((unavailableUser = await userRepository.findByUsername(newUsername))) {
-//     const randomDigits = Math.floor(Math.random() * 100000);
-//     newUsername = `${newUsername}${randomDigits}`;
-//   }
-
-//   return newUsername;
-// }
+    if (asc) return dateA - dateB;
+    return dateB - dateA;
+  });
+}

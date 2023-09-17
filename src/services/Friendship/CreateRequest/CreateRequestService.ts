@@ -43,13 +43,16 @@ class CreateRequestService {
       throw new AppError('Usuário não encontrado.', 404);
     }
 
-    friendship = await this.friendshipRepository.findByUserId(
+    friendship = await this.friendshipRepository.findByUserIds(
       user.id,
       friend_id,
     );
 
     if (friendship) {
-      throw new AppError('Solicitação já existe.', 400);
+      throw new AppError(
+        `${friendship.accepted ? 'Amizade' : 'Solicitação'} já existe`,
+        400,
+      );
     }
 
     friendship = this.friendshipRepository.create({

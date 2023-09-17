@@ -56,33 +56,6 @@ class UserRepository implements IUserRepository {
     return users;
   }
 
-  // async findProfile(user_id: string): Promise<User | undefined> {
-  //   let user: User | undefined;
-  //   const queryBuilder = this.ormRepository
-  //     .createQueryBuilder('user')
-  //     .where('user.id_user = :id', {
-  //       id: user_id,
-  //     });
-
-  //   user = await queryBuilder.getOne();
-
-  //   if (user?.role_name === 'pub') {
-  //     const userData = await queryBuilder
-  //       .leftJoinAndSelect('user.events', 'events')
-  //       .leftJoin('events', 'event', 'event.address IN (:...addresses)', {
-  //         addresses: user.addresses,
-  //       })
-  //       .addSelect('event.id_event')
-  //       .getOne();
-
-  //     if (userData) {
-  //       user.events = userData.events;
-  //     }
-  //   }
-
-  //   return user;
-  // }
-
   async findByUsername(username: string): Promise<User | undefined> {
     const query = this.ormRepository.createQueryBuilder('user').where(
       new Brackets(qb => {
@@ -133,10 +106,10 @@ class UserRepository implements IUserRepository {
     return users;
   }
 
-  async findByEmail(email: string, role?: string): Promise<User | undefined> {
+  async findByEmail(email: string): Promise<User | undefined> {
     const user = await this.ormRepository.findOne({
       // relations: ['permissions', 'vehicles', 'address'],
-      where: { email, role_name: role },
+      where: { email },
     });
 
     return user;
@@ -153,7 +126,16 @@ class UserRepository implements IUserRepository {
 
   async findById(id: string): Promise<User | undefined> {
     const user = await this.ormRepository.findOne({
-      relations: ['addresses'],
+      relations: [
+        'events',
+        'participations',
+        'addresses',
+        'addresses.events',
+        'sentFriendRequests',
+        'sentFriendRequests.receiver',
+        'receivedFriendRequests',
+        'receivedFriendRequests.sender',
+      ],
       where: { id_user: id },
     });
 

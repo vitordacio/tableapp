@@ -37,7 +37,7 @@ class FriendshipRepository implements IFriendshipRepository {
     return friendship;
   }
 
-  async findByUserId(
+  async findByUserIds(
     user_id: string,
     friend_id: string,
   ): Promise<Friendship | undefined> {

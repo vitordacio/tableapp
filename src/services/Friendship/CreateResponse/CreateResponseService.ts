@@ -41,12 +41,12 @@ class CreateResponseService {
     //   throw new AppError('Solicitação já respondida.', 400);
     // }
     if (accepted && !friendship.accepted) {
-      friendship.sender.friends += 1;
-      friendship.receiver.friends += 1;
-      await this.userRepository.saveMany([
-        friendship.sender,
-        friendship.receiver,
-      ]);
+      // friendship.sender.friends += 1;
+      // friendship.receiver.friends += 1;
+      // await this.userRepository.saveMany([
+      //   friendship.sender,
+      //   friendship.receiver,
+      // ]);
 
       const notifcation = this.notificationRepository.create({
         id: v4(),

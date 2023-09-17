@@ -30,9 +30,7 @@ class LoginGoogleService {
       throw new AppError('Usuário inválido', 400);
     }
 
-    user =
-      (await this.userRepository.findByGoogleId(googleUser.sub)) ||
-      (await this.userRepository.findByEmail(googleUser.email));
+    user = await this.userRepository.findByGoogleId(googleUser.sub);
 
     if (!user) {
       const newUsername = await generateUniqueUsername(googleUser.name);
@@ -49,6 +47,7 @@ class LoginGoogleService {
         password: hashedPassword,
         picture: googleUser.picture,
         locale: googleUser.locale,
+        google_id: googleUser.sub,
       });
     } else {
       user.name = googleUser.name;
