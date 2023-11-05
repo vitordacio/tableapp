@@ -12,6 +12,7 @@ import {
 import { User } from '@entities/User/User';
 import { Participation } from '@entities/Participation/Participation';
 import { Friendship } from '@entities/Friendship/Friendship';
+import { Emoji } from '@entities/Emoji/Emoji';
 
 @Entity('notifications')
 class Notification {
@@ -47,6 +48,13 @@ class Notification {
   @ManyToOne(() => Friendship, friendship => friendship.notifications)
   @JoinColumn({ name: 'friendship_id' })
   friendship: Friendship;
+
+  @Column({ nullable: true })
+  emoji_id: string;
+
+  @ManyToOne(() => Emoji, emoji => emoji.notifications)
+  @JoinColumn({ name: 'emoji_id' })
+  emoji: Emoji;
 
   @Column({ nullable: true })
   participation_id: string;

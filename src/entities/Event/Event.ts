@@ -13,6 +13,11 @@ import { Exclude } from 'class-transformer';
 import { User } from '@entities/User/User';
 import { Participation } from '@entities/Participation/Participation';
 import { Address } from '@entities/Address/Address';
+import { Emoji } from '@entities/Emoji/Emoji';
+import { Achievement } from '@entities/Achievement/Achievement';
+import { Report } from '@entities/Report/Report';
+import { EventType } from '@entities/EventType/EventType';
+import { EventPicture } from '@entities/EventPicture/EventPicture';
 
 @Entity('events')
 class Event {
@@ -20,7 +25,11 @@ class Event {
   id_event: string;
 
   @Column()
-  type: string;
+  type_id: string;
+
+  @ManyToOne(() => EventType, type => type.events)
+  @JoinColumn({ name: 'type_id' })
+  type: EventType;
 
   @Column()
   name: string;
@@ -47,22 +56,25 @@ class Event {
   additional: string;
 
   @Column({ nullable: true })
+  drink_preferences: string;
+
+  @Column({ nullable: true })
+  min_amount: number;
+
+  @Column({ default: 0 })
+  tickets_free: number;
+
+  @Column({ nullable: true })
+  ticket_value: number;
+
+  @Column({ nullable: true })
   club_name: string;
 
   @Column({ nullable: true })
   performer: string;
 
   @Column({ nullable: true })
-  drink_preferences: string;
-
-  @Column({ nullable: true })
-  img_url: string;
-
-  @Column({ default: 0 })
-  age_limit: number;
-
-  @Column({ default: 0 })
-  free_ticket: number;
+  cover_photo: string;
 
   @Column({ default: false })
   private: boolean;
@@ -81,11 +93,27 @@ class Event {
   @JoinColumn({ name: 'address_id' })
   address: Address;
 
+  @OneToMany(() => Achievement, achievement => achievement.event, {
+    cascade: false,
+  })
+  achievements: Achievement[];
+
+  @OneToMany(() => EventPicture, picture => picture.event, {
+    cascade: false,
+  })
+  pictures: EventPicture[];
+
   @OneToMany(() => Participation, participation => participation.event, {
     cascade: ['insert', 'recover', 'remove', 'update'],
     eager: true,
   })
   participations: Participation[];
+
+  @OneToMany(() => Emoji, emoji => emoji.event)
+  emojis: Emoji[];
+
+  @OneToMany(() => Report, report => report.event)
+  reports: Report[];
 
   @CreateDateColumn()
   created_at: Date;

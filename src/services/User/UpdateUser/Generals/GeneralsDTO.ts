@@ -3,6 +3,37 @@ export interface IUpdateUsernameDTO {
   user: AuthorizedUser<UserPerm>;
 }
 
+export interface IUpdateNameDTO {
+  name: string;
+  user: AuthorizedUser<UserPerm>;
+}
+
+export interface IUpdateBioDTO {
+  bio: string;
+  user: AuthorizedUser<UserPerm>;
+}
+
+export interface IUpdateLocationDTO {
+  location: string;
+  user: AuthorizedUser<UserPerm>;
+}
+
+export interface IUpdateGenderDTO {
+  gender: string;
+  user: AuthorizedUser<UserPerm>;
+}
+
+export interface IUpdateSocialDTO {
+  social: string;
+  username: string;
+  user: AuthorizedUser<UserPerm>;
+}
+
+export interface IUpdatePrivateDTO {
+  set_private: boolean;
+  user: AuthorizedUser<UserPerm>;
+}
+
 export interface IUpdateEmailDTO {
   email: string;
   user: AuthorizedUser<UserPerm>;
@@ -10,11 +41,7 @@ export interface IUpdateEmailDTO {
 
 export interface IUpdatePasswordDTO {
   password: string;
-  user: AuthorizedUser<UserPerm>;
-}
-
-export interface IUpdatePrivateDTO {
-  set_private: boolean;
+  new_password: string;
   user: AuthorizedUser<UserPerm>;
 }
 

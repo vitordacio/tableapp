@@ -21,7 +21,6 @@ class UserRepository implements IUserRepository {
       name: data.name,
       bio: data.bio,
       location: data.location,
-      age: data.age,
       gender: data.gender,
       picture: data.picture,
       cover_photo: data.cover_photo,

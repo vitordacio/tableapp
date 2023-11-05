@@ -7,40 +7,29 @@ import {
   DeleteDateColumn,
   ManyToOne,
   JoinColumn,
-  OneToMany,
 } from 'typeorm';
 
 import { Exclude } from 'class-transformer';
 import { User } from '@entities/User/User';
-import { Notification } from '@entities/Notification/Notification';
 
-@Entity('friendships')
-class Friendship {
+@Entity('blocks')
+class Block {
   @PrimaryColumn('uuid')
-  id_friendship: string;
+  id_block: string;
 
   @Column()
   sender_id: string;
 
-  @ManyToOne(() => User, user => user.friendships_sent)
+  @ManyToOne(() => User, user => user.reports_sent)
   @JoinColumn({ name: 'sender_id' })
   sender: User;
 
-  @Column()
+  @Column({ nullable: true })
   receiver_id: string;
 
-  @ManyToOne(() => User, user => user.friendships_received)
+  @ManyToOne(() => User, user => user.reports_received)
   @JoinColumn({ name: 'receiver_id' })
   receiver: User;
-
-  @Column({ default: false })
-  reviwed_by_receiver: boolean;
-
-  @Column({ default: false })
-  accepted: boolean;
-
-  @OneToMany(() => Notification, notification => notification.friendship)
-  notifications: Notification[];
 
   @CreateDateColumn()
   created_at: Date;
@@ -53,4 +42,4 @@ class Friendship {
   deleted_at: Date;
 }
 
-export { Friendship };
+export { Block };

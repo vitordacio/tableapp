@@ -6,7 +6,6 @@ export interface IUser {
   name: string;
   bio?: string;
   location?: string;
-  age?: number;
   gender?: string;
   picture?: string;
   cover_photo?: string;

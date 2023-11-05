@@ -22,7 +22,17 @@ import {
   updateEmailMiddleware,
   updatePasswordMiddleware,
   updatePrivateMiddleware,
+  updateBioMiddleware,
+  updateLocationMiddleware,
+  updateGenderMiddleware,
+  updateNameMiddleware,
+  updateSocialMiddleware,
 } from '../middlewares/validators/User/updateGenerals';
+import { updateBioController } from '../main/User/updateGenerals/updateBio';
+import { updateLocationController } from '../main/User/updateGenerals/updateLocation';
+import { updateGenderController } from '../main/User/updateGenerals/updateGender';
+import { updateNameController } from '../main/User/updateGenerals/updateName';
+import { updateSocialController } from '../main/User/updateGenerals/updateSocial';
 
 const userRouter = Router();
 
@@ -74,6 +84,46 @@ userRouter.put(
   [verifyToken, updateUsernameMiddleware],
   async (req: Request, res: Response) => {
     return updateUsernameController.handle(req, res);
+  },
+);
+
+userRouter.put(
+  '/user/name',
+  [verifyToken, updateNameMiddleware],
+  async (req: Request, res: Response) => {
+    return updateNameController.handle(req, res);
+  },
+);
+
+userRouter.put(
+  '/user/bio',
+  [verifyToken, updateBioMiddleware],
+  async (req: Request, res: Response) => {
+    return updateBioController.handle(req, res);
+  },
+);
+
+userRouter.put(
+  '/user/location',
+  [verifyToken, updateLocationMiddleware],
+  async (req: Request, res: Response) => {
+    return updateLocationController.handle(req, res);
+  },
+);
+
+userRouter.put(
+  '/user/gender',
+  [verifyToken, updateGenderMiddleware],
+  async (req: Request, res: Response) => {
+    return updateGenderController.handle(req, res);
+  },
+);
+
+userRouter.put(
+  '/user/social',
+  [verifyToken, updateSocialMiddleware],
+  async (req: Request, res: Response) => {
+    return updateSocialController.handle(req, res);
   },
 );
 

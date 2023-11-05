@@ -3,23 +3,23 @@ import { User } from '@entities/User/User';
 
 import { IUserRepository } from '@repositories/UserRepository/IUserRepository';
 import { AppError } from '@utils/AppError';
-import { IUpdatePrivateDTO } from './GeneralsDTO';
+import { IUpdateGenderDTO } from './GeneralsDTO';
 
 @injectable()
-class UpdatePrivateService {
+class UpdateGenderService {
   constructor(
     @inject('UserRepository')
     private userRepository: IUserRepository,
   ) {}
 
-  async execute({ set_private, user }: IUpdatePrivateDTO): Promise<User> {
+  async execute({ gender, user }: IUpdateGenderDTO): Promise<User> {
     const foundUser = await this.userRepository.findById(user.id);
 
     if (!foundUser) {
       throw new AppError('Usuário não encontrado.', 404);
     }
 
-    foundUser.private = set_private;
+    foundUser.gender = gender;
 
     await this.userRepository.save(foundUser);
 
@@ -27,4 +27,4 @@ class UpdatePrivateService {
   }
 }
 
-export { UpdatePrivateService };
+export { UpdateGenderService };

@@ -6,6 +6,43 @@ export const updateUsernameMiddleware = celebrate({
   },
 });
 
+export const updateNameMiddleware = celebrate({
+  [Segments.BODY]: {
+    name: Joi.string().required(),
+  },
+});
+
+export const updateBioMiddleware = celebrate({
+  [Segments.BODY]: {
+    bio: Joi.string().required(),
+  },
+});
+
+export const updateLocationMiddleware = celebrate({
+  [Segments.BODY]: {
+    location: Joi.string().required(),
+  },
+});
+
+export const updateGenderMiddleware = celebrate({
+  [Segments.BODY]: {
+    gender: Joi.string().required(),
+  },
+});
+
+export const updateSocialMiddleware = celebrate({
+  [Segments.BODY]: {
+    social: Joi.string().required(),
+    username: Joi.string().required(),
+  },
+});
+
+export const updatePrivateMiddleware = celebrate({
+  [Segments.BODY]: {
+    private: Joi.boolean().required(),
+  },
+});
+
 export const updateEmailMiddleware = celebrate({
   [Segments.BODY]: {
     email: Joi.string().email().required(),
@@ -15,11 +52,6 @@ export const updateEmailMiddleware = celebrate({
 export const updatePasswordMiddleware = celebrate({
   [Segments.BODY]: {
     password: Joi.string().min(6).required(),
-  },
-});
-
-export const updatePrivateMiddleware = celebrate({
-  [Segments.BODY]: {
-    private: Joi.boolean().required(),
+    new_password: Joi.string().min(6).required(),
   },
 });
