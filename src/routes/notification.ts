@@ -3,12 +3,13 @@ import { deleteNotificationController } from '../main/Notification/deleteNotific
 import { findNotificationByIdController } from '../main/Notification/findNotificationById';
 import { findNotificationIndexController } from '../main/Notification/findNotificationIndex';
 import { verifyToken } from '../middlewares/verifyToken';
+import { findNotificationsMiddleware } from '../middlewares/validators/Notification/findNotifications';
 
 const notificationRouter = Router();
 
 notificationRouter.get(
   '/notification',
-  verifyToken,
+  [verifyToken, findNotificationsMiddleware],
   async (req: Request, res: Response) => {
     return findNotificationIndexController.handle(req, res);
   },

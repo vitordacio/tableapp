@@ -24,9 +24,9 @@ class CreateResponseService {
 
   async execute({
     friendship_id,
-    accepted,
+    confirmed,
     user,
-  }: ICreateResponseDTO): Promise<Friendship> {
+  }: ICreateResponseDTO): Promise<Friendship | void> {
     const friendship = await this.friendshipRepository.findById(friendship_id);
 
     if (!friendship) {
@@ -37,33 +37,28 @@ class CreateResponseService {
       throw new AppError('Solicitação não pertence a esse usuário.', 403);
     }
 
-    // if (friendship.reviwed_by_receiver) {
-    //   throw new AppError('Solicitação já respondida.', 400);
-    // }
-    if (accepted && !friendship.accepted) {
-      // friendship.sender.friends += 1;
-      // friendship.receiver.friends += 1;
-      // await this.userRepository.saveMany([
-      //   friendship.sender,
-      //   friendship.receiver,
-      // ]);
+    if (!confirmed) return this.friendshipRepository.remove(friendship);
 
-      const notifcation = this.notificationRepository.create({
-        id: v4(),
-        message: `${friendship.receiver.name} aceitou o seu pedido de amizade!`,
-        type: 'friendship',
-        sent_by: user.id,
-        user_id: friendship.sender.id_user,
-        friendship_id: friendship.id_friendship,
-      });
-
-      await this.notificationRepository.save(notifcation);
-    }
-
-    friendship.reviwed_by_receiver = true;
-    friendship.accepted = accepted;
-
+    friendship.confirmed = true;
     await this.friendshipRepository.save(friendship);
+
+    friendship.sender.friends_count += 1;
+    friendship.receiver.friends_count += 1;
+    await this.userRepository.saveMany([
+      friendship.sender,
+      friendship.receiver,
+    ]);
+
+    const notification = this.notificationRepository.create({
+      id: v4(),
+      message: `${friendship.receiver.name} aceitou o seu pedido de amizade!`,
+      type: 'friendship',
+      sent_by: user.id,
+      user_id: friendship.sender.id_user,
+      friendship_id: friendship.id_friendship,
+    });
+
+    await this.notificationRepository.save(notification);
 
     return friendship;
   }

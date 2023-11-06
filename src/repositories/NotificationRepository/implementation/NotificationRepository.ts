@@ -41,20 +41,16 @@ class NotificationRepository implements INotificationRepository {
   async findByUser(
     id: string,
     page: number = 1,
-    limit: number = 50,
+    limit: number = 15,
   ): Promise<Notification[]> {
     const notifications = await this.ormRepository.find({
       order: { created_at: 'DESC' },
-      relations: ['participation', 'participation.event'],
-      // relations: [
-      //   'workshop',
-      //   'repair',
-      //   'repair.vehicle',
-      //   'preventive',
-      //   'preventive.type',
-      //   'preventive.vehicle',
-      // ],
-      // where: { user_id: id, type: In(['master', 'preventive_user', 'status']) },
+      relations: [
+        'participation',
+        'participation.event',
+        'friendship',
+        'emoji',
+      ],
       where: { user_id: id },
       take: limit,
       skip: limit * (page - 1),

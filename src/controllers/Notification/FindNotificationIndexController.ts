@@ -25,14 +25,14 @@ class FindNotificationIndexController {
       throw new AppError('Operação não permitida.', 403);
     }
 
-    const NotificationInstance =
+    const notificationInstance =
       await this.findNotificationIndexService.execute(
         req.user,
         page as unknown as number,
         limit as unknown as number,
       );
 
-    return res.status(201).json(instanceToPlain(NotificationInstance));
+    return res.status(201).json(instanceToPlain(notificationInstance));
   }
 }
 

@@ -33,11 +33,11 @@ class Friendship {
   @JoinColumn({ name: 'receiver_id' })
   receiver: User;
 
-  @Column({ default: false })
-  reviwed_by_receiver: boolean;
+  // @Column({ default: false })
+  // reviwed_by_receiver: boolean;
 
   @Column({ default: false })
-  accepted: boolean;
+  confirmed: boolean;
 
   @OneToMany(() => Notification, notification => notification.friendship)
   notifications: Notification[];

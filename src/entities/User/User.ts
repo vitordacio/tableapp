@@ -104,7 +104,8 @@ class User {
   @OneToMany(() => Participation, participation => participation.reviwer)
   participation_reviews: Participation[];
 
-  friends: User[];
+  @Column({ default: 0 })
+  friends_count: number;
 
   @OneToMany(() => Friendship, friendship => friendship.sender)
   friendships_sent: Friendship[];
@@ -114,6 +115,9 @@ class User {
 
   @OneToMany(() => Emoji, emoji => emoji.sender)
   emojis_sent: Emoji[];
+
+  @Column({ default: 0 })
+  emojis_count: number;
 
   @OneToMany(() => Emoji, emoji => emoji.receiver)
   emojis_received: Emoji[];

@@ -1,5 +1,5 @@
 export interface ICreateResponseDTO {
   friendship_id: string;
-  accepted: boolean;
+  confirmed: boolean;
   user: AuthorizedUser<UserPerm | PubPerm>;
 }

@@ -50,7 +50,7 @@ class CreateRequestService {
 
     if (friendship) {
       throw new AppError(
-        `${friendship.accepted ? 'Amizade' : 'Solicitação'} já existe`,
+        `${friendship.confirmed ? 'Amizade' : 'Solicitação'} já existe`,
         400,
       );
     }
@@ -63,16 +63,16 @@ class CreateRequestService {
 
     await this.friendshipRepository.save(friendship);
 
-    const notifcation = this.notificationRepository.create({
+    const notification = this.notificationRepository.create({
       id: v4(),
-      message: `${foundUser.name} enviou uma solicitação de amizade`,
+      message: `${foundUser.name} enviou uma solicitação de amizade.`,
       type: 'friendship',
       sent_by: user.id,
       user_id: friend_id,
       friendship_id: friendship.id_friendship,
     });
 
-    await this.notificationRepository.save(notifcation);
+    await this.notificationRepository.save(notification);
 
     return friendship;
   }

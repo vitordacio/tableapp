@@ -16,7 +16,6 @@ class FriendshipRepository implements IFriendshipRepository {
       id_friendship: data.id,
       sender_id: data.sender_id,
       receiver_id: data.receiver_id,
-      reviwed_by_receiver: data.reviwed_by_receiver,
     });
 
     return friendship;
