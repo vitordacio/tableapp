@@ -19,9 +19,10 @@ class LoginUserService {
   ) {}
 
   async execute({ login, password }: ILoginDTO): Promise<ILoginResponse> {
-    const user = isEmail(login)
-      ? await this.userRepository.findByEmail(login, 'user')
-      : await this.userRepository.findByUsername(login);
+    const user = await this.userRepository.findLogin(login);
+    // const user = isEmail(login)
+    //   ? await this.userRepository.findByEmail(login, 'user')
+    //   : await this.userRepository.findByUsername(login);
 
     if (!user) {
       throw new AppError('Combinação de usuário/senha incorreta!', 401);

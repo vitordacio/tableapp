@@ -15,7 +15,7 @@ class FindCheckUsernameController {
 
     const userInstance = await this.findCheckUsernameService.execute(username);
 
-    return res.status(201).json(instanceToPlain(userInstance));
+    return res.status(200).json(instanceToPlain(userInstance));
   }
 }
 

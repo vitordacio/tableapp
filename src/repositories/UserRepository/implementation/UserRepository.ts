@@ -48,11 +48,21 @@ class UserRepository implements IUserRepository {
 
   async findIndex(): Promise<User[]> {
     const users = await this.ormRepository.find({
-      // relations: ['totalAcceptedFriends'],
       order: { created_at: 'DESC' },
     });
 
     return users;
+  }
+
+  async checkUsername(username: string): Promise<User | undefined> {
+    const user = await this.ormRepository
+      .createQueryBuilder('user')
+      .where('LOWER(user.username) = :userName', {
+        userName: username.toLowerCase(),
+      })
+      .getOne();
+
+    return user;
   }
 
   async findByUsername(username: string): Promise<User | undefined> {
@@ -114,6 +124,13 @@ class UserRepository implements IUserRepository {
     return user;
   }
 
+  async findLogin(login: string): Promise<User | undefined> {
+    const user = await this.ormRepository.findOne({
+      where: [{ email: login }, { username: login }],
+    });
+    return user;
+  }
+
   async findByGoogleId(google_id: string): Promise<User | undefined> {
     const user = await this.ormRepository.findOne({
       // relations: ['permissions', 'vehicles', 'address'],
@@ -125,16 +142,16 @@ class UserRepository implements IUserRepository {
 
   async findById(id: string): Promise<User | undefined> {
     const user = await this.ormRepository.findOne({
-      relations: [
-        'events',
-        'participations',
-        'addresses',
-        'addresses.events',
-        'sentFriendRequests',
-        'sentFriendRequests.receiver',
-        'receivedFriendRequests',
-        'receivedFriendRequests.sender',
-      ],
+      // relations: [
+      //   'events',
+      //   'participations',
+      //   'addresses',
+      //   'addresses.events',
+      //   'sentFriendRequests',
+      //   'sentFriendRequests.receiver',
+      //   'receivedFriendRequests',
+      //   'receivedFriendRequests.sender',
+      // ],
       where: { id_user: id },
     });
 

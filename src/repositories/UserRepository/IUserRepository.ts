@@ -7,9 +7,11 @@ export interface IUserRepository {
   saveMany(users: User[]): Promise<User[]>;
   findById(id: string): Promise<User | undefined>;
   findIndex(): Promise<User[]>;
+  findLogin(login: string): Promise<User | undefined>;
   findByEmail(email: string, role?: string): Promise<User | undefined>;
   findByGoogleId(google_id: string): Promise<User | undefined>;
   findByUsername(username: string): Promise<User | undefined>;
+  checkUsername(username: string): Promise<User | undefined>;
   findByName(name: string, page: number, limit: number): Promise<User[]>;
   // findByPhone(phone: string, role?: string): Promise<User | undefined>;
   // findByDocument(doc: string, role?: string): Promise<User | undefined>;

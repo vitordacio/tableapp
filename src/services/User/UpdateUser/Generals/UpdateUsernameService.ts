@@ -24,14 +24,13 @@ class UpdateUsernameService {
       throw new AppError('Nome de usuário inválido.', 400);
     }
 
-    const alreadyExist = await this.userRepository.findByUsername(username);
+    const alreadyExist = await this.userRepository.checkUsername(username);
 
     if (alreadyExist) {
       throw new AppError('Nome de usuário já existe.', 400);
     }
 
     foundUser.username = username;
-
     await this.userRepository.save(foundUser);
 
     return foundUser;

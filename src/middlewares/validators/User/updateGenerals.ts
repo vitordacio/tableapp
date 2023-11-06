@@ -2,7 +2,7 @@ import { celebrate, Segments, Joi } from 'celebrate';
 
 export const updateUsernameMiddleware = celebrate({
   [Segments.BODY]: {
-    username: Joi.string().min(4).max(15).required(),
+    username: Joi.string().min(4).max(16).required(),
   },
 });
 

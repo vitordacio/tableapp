@@ -15,7 +15,7 @@ class FindCheckUsernameService {
 
     if (!isUsername(username)) return false;
 
-    const alreadyExist = await this.userRepository.findByUsername(username);
+    const alreadyExist = await this.userRepository.checkUsername(username);
 
     if (alreadyExist) return false;
 
