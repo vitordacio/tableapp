@@ -23,11 +23,20 @@ class CreateResponseService {
   ) {}
 
   async execute({
-    friendship_id,
-    confirmed,
+    friend_id,
     user,
   }: ICreateResponseDTO): Promise<Friendship | void> {
-    const friendship = await this.friendshipRepository.findById(friendship_id);
+    if (user.id === friend_id) {
+      throw new AppError(
+        'Não é possível responder solicitação de você mesmo.',
+        400,
+      );
+    }
+
+    const friendship = await this.friendshipRepository.findByUserIds(
+      user.id,
+      friend_id,
+    );
 
     if (!friendship) {
       throw new AppError('Solicitação não encontrada.', 404);
@@ -36,8 +45,6 @@ class CreateResponseService {
     if (user.id !== friendship.receiver_id) {
       throw new AppError('Solicitação não pertence a esse usuário.', 403);
     }
-
-    if (!confirmed) return this.friendshipRepository.remove(friendship);
 
     friendship.confirmed = true;
     await this.friendshipRepository.save(friendship);

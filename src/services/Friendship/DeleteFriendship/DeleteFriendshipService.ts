@@ -16,10 +16,13 @@ class DeleteFriendshipService {
   ) {}
 
   async execute(
-    friendship_id: string,
+    friend_id: string,
     user: AuthorizedUser<UserPerm | PubPerm>,
   ): Promise<void> {
-    const friendship = await this.friendshipRepository.findById(friendship_id);
+    const friendship = await this.friendshipRepository.findByUserIds(
+      user.id,
+      friend_id,
+    );
 
     if (
       !friendship ||

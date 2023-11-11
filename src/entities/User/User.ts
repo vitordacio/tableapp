@@ -113,6 +113,8 @@ class User {
   @OneToMany(() => Friendship, friendship => friendship.receiver)
   friendships_received: Friendship[];
 
+  friendship?: Friendship | undefined;
+
   @OneToMany(() => Emoji, emoji => emoji.sender)
   emojis_sent: Emoji[];
 

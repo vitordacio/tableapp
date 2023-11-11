@@ -4,17 +4,18 @@ import { instanceToPlain } from 'class-transformer';
 import { hasPermission } from '@utils/hasPermission';
 import { AppError } from '@utils/AppError';
 import { pubPerm, userPerm } from '@config/constants';
-import { DeleteFriendshipService } from '@services/Friendship/DeleteFriendship/DeleteFriendshipService';
+import { FindFriendsService } from '@services/User/FindFriends/FindFriendsService';
 
-class DeleteFriendshipController {
-  private deleteFriendshipService: DeleteFriendshipService;
+class FindFriendsController {
+  private findFriendshipByUserIdService: FindFriendsService;
 
   constructor() {
-    this.deleteFriendshipService = container.resolve(DeleteFriendshipService);
+    this.findFriendshipByUserIdService = container.resolve(FindFriendsService);
   }
 
   async handle(req: Request, res: Response): Promise<Response> {
-    const { friend_id } = req.params;
+    const { id } = req.params;
+    const { page, limit } = req.query;
 
     if (
       !hasPermission(req.user, userPerm) &&
@@ -23,13 +24,15 @@ class DeleteFriendshipController {
       throw new AppError('Operação não permitida.', 403);
     }
 
-    const friendshipInstance = await this.deleteFriendshipService.execute(
-      friend_id,
+    const friendshipInstance = await this.findFriendshipByUserIdService.execute(
+      id,
       req.user,
+      parseInt(page as string, 10),
+      parseInt(limit as string, 10),
     );
 
     return res.status(201).json(instanceToPlain(friendshipInstance));
   }
 }
 
-export { DeleteFriendshipController };
+export { FindFriendsController };

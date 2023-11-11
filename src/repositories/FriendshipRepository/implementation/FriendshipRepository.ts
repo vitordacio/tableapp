@@ -36,6 +36,35 @@ class FriendshipRepository implements IFriendshipRepository {
     return friendship;
   }
 
+  async findFriends(id: string, page: 1, limit: 20): Promise<Friendship[]> {
+    const friendships = await this.ormRepository
+      .createQueryBuilder('friendship')
+      .leftJoinAndSelect('friendship.sender', 'sender')
+      .leftJoinAndSelect('friendship.receiver', 'receiver')
+      .where('friendship.confirmed = true')
+      .andWhere(
+        '(friendship.sender_id = :user_id OR friendship.receiver_id = :user_id)',
+        {
+          user_id: id,
+        },
+      )
+      .select([
+        'sender.id_user',
+        'sender.name',
+        'sender.username',
+        'sender.picture',
+        'receiver.id_user',
+        'receiver.name',
+        'receiver.username',
+        'receiver.picture',
+      ])
+      .take(limit)
+      .skip((page - 1) * limit)
+      .getMany();
+
+    return friendships;
+  }
+
   async findByUserIds(
     user_id: string,
     friend_id: string,

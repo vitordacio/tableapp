@@ -14,7 +14,7 @@ class CreateRequestController {
   }
 
   async handle(req: Request, res: Response): Promise<Response> {
-    const { friend_id } = req.body;
+    const { friend_id } = req.params;
 
     if (
       !hasPermission(req.user, userPerm) &&

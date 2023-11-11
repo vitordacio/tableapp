@@ -33,6 +33,8 @@ import { updateLocationController } from '../main/User/updateGenerals/updateLoca
 import { updateGenderController } from '../main/User/updateGenerals/updateGender';
 import { updateNameController } from '../main/User/updateGenerals/updateName';
 import { updateSocialController } from '../main/User/updateGenerals/updateSocial';
+import { findFriendsMiddleware } from '../middlewares/validators/User/findFriends';
+import { findFriendsController } from '../main/User/findFriends';
 
 const userRouter = Router();
 
@@ -60,6 +62,14 @@ userRouter.get(
   '/user/check-username/:username',
   async (req: Request, res: Response) => {
     return findCheckUsernameController.handle(req, res);
+  },
+);
+
+userRouter.get(
+  '/user/friends/:id',
+  [verifyToken, findFriendsMiddleware],
+  async (req: Request, res: Response) => {
+    return findFriendsController.handle(req, res);
   },
 );
 
