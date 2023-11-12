@@ -8,25 +8,25 @@ export const updateUsernameMiddleware = celebrate({
 
 export const updateNameMiddleware = celebrate({
   [Segments.BODY]: {
-    name: Joi.string().required(),
+    name: Joi.string().min(3).max(30).required(),
   },
 });
 
 export const updateBioMiddleware = celebrate({
   [Segments.BODY]: {
-    bio: Joi.string().required(),
+    bio: Joi.string().max(150).required(),
   },
 });
 
 export const updateLocationMiddleware = celebrate({
   [Segments.BODY]: {
-    location: Joi.string().required(),
+    location: Joi.string().max(30).required(),
   },
 });
 
 export const updateGenderMiddleware = celebrate({
   [Segments.BODY]: {
-    gender: Joi.string().required(),
+    gender: Joi.string().max(30).required(),
   },
 });
 
