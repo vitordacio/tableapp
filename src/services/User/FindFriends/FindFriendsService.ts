@@ -19,13 +19,13 @@ class FindFriendsService {
     let friends: User[] = [];
     const friendships = await this.friendshipRepository.findFriends(
       friend_id,
-      page,
-      limit,
+      page || 1,
+      limit || 20,
     );
 
     const promise = friendships.map(async friendship => {
       const friend =
-        friendship.sender.id_user === friend_id
+        friendship.sender_id === friend_id
           ? friendship.receiver
           : friendship.sender;
 
@@ -34,7 +34,16 @@ class FindFriendsService {
         friend.id_user,
       );
 
-      friend.friendship = checkFriendship;
+      if (!checkFriendship) {
+        friend.friendship_status = '';
+      } else if (checkFriendship.confirmed) {
+        friend.friendship_status = 'friends';
+      } else {
+        friend.friendship_status =
+          checkFriendship.sender_id === user.id
+            ? 'request_sent'
+            : 'request_received';
+      }
 
       return friend;
     });

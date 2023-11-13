@@ -36,7 +36,11 @@ class FriendshipRepository implements IFriendshipRepository {
     return friendship;
   }
 
-  async findFriends(id: string, page: 1, limit: 20): Promise<Friendship[]> {
+  async findFriends(
+    id: string,
+    page: number,
+    limit: number,
+  ): Promise<Friendship[]> {
     const friendships = await this.ormRepository
       .createQueryBuilder('friendship')
       .leftJoinAndSelect('friendship.sender', 'sender')
@@ -48,16 +52,16 @@ class FriendshipRepository implements IFriendshipRepository {
           user_id: id,
         },
       )
-      .select([
-        'sender.id_user',
-        'sender.name',
-        'sender.username',
-        'sender.picture',
-        'receiver.id_user',
-        'receiver.name',
-        'receiver.username',
-        'receiver.picture',
-      ])
+      // .select([
+      //   'friendship.sender.id_user',
+      //   'friendship.sender.name',
+      //   'friendship.sender.username',
+      //   'friendship.sender.picture',
+      //   'friendship.receiver.id_user',
+      //   'friendship.receiver.name',
+      //   'friendship.receiver.username',
+      //   'friendship.receiver.picture',
+      // ])
       .take(limit)
       .skip((page - 1) * limit)
       .getMany();
@@ -69,9 +73,12 @@ class FriendshipRepository implements IFriendshipRepository {
     user_id: string,
     friend_id: string,
   ): Promise<Friendship | undefined> {
-    const queryBuilder = this.ormRepository.createQueryBuilder('friendship');
+    // const queryBuilder = this.ormRepository.createQueryBuilder('friendship');
 
-    const friendship = await queryBuilder
+    const friendship = await this.ormRepository
+      .createQueryBuilder('friendship')
+      .leftJoinAndSelect('friendship.sender', 'sender')
+      .leftJoinAndSelect('friendship.receiver', 'receiver')
       .where(
         '(friendship.sender_id = :user_id AND friendship.receiver_id = :friend_id) OR (friendship.sender_id = :friend_id AND friendship.receiver_id = :user_id)',
         {
