@@ -20,11 +20,11 @@ class Friendship {
   id_friendship: string;
 
   @Column()
-  sender_id: string;
+  author_id: string;
 
   @ManyToOne(() => User, user => user.friendships_sent)
-  @JoinColumn({ name: 'sender_id' })
-  sender: User;
+  @JoinColumn({ name: 'author_id' })
+  author: User;
 
   @Column()
   receiver_id: string;

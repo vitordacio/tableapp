@@ -4,7 +4,7 @@ import { container } from 'tsyringe';
 import { userPerm } from '@config/constants';
 import { AppError } from '@utils/AppError';
 import { hasPermission } from '@utils/hasPermission';
-import { UpdateGenderService } from '@services/User/UpdateUser/Generals/UpdateGenderService';
+import { UpdateGenderService } from '@services/User/UpdateUser/UpdateGenderService';
 
 class UpdateGenderController {
   private updateGenderService: UpdateGenderService;

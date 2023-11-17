@@ -4,7 +4,7 @@ import { container } from 'tsyringe';
 import { userPerm } from '@config/constants';
 import { AppError } from '@utils/AppError';
 import { hasPermission } from '@utils/hasPermission';
-import { UpdatePrivateService } from '@services/User/UpdateUser/Generals/UpdatePrivateService';
+import { UpdatePrivateService } from '@services/User/UpdateUser/UpdatePrivateService';
 
 class UpdatePrivateController {
   private updatePrivateService: UpdatePrivateService;

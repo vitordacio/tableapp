@@ -19,6 +19,9 @@ class SocialNetwork {
   id_social_network: string;
 
   @Column()
+  username: string;
+
+  @Column()
   type_id: string;
 
   @ManyToOne(() => SocialNetworkType, type => type.social_networks)

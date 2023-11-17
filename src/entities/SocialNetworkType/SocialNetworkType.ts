@@ -17,13 +17,10 @@ class SocialNetworkType {
   id_social_network_type: string;
 
   @Column({ unique: true })
-  name: string;
+  type: string;
 
   @Column()
   base_url: string;
-
-  @Column()
-  picture: string;
 
   @OneToMany(() => SocialNetwork, social_network => social_network.type)
   social_networks: SocialNetwork[];

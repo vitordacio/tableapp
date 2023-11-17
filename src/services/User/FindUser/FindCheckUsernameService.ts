@@ -11,11 +11,11 @@ class FindCheckUsernameService {
   ) {}
 
   async execute(username: string): Promise<boolean> {
-    if (username.length < 4 || username.length > 16) return false;
+    if (username.length < 4 || username.length > 15) return false;
 
     if (!isUsername(username)) return false;
 
-    const alreadyExist = await this.userRepository.checkUsername(username);
+    const alreadyExist = await this.userRepository.findByUsername(username);
 
     if (alreadyExist) return false;
 

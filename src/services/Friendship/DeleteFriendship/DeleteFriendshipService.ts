@@ -26,17 +26,17 @@ class DeleteFriendshipService {
 
     if (
       !friendship ||
-      (friendship.sender_id !== user.id && friendship.receiver_id !== user.id)
+      (friendship.author_id !== user.id && friendship.receiver_id !== user.id)
     ) {
       throw new AppError('Amizade não encontrada.', 404);
     }
 
     await this.friendshipRepository.remove(friendship);
 
-    friendship.sender.friends_count -= 1;
+    friendship.author.friends_count -= 1;
     friendship.receiver.friends_count -= 1;
     await this.userRepository.saveMany([
-      friendship.sender,
+      friendship.author,
       friendship.receiver,
     ]);
   }

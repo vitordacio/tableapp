@@ -7,6 +7,7 @@ import { User } from '@entities/User/User';
 
 import { AppError } from '@utils/AppError';
 import { isUsername } from '@utils/validations';
+import { extractTagsFromText } from '@utils/generateTags';
 import { ICreateUserDTO } from './CreateUserServiceDTO';
 
 @injectable()
@@ -25,7 +26,7 @@ class CreateUserService {
     username,
     password,
   }: ICreateUserDTO): Promise<User> {
-    const emailExists = await this.userRepository.findByEmail(email, 'user');
+    const emailExists = await this.userRepository.findByEmail(email.trim());
 
     if (emailExists) {
       throw new AppError('Email já cadastrado no sistema.', 400);
@@ -49,6 +50,7 @@ class CreateUserService {
       email,
       username,
       password: hashedPassword,
+      tags: extractTagsFromText(`${username} ${name}`),
     });
 
     if (username === 'master') user.role_name = 'master';

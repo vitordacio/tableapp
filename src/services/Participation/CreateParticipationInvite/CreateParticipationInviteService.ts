@@ -56,7 +56,7 @@ class CreateParticipationInviteService {
       throw new AppError('Evento não encontrado.', 404);
     }
 
-    if (user.id !== event.owner_id) {
+    if (user.id !== event.author_id) {
       const auth = hasModPermission(user.id, event.participations);
 
       if (!auth) {
@@ -91,7 +91,7 @@ class CreateParticipationInviteService {
         id: v4(),
         message: `${foundUser.name} te convidou para participar de ${event.name}${typeText}`,
         type: 'participation',
-        sent_by: foundUser.id_user,
+        author_id: foundUser.id_user,
         user_id,
         participation_id: participation.id_participation,
       });
@@ -100,7 +100,7 @@ class CreateParticipationInviteService {
         id: v4(),
         message: `Sua participação em ${event.name} foi atualizada`,
         type: 'participation',
-        sent_by: foundUser.id_user,
+        author_id: foundUser.id_user,
         user_id,
         participation_id: participation.id_participation,
       });

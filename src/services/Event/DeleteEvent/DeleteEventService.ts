@@ -17,11 +17,11 @@ class DeleteEventService {
   ): Promise<void> {
     const event = await this.eventRepository.findById(event_id);
 
-    if (!event || user.id !== event.owner_id) {
+    if (!event || user.id !== event.author_id) {
       throw new AppError('Evento não encontrado.', 404);
     }
 
-    // if (user.id !== event.owner_id) {
+    // if (user.id !== event.author_id) {
     //   const auth = hasModPermission(user.id, event.participations);
 
     //   if (!auth) {

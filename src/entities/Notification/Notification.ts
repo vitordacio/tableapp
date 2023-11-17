@@ -36,11 +36,11 @@ class Notification {
   user: User;
 
   @Column()
-  sent_by: string;
+  author_id: string;
 
   @ManyToOne(() => User, user => user.notifications_sent)
-  @JoinColumn({ name: 'sent_by' })
-  sender: User;
+  @JoinColumn({ name: 'author_id' })
+  author: User;
 
   @Column({ nullable: true })
   friendship_id: string;

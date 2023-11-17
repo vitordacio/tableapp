@@ -31,11 +31,11 @@ class Participation {
   @Column({ default: false })
   confirmed_by_event: boolean;
 
-  @Column({ default: false })
-  reviwed_by_user: boolean;
+  // @Column({ default: false })
+  // reviwed_by_user: boolean;
 
-  @Column({ default: false })
-  reviwed_by_event: boolean;
+  // @Column({ default: false })
+  // reviwed_by_event: boolean;
 
   @Column()
   user_id: string;

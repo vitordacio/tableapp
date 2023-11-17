@@ -4,7 +4,6 @@ import { IHashProvider } from '@providers/HashProvider/IHashProvider';
 import { generateAccessToken } from '@providers/Token/AccessTokenProvider';
 import { IUserRepository } from '@repositories/UserRepository/IUserRepository';
 import { AppError } from '@utils/AppError';
-
 import { isEmail } from '@utils/validations';
 import { ILoginDTO, ILoginResponse } from './LoginDTO';
 
@@ -19,10 +18,9 @@ class LoginUserService {
   ) {}
 
   async execute({ login, password }: ILoginDTO): Promise<ILoginResponse> {
-    const user = await this.userRepository.findLogin(login);
-    // const user = isEmail(login)
-    //   ? await this.userRepository.findByEmail(login, 'user')
-    //   : await this.userRepository.findByUsername(login);
+    const user = isEmail(login)
+      ? await this.userRepository.findByEmail(login)
+      : await this.userRepository.findByUsername(login);
 
     if (!user) {
       throw new AppError('Combinação de usuário/senha incorreta!', 401);

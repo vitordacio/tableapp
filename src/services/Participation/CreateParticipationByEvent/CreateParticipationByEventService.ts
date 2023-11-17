@@ -46,7 +46,7 @@ class CreateParticipationByEventService {
       throw new AppError('Usuário não encontrado.', 404);
     }
 
-    if (user.id !== participation.event.owner_id) {
+    if (user.id !== participation.event.author_id) {
       const auth = hasModPermission(
         user.id,
         participation.event.participations,
@@ -66,7 +66,7 @@ class CreateParticipationByEventService {
         id: v4(),
         message: `${foundUser.name} aprovou sua entrada em ${participation.event.name}`,
         type: 'participation',
-        sent_by: foundUser.id_user,
+        author_id: foundUser.id_user,
         user_id: participation.user_id,
         participation_id: participation.id_participation,
       });

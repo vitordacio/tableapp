@@ -1,9 +1,13 @@
-// import { Brackets, getRepository, Repository } from 'typeorm';
-import { Brackets, getRepository, Repository } from 'typeorm';
+// CREATE EXTENSION IF NOT EXISTS unaccent;
+// CREATE EXTENSION IF NOT EXISTS pg_trgm;
+import { getRepository, Repository } from 'typeorm';
 import { IUser } from '@entities/User/IUser';
 import { User } from '@entities/User/User';
 import { clearUsername } from '@utils/handleUser';
+import { extractTagsFromText } from '@utils/generateTags';
 import { IUserRepository } from '../IUserRepository';
+
+const similarity = 0.3;
 
 class UserRepository implements IUserRepository {
   private ormRepository: Repository<User>;
@@ -31,6 +35,7 @@ class UserRepository implements IUserRepository {
       CNPJ: data.CNPJ,
       role_name: data.role_name,
       google_id: data.google_id,
+      tags: data.tags as unknown as string,
     });
 
     return user;
@@ -56,11 +61,63 @@ class UserRepository implements IUserRepository {
     return users;
   }
 
-  async checkUsername(username: string): Promise<User | undefined> {
+  // async findByUsername(username: string): Promise<User | undefined> {
+  //   const query = this.ormRepository.createQueryBuilder('user').where(
+  //     new Brackets(qb => {
+  //       qb.where('unaccent(LOWER(user.username)) ~~ unaccent(:query)', {
+  //         query: username,
+  //       });
+
+  //       return qb;
+  //     }),
+  //   );
+
+  //   const user = await query.getOne();
+
+  //   return user;
+  // }
+
+  async findSearch(
+    query: string,
+    page: number,
+    limit: number,
+  ): Promise<User[]> {
+    let tagName: string[] = [];
+    if (query) tagName = extractTagsFromText(query);
+
+    const conditions =
+      tagName.length !== 0
+        ? tagName
+            .map(
+              word =>
+                `similarity(unaccent(LOWER(tag)), unaccent(lower('${word}'))) > ${similarity}`,
+            )
+            .join(' OR ')
+        : `''::text IS NULL`;
+
+    const users = this.ormRepository
+      .createQueryBuilder('user')
+      .where(`EXISTS (SELECT 1 FROM unnest(user.tags) tag WHERE ${conditions})`)
+      .select([
+        'user.id_user',
+        'user.name',
+        'user.username',
+        'user.picture',
+        `(SELECT count(*) FROM unnest(user.tags) as tag WHERE ${conditions}) as qtd`,
+      ])
+      .orderBy('qtd', 'DESC')
+      .take(limit)
+      .skip(page && limit ? limit * (page - 1) : undefined)
+      .getMany();
+
+    return users;
+  }
+
+  async findByEmail(email: string): Promise<User | undefined> {
     const user = await this.ormRepository
       .createQueryBuilder('user')
-      .where('LOWER(user.username) = :userName', {
-        userName: username.toLowerCase(),
+      .where('LOWER(user.email) = :query', {
+        query: email.toLowerCase().trim(),
       })
       .getOne();
 
@@ -68,68 +125,13 @@ class UserRepository implements IUserRepository {
   }
 
   async findByUsername(username: string): Promise<User | undefined> {
-    const query = this.ormRepository.createQueryBuilder('user').where(
-      new Brackets(qb => {
-        qb.where(
-          '(:nullService::text IS NULL OR unaccent(LOWER(user.username)) ~~ unaccent(:userName))',
-          {
-            userName: `%${clearUsername(username)}%`,
-            nullService: clearUsername(username),
-          },
-        );
-
-        return qb;
-      }),
-    );
-
-    const user = await query.getOne();
-
-    return user;
-  }
-
-  async findByName(name: string, page: number, limit: number): Promise<User[]> {
-    // CREATE EXTENSION IF NOT EXISTS unaccent;
-    const query = this.ormRepository
+    const user = await this.ormRepository
       .createQueryBuilder('user')
-      // .leftJoinAndSelect('workshop.child_services', 'services')
-      // .leftJoinAndSelect('services.service', 'masterservices')
-      .where(
-        new Brackets(qb => {
-          qb.where(
-            '(:nullService::text IS NULL OR unaccent(LOWER(user.name)) ~~ unaccent(:name) OR unaccent(LOWER(user.username)) ~~ unaccent(:userName))',
-            {
-              name: `%${name}%`,
-              userName: `%${name}%`,
-              nullService: name,
-            },
-          );
+      .where('LOWER(user.username) = :query', {
+        query: clearUsername(username),
+      })
+      .getOne();
 
-          // qb.andWhere('workshop.active = true');
-
-          return qb;
-        }),
-      )
-      .take(limit)
-      .skip(page && limit ? limit * (page - 1) : undefined);
-
-    const users = await query.getMany();
-
-    return users;
-  }
-
-  async findByEmail(email: string): Promise<User | undefined> {
-    const user = await this.ormRepository.findOne({
-      // relations: ['permissions', 'vehicles', 'address'],
-      where: { email },
-    });
-
-    return user;
-  }
-
-  async findLogin(login: string): Promise<User | undefined> {
-    const user = await this.ormRepository.findOne({
-      where: [{ email: login }, { username: login }],
-    });
     return user;
   }
 
@@ -144,16 +146,6 @@ class UserRepository implements IUserRepository {
 
   async findById(id: string): Promise<User | undefined> {
     const user = await this.ormRepository.findOne({
-      // relations: [
-      //   'events',
-      //   'participations',
-      //   'addresses',
-      //   'addresses.events',
-      //   'sentFriendRequests',
-      //   'sentFriendRequests.receiver',
-      //   'receivedFriendRequests',
-      //   'receivedFriendRequests.sender',
-      // ],
       where: { id_user: id },
     });
 

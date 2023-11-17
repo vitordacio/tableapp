@@ -46,7 +46,7 @@ class CreateParticipationByUserService {
       throw new AppError('Evento não encontrado.', 404);
     }
 
-    if (user.id === event.owner_id) {
+    if (user.id === event.author_id) {
       throw new AppError('Você é o dono do evento.', 404);
     }
 
@@ -67,8 +67,8 @@ class CreateParticipationByUserService {
         id: v4(),
         message: `${foundUser.name} pediu para participar de ${event.name}`,
         type: 'participation',
-        sent_by: foundUser.id_user,
-        user_id: event.owner_id,
+        author_id: foundUser.id_user,
+        user_id: event.author_id,
         participation_id: participation.id_participation,
       });
     }
@@ -87,8 +87,8 @@ class CreateParticipationByUserService {
         id: v4(),
         message: `${foundUser.name} está participando de ${event.name}`,
         type: 'participation',
-        sent_by: foundUser.id_user,
-        user_id: event.owner_id,
+        author_id: foundUser.id_user,
+        user_id: event.author_id,
         participation_id: participation.id_participation,
       });
     }

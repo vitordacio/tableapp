@@ -4,6 +4,7 @@ import { AppError } from '@utils/AppError';
 import { IEventRepository } from '@repositories/EventRepository/IEventRepository';
 import { hasModPermission } from '@utils/validations';
 import { Event } from '@entities/Event/Event';
+import { extractTagsFromText } from '@utils/generateTags';
 import { IUpdateEventDTO } from './UpdateEventDTO';
 
 @injectable()
@@ -14,8 +15,8 @@ class UpdateEventService {
   ) {}
 
   async execute({
-    user,
     event_id,
+    user,
     name,
     location,
     date,
@@ -24,8 +25,9 @@ class UpdateEventService {
     finish_time,
     additional,
     drink_preferences,
-    age_limit,
-    free_ticket,
+    ticket_value,
+    tickets_free,
+    min_amount,
     is_private,
     club_name,
     performer,
@@ -36,7 +38,7 @@ class UpdateEventService {
       throw new AppError('Evento não encontrado.', 404);
     }
 
-    if (user.id !== event.owner_id) {
+    if (user.id !== event.author_id) {
       const auth = hasModPermission(user.id, event.participations);
 
       if (!auth) {
@@ -60,12 +62,16 @@ class UpdateEventService {
     if (finish_date) event.finish_date = finish_date as unknown as Date;
     if (finish_time) event.finish_time = finish_time as unknown as Date;
     event.additional = additional as string;
+    event.club_name = club_name as string;
+    event.performer = performer as string;
     event.drink_preferences = drink_preferences as string;
-    event.age_limit = age_limit || 0;
-    event.free_ticket = free_ticket || 0;
+    event.ticket_value = ticket_value || 0;
+    event.tickets_free = tickets_free || 0;
+    event.min_amount = min_amount || 0;
     event.private = is_private as boolean;
-    if (event.type !== 'table') event.club_name = club_name as string;
-    if (event.type !== 'table') event.performer = performer as string;
+    event.tags = extractTagsFromText(
+      `${event.name} ${event.location} ${event.author.name} ${event.author.username}`,
+    ) as unknown as string;
 
     await this.eventRepository.save(event);
 

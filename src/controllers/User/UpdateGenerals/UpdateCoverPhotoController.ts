@@ -4,7 +4,7 @@ import { container } from 'tsyringe';
 import { userPerm } from '@config/constants';
 import { AppError } from '@utils/AppError';
 import { hasPermission } from '@utils/hasPermission';
-import { UpdateCoverPhotoService } from '@services/User/UpdateUser/Generals/UpdateCoverPhotoService';
+import { UpdateCoverPhotoService } from '@services/User/UpdateUser/UpdateCoverPhotoService';
 
 class UpdateCoverPhotoController {
   private updateCoverPhotoService: UpdateCoverPhotoService;

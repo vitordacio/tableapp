@@ -15,7 +15,7 @@ class NotificationRepository implements INotificationRepository {
     message,
     type,
     user_id,
-    sent_by,
+    author_id,
     friendship_id,
     participation_id,
   }: INotification): Notification {
@@ -24,7 +24,7 @@ class NotificationRepository implements INotificationRepository {
       message,
       type,
       user_id,
-      sent_by,
+      author_id,
       friendship_id,
       participation_id,
     });
@@ -40,8 +40,8 @@ class NotificationRepository implements INotificationRepository {
 
   async findByUser(
     id: string,
-    page: number = 1,
-    limit: number = 15,
+    page: number,
+    limit: number,
   ): Promise<Notification[]> {
     const notifications = await this.ormRepository.find({
       order: { created_at: 'DESC' },

@@ -24,7 +24,7 @@ class UpdateEventActivedService {
       throw new AppError('Evento não encontrado.', 404);
     }
 
-    if (user.id !== event.owner_id) {
+    if (user.id !== event.author_id) {
       const auth = hasModPermission(user.id, event.participations);
 
       if (!auth) {

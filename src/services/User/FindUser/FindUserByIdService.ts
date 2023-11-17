@@ -49,10 +49,10 @@ class FindUserByIdService {
       friendships = sortByDate(friendships, 'updated_at');
       friendships.forEach(friendship => {
         if (!friendship.accepted) return;
-        if (user.id_user === friendship.sender_id) {
+        if (user.id_user === friendship.author_id) {
           friends = [...friends, friendship.receiver];
         } else {
-          friends = [...friends, friendship.sender];
+          friends = [...friends, friendship.author];
         }
       });
       user.friends = friends;

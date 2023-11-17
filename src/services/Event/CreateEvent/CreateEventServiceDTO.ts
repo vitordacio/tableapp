@@ -1,5 +1,5 @@
 export interface ICreateEventDTO {
-  type: string;
+  type_id: string;
   name: string;
   location: string;
   date?: string;
@@ -10,8 +10,9 @@ export interface ICreateEventDTO {
   performer?: string;
   additional?: string;
   drink_preferences?: string;
-  age_limit?: number;
-  free_ticket?: number;
+  ticket_value?: number;
+  tickets_free?: number;
+  min_amount?: number;
   is_private?: boolean;
   user: AuthorizedUser<UserPerm | PubPerm>;
 }

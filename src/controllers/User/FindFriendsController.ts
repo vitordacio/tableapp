@@ -15,7 +15,7 @@ class FindFriendsController {
 
   async handle(req: Request, res: Response): Promise<Response> {
     const { id } = req.params;
-    const { page, limit } = req.query;
+    const { name, page, limit } = req.query;
 
     if (
       !hasPermission(req.user, userPerm) &&
@@ -25,10 +25,13 @@ class FindFriendsController {
     }
 
     const friendshipInstance = await this.findFriendshipByUserIdService.execute(
-      id,
-      req.user,
-      parseInt(page as string, 10),
-      parseInt(limit as string, 10),
+      {
+        friend_id: id,
+        user: req.user,
+        name: name as string,
+        page: parseInt(page as string, 10),
+        limit: parseInt(limit as string, 10),
+      },
     );
 
     return res.status(201).json(instanceToPlain(friendshipInstance));

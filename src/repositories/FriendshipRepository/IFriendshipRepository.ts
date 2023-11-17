@@ -9,7 +9,13 @@ export interface IFriendshipRepository {
     user_id: string,
     friend_id: string,
   ): Promise<Friendship | undefined>;
-  findFriends(id: string, page: number, limit: number): Promise<Friendship[]>;
+  findFriends(
+    id: string,
+    page: number,
+    limit: number,
+    name: string,
+  ): Promise<Friendship[]>;
+  checkFriends(user_id: string, friend_ids: string[]): Promise<Friendship[]>;
   delete(id: string): Promise<void>;
   remove(entitie: Friendship): Promise<void>;
 }

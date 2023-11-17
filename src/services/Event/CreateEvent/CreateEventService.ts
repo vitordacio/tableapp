@@ -6,6 +6,7 @@ import { Event } from '@entities/Event/Event';
 import { IUserRepository } from '@repositories/UserRepository/IUserRepository';
 import { AppError } from '@utils/AppError';
 import { IEventRepository } from '@repositories/EventRepository/IEventRepository';
+import { extractTagsFromText } from '@utils/generateTags';
 import { ICreateEventDTO } from './CreateEventServiceDTO';
 
 dayjs.extend(utc);
@@ -22,7 +23,6 @@ class CreateEventService {
 
   async execute({
     user,
-    type,
     name,
     location,
     date,
@@ -31,28 +31,29 @@ class CreateEventService {
     finish_time,
     additional,
     drink_preferences,
-    age_limit,
-    free_ticket,
+    ticket_value,
+    tickets_free,
+    min_amount,
     is_private,
     club_name,
     performer,
   }: ICreateEventDTO): Promise<Event> {
-    const owner = await this.userRepository.findById(user.id);
+    const author = await this.userRepository.findById(user.id);
 
-    if (!owner) {
+    if (!author) {
       throw new AppError('Usuário não encontrado.', 404);
     }
 
-    if (owner.role_name === 'user' && type !== 'table') {
-      throw new AppError('Não autorizado.', 403);
-    }
+    // if (author.role_name === 'user' && type !== 'table') {
+    //   throw new AppError('Não autorizado.', 403);
+    // }
 
     const formatedDate = dayjs.utc();
 
     const event = this.eventRepository.create({
       id: v4(),
-      owner_id: owner.id_user,
-      type,
+      author_id: author.id_user,
+      type_id: '',
       name,
       location,
       date: date || formatedDate.format('YYYY-MM-DD'),
@@ -62,11 +63,15 @@ class CreateEventService {
       finish_time: finish_time || formatedDate.add(24, 'hour').format('HH:mm'),
       additional,
       drink_preferences,
-      age_limit,
-      free_ticket,
+      ticket_value,
+      tickets_free,
+      min_amount,
       private: is_private,
-      club_name: type !== 'table' ? club_name : '',
-      performer: type !== 'table' ? performer : '',
+      club_name,
+      performer,
+      tags: extractTagsFromText(
+        `${name} ${location} ${author.name} ${author.username}`,
+      ),
     });
 
     event.participations = [];

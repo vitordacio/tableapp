@@ -3,23 +3,23 @@ import { User } from '@entities/User/User';
 
 import { IUserRepository } from '@repositories/UserRepository/IUserRepository';
 import { AppError } from '@utils/AppError';
-import { IUpdatePictureDTO } from './GeneralsDTO';
+import { IUpdateCoverPhotoDTO } from './GeneralsDTO';
 
 @injectable()
-class UpdatePictureService {
+class UpdateCoverPhotoService {
   constructor(
     @inject('UserRepository')
     private userRepository: IUserRepository,
   ) {}
 
-  async execute({ image, user }: IUpdatePictureDTO): Promise<User> {
+  async execute({ cover_photo, user }: IUpdateCoverPhotoDTO): Promise<User> {
     const foundUser = await this.userRepository.findById(user.id);
 
     if (!foundUser) {
       throw new AppError('Usuário não encontrado.', 404);
     }
 
-    foundUser.picture = image;
+    foundUser.cover_photo = cover_photo;
 
     await this.userRepository.save(foundUser);
 
@@ -27,4 +27,4 @@ class UpdatePictureService {
   }
 }
 
-export { UpdatePictureService };
+export { UpdateCoverPhotoService };

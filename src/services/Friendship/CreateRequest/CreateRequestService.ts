@@ -57,7 +57,7 @@ class CreateRequestService {
 
     friendship = this.friendshipRepository.create({
       id: v4(),
-      sender_id: foundUser.id_user,
+      author_id: foundUser.id_user,
       receiver_id: friend.id_user,
     });
 
@@ -67,7 +67,7 @@ class CreateRequestService {
       id: v4(),
       message: `${foundUser.name} enviou uma solicitação de amizade.`,
       type: 'friendship',
-      sent_by: user.id,
+      author_id: user.id,
       user_id: friend_id,
       friendship_id: friendship.id_friendship,
     });

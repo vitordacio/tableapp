@@ -21,7 +21,11 @@ class FindUserByNameService {
       .replace(/[\u0300-\u036f]/g, '')
       .trim();
 
-    const users = await this.userRepository.findByName(name, page, limit);
+    const users = await this.userRepository.findSearch(
+      name,
+      page || 1,
+      limit || 20,
+    );
 
     return users;
   }

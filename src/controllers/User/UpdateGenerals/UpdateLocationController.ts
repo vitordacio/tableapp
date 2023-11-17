@@ -4,7 +4,7 @@ import { container } from 'tsyringe';
 import { userPerm } from '@config/constants';
 import { AppError } from '@utils/AppError';
 import { hasPermission } from '@utils/hasPermission';
-import { UpdateLocationService } from '@services/User/UpdateUser/Generals/UpdateLocationService';
+import { UpdateLocationService } from '@services/User/UpdateUser/UpdateLocationService';
 
 class UpdateLocationController {
   private updateLocationService: UpdateLocationService;

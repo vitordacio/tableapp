@@ -17,8 +17,8 @@ class FindNotificationIndexService {
   ): Promise<Notification[]> {
     const notifications = await this.notificationRepository.findByUser(
       user.id,
-      page,
-      limit,
+      page || 1,
+      limit || 20,
     );
 
     return notifications;

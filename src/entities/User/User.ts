@@ -59,6 +59,9 @@ class User {
   @Column({ default: false })
   private: boolean;
 
+  @Column({ default: false })
+  verified: boolean;
+
   @Column({ nullable: true })
   locale: string;
 
@@ -71,15 +74,19 @@ class User {
   @Column({ nullable: true })
   google_id: string;
 
+  @Column({ array: true })
+  @Exclude()
+  tags: string;
+
   // RELATIONS
 
   @OneToMany(() => Notification, notification => notification.user)
   notifications_received: Notification[];
 
-  @OneToMany(() => Notification, notification => notification.sender)
+  @OneToMany(() => Notification, notification => notification.author)
   notifications_sent: Notification[];
 
-  @OneToMany(() => Event, event => event.owner, { cascade: false })
+  @OneToMany(() => Event, event => event.author, { cascade: false })
   events: Event[];
 
   @OneToMany(() => Achievement, achievement => achievement.user, {
@@ -107,7 +114,7 @@ class User {
   @Column({ default: 0 })
   friends_count: number;
 
-  @OneToMany(() => Friendship, friendship => friendship.sender)
+  @OneToMany(() => Friendship, friendship => friendship.author)
   friendships_sent: Friendship[];
 
   @OneToMany(() => Friendship, friendship => friendship.receiver)
@@ -115,22 +122,22 @@ class User {
 
   friendship_status?: 'friends' | 'request_sent' | 'request_received' | '';
 
-  @OneToMany(() => Emoji, emoji => emoji.sender)
-  emojis_sent: Emoji[];
-
   @Column({ default: 0 })
   emojis_count: number;
+
+  @OneToMany(() => Emoji, emoji => emoji.author)
+  emojis_sent: Emoji[];
 
   @OneToMany(() => Emoji, emoji => emoji.receiver)
   emojis_received: Emoji[];
 
-  @OneToMany(() => Report, report => report.sender)
+  @OneToMany(() => Report, report => report.author)
   reports_sent: Report[];
 
   @OneToMany(() => Report, report => report.receiver)
   reports_received: Report[];
 
-  @OneToMany(() => Block, block => block.sender)
+  @OneToMany(() => Block, block => block.author)
   blocks_sent: Block[];
 
   @OneToMany(() => Block, block => block.receiver)

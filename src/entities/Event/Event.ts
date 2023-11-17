@@ -79,12 +79,16 @@ class Event {
   @Column({ default: false })
   private: boolean;
 
+  @Column({ array: true })
+  @Exclude()
+  tags: string;
+
   @Column()
-  owner_id: string;
+  author_id: string;
 
   @ManyToOne(() => User, user => user.events)
-  @JoinColumn({ name: 'owner_id' })
-  owner: User;
+  @JoinColumn({ name: 'author_id' })
+  author: User;
 
   @Column({ nullable: true })
   address_id: string;

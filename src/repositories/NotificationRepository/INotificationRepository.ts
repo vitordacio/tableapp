@@ -4,11 +4,7 @@ import { Notification } from '@entities/Notification/Notification';
 interface INotificationRepository {
   create(data: INotification): Notification;
   save(notification: Notification): Promise<Notification>;
-  findByUser(
-    id: string,
-    page?: number,
-    limit?: number,
-  ): Promise<Notification[]>;
+  findByUser(id: string, page: number, limit: number): Promise<Notification[]>;
   // findByWorkshop(
   //   id: string,
   //   page: number,

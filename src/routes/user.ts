@@ -2,10 +2,8 @@ import { Request, Response, Router } from 'express';
 
 import { verifyToken } from '../middlewares/verifyToken';
 import { createUserMiddleware } from '../middlewares/validators/User/createUser';
-import { updateUserMiddleware } from '../middlewares/validators/User/updateUser';
 
 import { createUserController } from '../main/User/createUser';
-import { updateUserController } from '../main/User/updateUser';
 import { deleteUserController } from '../main/User/deleteUser';
 
 import { findUserIndexController } from '../main/User/findUserIndex';
@@ -78,14 +76,6 @@ userRouter.get(
   verifyToken,
   async (req: Request, res: Response) => {
     return findUserdByIdController.handle(req, res);
-  },
-);
-
-userRouter.put(
-  '/user',
-  [verifyToken, updateUserMiddleware],
-  async (req: Request, res: Response) => {
-    return updateUserController.handle(req, res);
   },
 );
 

@@ -20,7 +20,7 @@ class FindFriendshipByIdService {
 
     if (
       !friendship ||
-      (friendship.sender_id !== user.id && friendship.receiver_id !== user.id)
+      (friendship.author_id !== user.id && friendship.receiver_id !== user.id)
     ) {
       throw new AppError('Amizade não encontrada.', 404);
     }

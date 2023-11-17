@@ -19,14 +19,14 @@ class Report {
   id_report: string;
 
   @Column()
-  type: string;
+  message: string;
 
   @Column()
-  sender_id: string;
+  author_id: string;
 
   @ManyToOne(() => User, user => user.reports_sent)
-  @JoinColumn({ name: 'sender_id' })
-  sender: User;
+  @JoinColumn({ name: 'author_id' })
+  author: User;
 
   @Column({ nullable: true })
   receiver_id: string;
