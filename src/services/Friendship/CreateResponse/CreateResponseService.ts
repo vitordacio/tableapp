@@ -33,41 +33,47 @@ class CreateResponseService {
       );
     }
 
-    const friendship = await this.friendshipRepository.findByUserIds(
+    const response = await this.friendshipRepository.findByUserIds(
       user.id,
       friend_id,
     );
 
-    if (!friendship) {
+    if (!response) {
       throw new AppError('Solicitação não encontrada.', 404);
     }
 
-    if (user.id !== friendship.receiver_id) {
+    if (user.id !== response.receiver_id) {
       throw new AppError('Solicitação não pertence a esse usuário.', 403);
     }
 
-    friendship.confirmed = true;
-    await this.friendshipRepository.save(friendship);
+    response.confirmed = true;
+    // await this.friendshipRepository.save(response);
 
-    friendship.author.friends_count += 1;
-    friendship.receiver.friends_count += 1;
-    await this.userRepository.saveMany([
-      friendship.author,
-      friendship.receiver,
-    ]);
+    response.author.friends_count += 1;
+    response.receiver.friends_count += 1;
+    // await this.userRepository.saveMany([
+    //   response.author,
+    //   response.receiver,
+    // ]);
 
     const notification = this.notificationRepository.create({
       id: v4(),
-      message: `${friendship.receiver.name} aceitou o seu pedido de amizade!`,
+      message: `${response.receiver.name} aceitou sua solicitação de amizade! 🤝`,
       type: 'friendship',
       author_id: user.id,
-      user_id: friendship.author.id_user,
-      friendship_id: friendship.id_friendship,
+      user_id: response.author.id_user,
+      friendship_id: response.id_friendship,
     });
 
-    await this.notificationRepository.save(notification);
+    // await this.notificationRepository.save(notification);
 
-    return friendship;
+    await Promise.all([
+      this.friendshipRepository.save(response),
+      this.userRepository.saveMany([response.author, response.receiver]),
+      await this.notificationRepository.save(notification),
+    ]);
+
+    return response;
   }
 }
 

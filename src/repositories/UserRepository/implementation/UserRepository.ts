@@ -152,6 +152,89 @@ class UserRepository implements IUserRepository {
     return user;
   }
 
+  async findFriendsByUserId(
+    id: string,
+    page: number,
+    limit: number,
+    query: string,
+  ): Promise<User[]> {
+    let tagName: string[] = [];
+    if (query) tagName = extractTagsFromText(query);
+
+    const conditions =
+      tagName.length !== 0
+        ? tagName
+            .map(
+              word =>
+                `similarity(unaccent(LOWER(tag)), unaccent(lower('${word}'))) > ${similarity}`,
+            )
+            .join(' OR ')
+        : `''::text IS NULL`;
+
+    const user = await this.ormRepository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.friendships_sent', 'friendships_sent')
+      .leftJoinAndSelect('user.friendships_received', 'friendships_received')
+      .leftJoinAndSelect('friendships_received.author', 'author')
+      .leftJoinAndSelect('friendships_sent.receiver', 'receiver')
+      .where('friendships_sent.confirmed = true')
+      .andWhere('friendships_received.confirmed = true')
+      .andWhere(
+        `((friendships_sent.author_id = :user_id AND EXISTS (SELECT 1 FROM unnest(receiver.tags) tag WHERE ${conditions})) OR (friendships_received.receiver_id = :user_id AND EXISTS (SELECT 1 FROM unnest(author.tags) tag WHERE ${conditions})))`,
+        {
+          user_id: id,
+        },
+      )
+      .take(limit)
+      .skip((page - 1) * limit)
+      .getMany();
+
+    const friends: User[] = [];
+
+    user.forEach(userFound => {
+      const friendSent = userFound.friendships_sent.map(sent => sent.receiver);
+      const friendReceived = userFound.friendships_received.map(
+        received => received.author,
+      );
+
+      friends.push(...friendSent, ...friendReceived);
+    });
+
+    return friends;
+  }
+
+  async checkFriends(user_id: string, friend_ids: string[]): Promise<User[]> {
+    const user = await this.ormRepository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.friendships_sent', 'friendships_sent')
+      .leftJoinAndSelect('user.friendships_received', 'friendships_received')
+      .leftJoinAndSelect('friendships_received.author', 'author')
+      .leftJoinAndSelect('friendships_sent.receiver', 'receiver')
+      .where('friendships_sent.confirmed = true')
+      .andWhere('friendships_received.confirmed = true')
+      .andWhere(
+        '(friendships_sent.author_id = :user_id AND friendships_sent.receiver_id IN(:...friend_ids)) OR (friendships_received.author_id IN(:...friend_ids) AND friendships_received.receiver_id = :user_id)',
+        {
+          user_id,
+          friend_ids,
+        },
+      )
+      .getMany();
+
+    const friends: User[] = [];
+
+    user.forEach(userFound => {
+      const friendSent = userFound.friendships_sent.map(sent => sent.receiver);
+      const friendReceived = userFound.friendships_received.map(
+        received => received.author,
+      );
+
+      friends.push(...friendSent, ...friendReceived);
+    });
+
+    return friends;
+  }
+
   // findByDocument(doc: string, roleName: string): Promise<User | undefined> {
   //   const user = this.ormRepository
   //     .createQueryBuilder('user')

@@ -9,7 +9,7 @@ export interface IFriendshipRepository {
     user_id: string,
     friend_id: string,
   ): Promise<Friendship | undefined>;
-  findFriends(
+  findFriendsByUserId(
     id: string,
     page: number,
     limit: number,

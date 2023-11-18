@@ -31,13 +31,18 @@ class DeleteFriendshipService {
       throw new AppError('Amizade não encontrada.', 404);
     }
 
-    await this.friendshipRepository.remove(friendship);
+    // await this.friendshipRepository.remove(friendship);
 
     friendship.author.friends_count -= 1;
     friendship.receiver.friends_count -= 1;
-    await this.userRepository.saveMany([
-      friendship.author,
-      friendship.receiver,
+    // await this.userRepository.saveMany([
+    //   friendship.author,
+    //   friendship.receiver,
+    // ]);
+
+    await Promise.all([
+      this.friendshipRepository.remove(friendship),
+      this.userRepository.saveMany([friendship.author, friendship.receiver]),
     ]);
   }
 }

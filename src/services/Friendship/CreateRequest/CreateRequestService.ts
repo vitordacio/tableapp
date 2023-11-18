@@ -22,8 +22,6 @@ class CreateRequestService {
   ) {}
 
   async execute({ friend_id, user }: ICreateRequestDTO): Promise<Friendship> {
-    let friendship;
-
     if (user.id === friend_id) {
       throw new AppError(
         'Não é possível enviar solicitação para você mesmo.',
@@ -31,22 +29,19 @@ class CreateRequestService {
       );
     }
 
-    const foundUser = await this.userRepository.findById(user.id);
+    const [foundUser, friend, friendship] = await Promise.all([
+      this.userRepository.findById(user.id),
+      this.userRepository.findById(friend_id),
+      this.friendshipRepository.findByUserIds(user.id, friend_id),
+    ]);
 
     if (!foundUser) {
       throw new AppError('Token expirado, realize login novamente.', 403);
     }
 
-    const friend = await this.userRepository.findById(friend_id);
-
     if (!friend) {
       throw new AppError('Usuário não encontrado.', 404);
     }
-
-    friendship = await this.friendshipRepository.findByUserIds(
-      user.id,
-      friend_id,
-    );
 
     if (friendship) {
       throw new AppError(
@@ -55,26 +50,26 @@ class CreateRequestService {
       );
     }
 
-    friendship = this.friendshipRepository.create({
+    const request = this.friendshipRepository.create({
       id: v4(),
       author_id: foundUser.id_user,
       receiver_id: friend.id_user,
     });
 
-    await this.friendshipRepository.save(friendship);
+    await this.friendshipRepository.save(request);
 
     const notification = this.notificationRepository.create({
       id: v4(),
-      message: `${foundUser.name} enviou uma solicitação de amizade.`,
+      message: `${foundUser.name} quer ser seu amigo! 🤝`,
       type: 'friendship',
       author_id: user.id,
       user_id: friend_id,
-      friendship_id: friendship.id_friendship,
+      friendship_id: request.id_friendship,
     });
 
     await this.notificationRepository.save(notification);
 
-    return friendship;
+    return request;
   }
 }
 

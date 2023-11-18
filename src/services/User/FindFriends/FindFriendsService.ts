@@ -2,6 +2,7 @@ import { inject, injectable } from 'tsyringe';
 
 import { IFriendshipRepository } from '@repositories/FriendshipRepository/IFriendshipRepository';
 import { User } from '@entities/User/User';
+import { IUserRepository } from '@repositories/UserRepository/IUserRepository';
 import { IFindFriendsServiceDTO } from './IFindFriendsServiceDTO';
 
 @injectable()
@@ -9,6 +10,9 @@ class FindFriendsService {
   constructor(
     @inject('FriendshipRepository')
     private friendshipRepository: IFriendshipRepository,
+
+    @inject('UserRepository')
+    private userRepository: IUserRepository,
   ) {}
 
   async execute({
@@ -18,28 +22,20 @@ class FindFriendsService {
     page,
     limit,
   }: IFindFriendsServiceDTO): Promise<User[]> {
-    const friends: User[] = [];
     const friend_ids: string[] = [];
 
-    const friendships = await this.friendshipRepository.findFriends(
+    const friends = await this.userRepository.findFriendsByUserId(
       friend_id,
       page || 1,
       limit || 20,
       name || '',
     );
 
-    friendships.forEach(friendship => {
-      const friend =
-        friendship.author_id === friend_id
-          ? friendship.receiver
-          : friendship.author;
-
+    friends.forEach(friend => {
       if (friend.id_user === user.id) return;
 
       friend_ids.push(friend.id_user);
-
       friend.friendship_status = '';
-      friends.push(friend);
     });
 
     if (friend_ids.length !== 0) {
@@ -70,33 +66,6 @@ class FindFriendsService {
         }
       });
     }
-
-    // const promise = friendships.map(async friendship => {
-    //   const friend =
-    //     friendship.author_id === friend_id
-    //       ? friendship.receiver
-    //       : friendship.author;
-
-    //   const checkFriendship = await this.friendshipRepository.findByUserIds(
-    //     user.id,
-    //     friend.id_user,
-    //   );
-
-    //   if (!checkFriendship) {
-    //     friend.friendship_status = '';
-    //   } else if (checkFriendship.confirmed) {
-    //     friend.friendship_status = 'friends';
-    //   } else {
-    //     friend.friendship_status =
-    //       checkFriendship.author_id === user.id
-    //         ? 'request_sent'
-    //         : 'request_received';
-    //   }
-
-    //   return friend;
-    // });
-
-    // friends = await Promise.all(promise);
 
     return friends;
   }
