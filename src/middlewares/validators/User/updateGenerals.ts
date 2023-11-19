@@ -30,13 +30,6 @@ export const updateGenderMiddleware = celebrate({
   },
 });
 
-export const updateSocialMiddleware = celebrate({
-  [Segments.BODY]: {
-    social: Joi.string().required(),
-    username: Joi.string().required(),
-  },
-});
-
 export const updatePrivateMiddleware = celebrate({
   [Segments.BODY]: {
     private: Joi.boolean().required(),

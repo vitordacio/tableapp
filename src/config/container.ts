@@ -17,10 +17,18 @@ import { AddressRepository } from '@repositories/AddressRepository/implementatio
 
 import { IFriendshipRepository } from '@repositories/FriendshipRepository/IFriendshipRepository';
 import { FriendshipRepository } from '@repositories/FriendshipRepository/implementation/FriendshipRepository';
+
 import { INotificationRepository } from '@repositories/NotificationRepository/INotificationRepository';
 import { NotificationRepository } from '@repositories/NotificationRepository/implementation/NotificationRepository';
 
+import { ISocialNetworkRepository } from '@repositories/SocialNetworkRepository/ISocialNetworkRepository';
+import { SocialNetworkRepository } from '@repositories/SocialNetworkRepository/implementation/SocialNetworkRepository';
+
+import { ISocialNetworkTypeRepository } from '@repositories/SocialNetworkTypeRepository/ISocialNetworkTypeRepository';
+import { SocialNetworkTypeRepository } from '@repositories/SocialNetworkTypeRepository/implementation/SocialNetworkTypeRepository';
+
 container.registerSingleton<IUserRepository>('UserRepository', UserRepository);
+
 container.registerSingleton<IEventRepository>(
   'EventRepository',
   EventRepository,
@@ -46,4 +54,14 @@ container.registerSingleton<IFriendshipRepository>(
 container.registerSingleton<INotificationRepository>(
   'NotificationRepository',
   NotificationRepository,
+);
+
+container.registerSingleton<ISocialNetworkRepository>(
+  'SocialNetworkRepository',
+  SocialNetworkRepository,
+);
+
+container.registerSingleton<ISocialNetworkTypeRepository>(
+  'SocialNetworkTypeRepository',
+  SocialNetworkTypeRepository,
 );

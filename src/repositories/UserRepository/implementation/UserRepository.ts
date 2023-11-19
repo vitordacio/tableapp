@@ -5,6 +5,7 @@ import { IUser } from '@entities/User/IUser';
 import { User } from '@entities/User/User';
 import { clearUsername } from '@utils/handleUser';
 import { extractTagsFromText } from '@utils/generateTags';
+import { Friendship } from '@entities/Friendship/Friendship';
 import { IUserRepository } from '../IUserRepository';
 
 const similarity = 0.3;
@@ -146,6 +147,7 @@ class UserRepository implements IUserRepository {
 
   async findById(id: string): Promise<User | undefined> {
     const user = await this.ormRepository.findOne({
+      relations: ['social_networks', 'social_networks.type'],
       where: { id_user: id },
     });
 
@@ -173,11 +175,14 @@ class UserRepository implements IUserRepository {
 
     const user = await this.ormRepository
       .createQueryBuilder('user')
+      .where('user.id_user = :id', {
+        id,
+      })
       .leftJoinAndSelect('user.friendships_sent', 'friendships_sent')
       .leftJoinAndSelect('user.friendships_received', 'friendships_received')
       .leftJoinAndSelect('friendships_received.author', 'author')
       .leftJoinAndSelect('friendships_sent.receiver', 'receiver')
-      .where('friendships_sent.confirmed = true')
+      .andWhere('friendships_sent.confirmed = true')
       .andWhere('friendships_received.confirmed = true')
       .andWhere(
         `((friendships_sent.author_id = :user_id AND EXISTS (SELECT 1 FROM unnest(receiver.tags) tag WHERE ${conditions})) OR (friendships_received.receiver_id = :user_id AND EXISTS (SELECT 1 FROM unnest(author.tags) tag WHERE ${conditions})))`,
@@ -187,18 +192,78 @@ class UserRepository implements IUserRepository {
       )
       .take(limit)
       .skip((page - 1) * limit)
-      .getMany();
+      .getOne();
+
+    if (!user) return [];
 
     const friends: User[] = [];
 
-    user.forEach(userFound => {
-      const friendSent = userFound.friendships_sent.map(sent => sent.receiver);
-      const friendReceived = userFound.friendships_received.map(
-        received => received.author,
+    const friendships: Friendship[] = [
+      ...user.friendships_sent,
+      ...user.friendships_received,
+    ];
+
+    if (friendships.length !== 0) {
+      friendships.sort(
+        (a, b) =>
+          new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime(),
       );
 
-      friends.push(...friendSent, ...friendReceived);
-    });
+      friendships.forEach(friendship =>
+        friends.push(
+          friendship.author_id === id ? friendship.receiver : friendship.author,
+        ),
+      );
+    }
+
+    return friends;
+  }
+
+  async findLatestFriendsByUserId(
+    id: string,
+    page: number,
+    limit: number,
+  ): Promise<User[]> {
+    const user = await this.ormRepository
+      .createQueryBuilder('user')
+      .where('user.id_user = :id', {
+        id,
+      })
+      .leftJoinAndSelect('user.friendships_sent', 'friendships_sent')
+      .leftJoinAndSelect('user.friendships_received', 'friendships_received')
+      .leftJoinAndSelect('friendships_received.author', 'author')
+      .leftJoinAndSelect('friendships_sent.receiver', 'receiver')
+      .andWhere('friendships_sent.confirmed = true')
+      .andWhere('friendships_received.confirmed = true')
+      .orderBy(
+        'friendships_sent.updated_at, friendships_received.updated_at',
+        'DESC',
+      )
+      .take(limit)
+      .skip((page - 1) * limit)
+      .getOne();
+
+    if (!user) return [];
+
+    const friends: User[] = [];
+
+    const friendships: Friendship[] = [
+      ...user.friendships_sent,
+      ...user.friendships_received,
+    ];
+
+    if (friendships.length !== 0) {
+      friendships.sort(
+        (a, b) =>
+          new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime(),
+      );
+
+      friendships.forEach(friendship =>
+        friends.push(
+          friendship.author_id === id ? friendship.receiver : friendship.author,
+        ),
+      );
+    }
 
     return friends;
   }

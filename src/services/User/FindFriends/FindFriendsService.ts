@@ -24,12 +24,25 @@ class FindFriendsService {
   }: IFindFriendsServiceDTO): Promise<User[]> {
     const friend_ids: string[] = [];
 
-    const friends = await this.userRepository.findFriendsByUserId(
-      friend_id,
-      page || 1,
-      limit || 20,
-      name || '',
-    );
+    const friends = name
+      ? await this.userRepository.findFriendsByUserId(
+          friend_id,
+          page || 1,
+          limit || 20,
+          name || '',
+        )
+      : await this.userRepository.findLatestFriendsByUserId(
+          friend_id,
+          page || 1,
+          limit || 20,
+        );
+
+    // const friends = await this.userRepository.findFriendsByUserId(
+    //   friend_id,
+    //   page || 1,
+    //   limit || 20,
+    //   name || '',
+    // );
 
     friends.forEach(friend => {
       if (friend.id_user === user.id) return;

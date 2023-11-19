@@ -59,30 +59,6 @@ class NotificationRepository implements INotificationRepository {
     return notifications;
   }
 
-  // async findByWorkshop(
-  //   id: string,
-  //   page: number,
-  //   limit: number,
-  // ): Promise<Notification[]> {
-  //   const notifications = await this.ormRepository.find({
-  //     order: { created_at: 'DESC' },
-  //     relations: [
-  //       'user',
-  //       'preventive',
-  //       'preventive.type',
-  //       'preventive.vehicle',
-  //     ],
-  //     where: {
-  //       workshop_id: id,
-  //       type: In(['master', 'preventive_workshop']),
-  //     },
-  //     take: limit,
-  //     skip: limit * (page - 1),
-  //   });
-
-  //   return notifications;
-  // }
-
   async saveMany(notifications: Notification[]): Promise<Notification[]> {
     const newNotifications = await this.ormRepository.save(notifications);
 

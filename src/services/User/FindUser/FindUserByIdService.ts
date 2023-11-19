@@ -1,76 +1,47 @@
 import { inject, injectable } from 'tsyringe';
-
 import { User } from '@entities/User/User';
 import { IUserRepository } from '@repositories/UserRepository/IUserRepository';
 import { AppError } from '@utils/AppError';
-import { Friendship } from '@entities/Friendship/Friendship';
-import { Address } from '@entities/Address/Address';
-import { Event } from '@entities/Event/Event';
-import { sortByDate } from '@utils/handleUser';
+import { IFriendshipRepository } from '@repositories/FriendshipRepository/IFriendshipRepository';
 
 @injectable()
 class FindUserByIdService {
   constructor(
     @inject('UserRepository')
     private userRepository: IUserRepository,
+
+    @inject('FriendshipRepository')
+    private friendshipRepository: IFriendshipRepository,
   ) {}
 
-  async execute(user_id: string): Promise<User> {
-    const user = await this.userRepository.findById(user_id);
+  async execute(
+    friend_id: string,
+    user: AuthorizedUser<UserPerm | PubPerm>,
+  ): Promise<User> {
+    const [foundUser, friend, friendship] = await Promise.all([
+      this.userRepository.findById(user.id),
+      this.userRepository.findById(friend_id),
+      this.friendshipRepository.findByUserIds(user.id, friend_id),
+    ]);
 
-    if (!user) {
+    if (!foundUser) {
+      throw new AppError('Token expirado, realize login novamente.', 403);
+    }
+
+    if (!friend) {
       throw new AppError('Usuário não encontrado.', 404);
     }
 
-    if (user.role_name === 'pub') {
-      let pubEvents: Event[] = [...user.events];
-
-      user.addresses.forEach(address => {
-        pubEvents = [...pubEvents, ...address.events];
-      });
-
-      user.events = pubEvents;
-
-      user.addresses.forEach(address => {
-        address.events = undefined as unknown as Event[];
-      });
-
-      user.addresses = sortByDate(user.addresses, 'updated_at');
+    if (!friendship) {
+      friend.friendship_status = '';
+    } else if (friendship.confirmed) {
+      friend.friendship_status = 'friends';
+    } else {
+      friend.friendship_status =
+        friendship.author_id === user.id ? 'request_sent' : 'request_received';
     }
 
-    if (user.role_name === 'user') {
-      user.addresses = undefined as unknown as Address[];
-      let friendships: Friendship[] = [
-        ...user.sentFriendRequests,
-        ...user.receivedFriendRequests,
-      ];
-      let friends: User[] = [];
-
-      friendships = sortByDate(friendships, 'updated_at');
-      friendships.forEach(friendship => {
-        if (!friendship.accepted) return;
-        if (user.id_user === friendship.author_id) {
-          friends = [...friends, friendship.receiver];
-        } else {
-          friends = [...friends, friendship.author];
-        }
-      });
-      user.friends = friends;
-
-      user.participations = user.participations.filter(
-        participation =>
-          (participation.confirmed_by_user && participation.in) ||
-          !participation.confirmed_by_user,
-      );
-      user.participations = sortByDate(user.participations, 'updated_at');
-    }
-
-    user.sentFriendRequests = undefined as unknown as Friendship[];
-    user.receivedFriendRequests = undefined as unknown as Friendship[];
-
-    user.events = sortByDate(user.events, 'finish_date');
-
-    return user;
+    return foundUser;
   }
 }
 

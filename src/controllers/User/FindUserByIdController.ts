@@ -23,7 +23,7 @@ class FindUserByIdController {
       throw new AppError('Operação não permitida.', 403);
     }
 
-    const userInstance = await this.findUserByIdService.execute(id);
+    const userInstance = await this.findUserByIdService.execute(id, req.user);
 
     return res.status(201).json(instanceToPlain(userInstance));
   }

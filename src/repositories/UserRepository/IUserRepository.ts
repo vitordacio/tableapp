@@ -21,4 +21,9 @@ export interface IUserRepository {
     limit: number,
     name: string,
   ): Promise<User[]>;
+  findLatestFriendsByUserId(
+    id: string,
+    page: number,
+    limit: number,
+  ): Promise<User[]>;
 }

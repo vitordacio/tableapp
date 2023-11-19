@@ -2,6 +2,7 @@ import { Request, Response, Router } from 'express';
 
 import { verifyToken } from '../middlewares/verifyToken';
 import { createUserMiddleware } from '../middlewares/validators/User/createUser';
+import { createSocialNetworkMiddleware } from '../middlewares/validators/User/createSocialNetwork';
 
 import { createUserController } from '../main/User/createUser';
 import { deleteUserController } from '../main/User/deleteUser';
@@ -24,15 +25,15 @@ import {
   updateLocationMiddleware,
   updateGenderMiddleware,
   updateNameMiddleware,
-  updateSocialMiddleware,
 } from '../middlewares/validators/User/updateGenerals';
 import { updateBioController } from '../main/User/updateGenerals/updateBio';
 import { updateLocationController } from '../main/User/updateGenerals/updateLocation';
 import { updateGenderController } from '../main/User/updateGenerals/updateGender';
 import { updateNameController } from '../main/User/updateGenerals/updateName';
-import { updateSocialController } from '../main/User/updateGenerals/updateSocial';
 import { findFriendsMiddleware } from '../middlewares/validators/User/findFriends';
 import { findFriendsController } from '../main/User/findFriends';
+import { createSocialNetworkController } from '../main/User/createSocialNetwork';
+import { deleteSocialNetworkController } from '../main/User/deleteSocialNetwork';
 
 const userRouter = Router();
 
@@ -120,14 +121,6 @@ userRouter.put(
 );
 
 userRouter.put(
-  '/user/social',
-  [verifyToken, updateSocialMiddleware],
-  async (req: Request, res: Response) => {
-    return updateSocialController.handle(req, res);
-  },
-);
-
-userRouter.put(
   '/user/email',
   [verifyToken, updateEmailMiddleware],
   async (req: Request, res: Response) => {
@@ -151,21 +144,21 @@ userRouter.put(
   },
 );
 
-// userRouter.put(
-//   '/user/picture',
-//   [verifyToken, updateUserMiddleware],
-//   async (req: Request, res: Response) => {
-//     return updateUserController.handle(req, res);
-//   },
-// );
+userRouter.post(
+  '/user/social',
+  [verifyToken, createSocialNetworkMiddleware],
+  async (req: Request, res: Response) => {
+    return createSocialNetworkController.handle(req, res);
+  },
+);
 
-// userRouter.put(
-//   '/user/cover_photo',
-//   [verifyToken, updateUserMiddleware],
-//   async (req: Request, res: Response) => {
-//     return updateUserController.handle(req, res);
-//   },
-// );
+userRouter.delete(
+  '/user/social/:id',
+  verifyToken,
+  async (req: Request, res: Response) => {
+    return deleteSocialNetworkController.handle(req, res);
+  },
+);
 
 userRouter.delete(
   '/user/self',
