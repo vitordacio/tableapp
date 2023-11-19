@@ -6,7 +6,7 @@ function extractTagsFromText(text?: string): string[] {
         .toLowerCase()
         .split(/[\s/.,\\-]+/)
         .map(word => word.replace(/[^\w\s]/gi, ''))
-        .filter(word => !stopWords.includes(word) && word.length > 2)
+        .filter(word => !stopWords.includes(word) && word.length >= 4)
     : [];
 
   const uniqueWords = Array.from(new Set(words));

@@ -1,5 +1,5 @@
 // import { Brackets, getRepository, Repository } from 'typeorm';
-import { getRepository, Repository } from 'typeorm';
+import { Brackets, getRepository, Repository } from 'typeorm';
 import { IFriendship } from '@entities/Friendship/IFriendship';
 import { Friendship } from '@entities/Friendship/Friendship';
 // import { extractTagsFromText } from '@utils/generateTags';
@@ -40,6 +40,43 @@ class FriendshipRepository implements IFriendshipRepository {
     return friendship;
   }
 
+  // async findFriendsByUserId(
+  //   id: string,
+  //   page: number,
+  //   limit: number,
+  //   query: string,
+  // ): Promise<Friendship[]> {
+  //   let tagName: string[] = [];
+  //   if (query) tagName = extractTagsFromText(query);
+
+  //   const conditions =
+  //     tagName.length !== 0
+  //       ? tagName
+  //           .map(
+  //             word =>
+  //               `similarity(unaccent(LOWER(tag)), unaccent(lower('${word}'))) > ${similarity}`,
+  //           )
+  //           .join(' OR ')
+  //       : `''::text IS NULL`;
+
+  //   const friendships = await this.ormRepository
+  //     .createQueryBuilder('friendship')
+  //     .leftJoinAndSelect('friendship.author', 'author')
+  //     .leftJoinAndSelect('friendship.receiver', 'receiver')
+  //     .where('friendship.confirmed = true')
+  //     .andWhere(
+  //       `((friendship.author_id = :user_id AND EXISTS (SELECT 1 FROM unnest(receiver.tags) tag WHERE ${conditions})) OR (friendship.receiver_id = :user_id AND EXISTS (SELECT 1 FROM unnest(author.tags) tag WHERE ${conditions})))`,
+  //       {
+  //         user_id: id,
+  //       },
+  //     )
+  //     .take(limit)
+  //     .skip((page - 1) * limit)
+  //     .getMany();
+
+  //   return friendships;
+  // }
+
   async findFriendsByUserId(
     id: string,
     page: number,
@@ -57,7 +94,7 @@ class FriendshipRepository implements IFriendshipRepository {
                 `similarity(unaccent(LOWER(tag)), unaccent(lower('${word}'))) > ${similarity}`,
             )
             .join(' OR ')
-        : `''::text IS NULL`;
+        : null;
 
     const friendships = await this.ormRepository
       .createQueryBuilder('friendship')
@@ -65,11 +102,60 @@ class FriendshipRepository implements IFriendshipRepository {
       .leftJoinAndSelect('friendship.receiver', 'receiver')
       .where('friendship.confirmed = true')
       .andWhere(
-        `((friendship.author_id = :user_id AND EXISTS (SELECT 1 FROM unnest(receiver.tags) tag WHERE ${conditions})) OR (friendship.receiver_id = :user_id AND EXISTS (SELECT 1 FROM unnest(author.tags) tag WHERE ${conditions})))`,
+        new Brackets(qb => {
+          qb.where(
+            `${
+              conditions
+                ? `((friendship.author_id = :user_id AND EXISTS (SELECT 1 FROM unnest(receiver.tags) tag WHERE ${conditions})) OR (friendship.receiver_id = :user_id AND EXISTS (SELECT 1 FROM unnest(author.tags) tag WHERE ${conditions})))`
+                : '(friendship.receiver_id = :user_id AND (:nullName::text IS NULL OR EXISTS (SELECT 1 FROM unnest(author.tags) tag WHERE unaccent(LOWER(tag)) ~~ unaccent(:query)))) OR (friendship.author_id = :user_id AND (:nullName::text IS NULL OR EXISTS (SELECT 1 FROM unnest(receiver.tags) tag WHERE unaccent(LOWER(tag)) ~~ unaccent(:query))))'
+            }`,
+            {
+              user_id: id,
+              query: `%${query}%`,
+              nullName: query,
+            },
+          );
+
+          return qb;
+        }),
+      )
+      .select(['friendship.id_friendship', 'author', 'receiver'])
+      .addSelect(
+        `(SELECT count(*) FROM unnest(author.tags) as tag WHERE ${conditions}) +
+         (SELECT count(*) FROM unnest(receiver.tags) as tag WHERE ${conditions})`,
+        'qtd',
+      )
+      .orderBy('qtd', 'DESC')
+      .take(limit)
+      .skip((page - 1) * limit)
+      .getMany();
+
+    return friendships;
+  }
+
+  async findLatestByUserId(
+    id: string,
+    page: number,
+    limit: number,
+  ): Promise<Friendship[]> {
+    const friendships = await this.ormRepository
+      .createQueryBuilder('friendship')
+      .leftJoinAndSelect('friendship.author', 'author')
+      .leftJoinAndSelect('friendship.receiver', 'receiver')
+      .where(
+        'friendship.author_id = :user_id OR friendship.receiver_id = :user_id',
         {
           user_id: id,
         },
       )
+      .andWhere('friendship.confirmed = true')
+      .select([
+        'friendship.id_friendship',
+        'author',
+        'receiver',
+        'friendship.created_at',
+      ])
+      .orderBy('friendship.created_at', 'DESC')
       .take(limit)
       .skip((page - 1) * limit)
       .getMany();
@@ -93,6 +179,7 @@ class FriendshipRepository implements IFriendshipRepository {
           friend_ids,
         },
       )
+      .select(['friendship.id_friendship', 'author', 'receiver'])
       .getMany();
 
     return friendship;

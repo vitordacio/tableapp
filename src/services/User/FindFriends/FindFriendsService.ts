@@ -3,6 +3,7 @@ import { inject, injectable } from 'tsyringe';
 import { IFriendshipRepository } from '@repositories/FriendshipRepository/IFriendshipRepository';
 import { User } from '@entities/User/User';
 import { IUserRepository } from '@repositories/UserRepository/IUserRepository';
+import { AppError } from '@utils/AppError';
 import { IFindFriendsServiceDTO } from './IFindFriendsServiceDTO';
 
 @injectable()
@@ -23,35 +24,42 @@ class FindFriendsService {
     limit,
   }: IFindFriendsServiceDTO): Promise<User[]> {
     const friend_ids: string[] = [];
+    const friends: User[] = [];
 
-    const friends = name
-      ? await this.userRepository.findFriendsByUserId(
+    const searchedUser = await this.userRepository.findById(friend_id);
+
+    if (!searchedUser) {
+      throw new AppError('Usuário não encontrado', 404);
+    }
+
+    const friendships = name
+      ? await this.friendshipRepository.findFriendsByUserId(
           friend_id,
           page || 1,
           limit || 20,
           name || '',
         )
-      : await this.userRepository.findLatestFriendsByUserId(
+      : await this.friendshipRepository.findLatestByUserId(
           friend_id,
           page || 1,
           limit || 20,
         );
 
-    // const friends = await this.userRepository.findFriendsByUserId(
-    //   friend_id,
-    //   page || 1,
-    //   limit || 20,
-    //   name || '',
-    // );
+    friendships.forEach(friendship => {
+      const friend =
+        friendship.author.id_user === friend_id
+          ? friendship.receiver
+          : friendship.author;
 
-    friends.forEach(friend => {
       if (friend.id_user === user.id) return;
 
+      friend.friendship_status = user.id === friend_id ? 'friends' : '';
+
       friend_ids.push(friend.id_user);
-      friend.friendship_status = '';
+      friends.push(friend);
     });
 
-    if (friend_ids.length !== 0) {
+    if (friend_ids.length !== 0 && user.id !== friend_id) {
       const userFriendships = await this.friendshipRepository.checkFriends(
         user.id,
         friend_ids,
@@ -59,7 +67,7 @@ class FindFriendsService {
 
       userFriendships.forEach(friendship => {
         const userFriend =
-          friendship.author_id === user.id
+          friendship.author.id_user === user.id
             ? friendship.receiver
             : friendship.author;
 
@@ -73,7 +81,7 @@ class FindFriendsService {
           friend.friendship_status = 'friends';
         } else {
           friend.friendship_status =
-            friendship.author_id === user.id
+            friendship.author.id_user === user.id
               ? 'request_sent'
               : 'request_received';
         }

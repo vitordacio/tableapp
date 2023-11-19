@@ -1,11 +1,10 @@
 // CREATE EXTENSION IF NOT EXISTS unaccent;
 // CREATE EXTENSION IF NOT EXISTS pg_trgm;
-import { getRepository, Repository } from 'typeorm';
+import { Brackets, getRepository, Repository } from 'typeorm';
 import { IUser } from '@entities/User/IUser';
 import { User } from '@entities/User/User';
 import { clearUsername } from '@utils/handleUser';
 import { extractTagsFromText } from '@utils/generateTags';
-import { Friendship } from '@entities/Friendship/Friendship';
 import { IUserRepository } from '../IUserRepository';
 
 const similarity = 0.3;
@@ -94,11 +93,27 @@ class UserRepository implements IUserRepository {
                 `similarity(unaccent(LOWER(tag)), unaccent(lower('${word}'))) > ${similarity}`,
             )
             .join(' OR ')
-        : `''::text IS NULL`;
+        : null;
 
     const users = this.ormRepository
       .createQueryBuilder('user')
-      .where(`EXISTS (SELECT 1 FROM unnest(user.tags) tag WHERE ${conditions})`)
+      .where(
+        new Brackets(qb => {
+          qb.where(
+            `${
+              conditions
+                ? `EXISTS (SELECT 1 FROM unnest(user.tags) tag WHERE ${conditions})`
+                : '(:nullName::text IS NULL OR EXISTS (SELECT 1 FROM unnest(user.tags) tag WHERE unaccent(LOWER(tag)) ~~ unaccent(:query)))'
+            }`,
+            {
+              query: `%${query}%`,
+              nullName: query,
+            },
+          );
+
+          return qb;
+        }),
+      )
       .select([
         'user.id_user',
         'user.name',
@@ -153,361 +168,6 @@ class UserRepository implements IUserRepository {
 
     return user;
   }
-
-  async findFriendsByUserId(
-    id: string,
-    page: number,
-    limit: number,
-    query: string,
-  ): Promise<User[]> {
-    let tagName: string[] = [];
-    if (query) tagName = extractTagsFromText(query);
-
-    const conditions =
-      tagName.length !== 0
-        ? tagName
-            .map(
-              word =>
-                `similarity(unaccent(LOWER(tag)), unaccent(lower('${word}'))) > ${similarity}`,
-            )
-            .join(' OR ')
-        : `''::text IS NULL`;
-
-    const user = await this.ormRepository
-      .createQueryBuilder('user')
-      .where('user.id_user = :id', {
-        id,
-      })
-      .leftJoinAndSelect('user.friendships_sent', 'friendships_sent')
-      .leftJoinAndSelect('user.friendships_received', 'friendships_received')
-      .leftJoinAndSelect('friendships_received.author', 'author')
-      .leftJoinAndSelect('friendships_sent.receiver', 'receiver')
-      .andWhere('friendships_sent.confirmed = true')
-      .andWhere('friendships_received.confirmed = true')
-      .andWhere(
-        `((friendships_sent.author_id = :user_id AND EXISTS (SELECT 1 FROM unnest(receiver.tags) tag WHERE ${conditions})) OR (friendships_received.receiver_id = :user_id AND EXISTS (SELECT 1 FROM unnest(author.tags) tag WHERE ${conditions})))`,
-        {
-          user_id: id,
-        },
-      )
-      .take(limit)
-      .skip((page - 1) * limit)
-      .getOne();
-
-    if (!user) return [];
-
-    const friends: User[] = [];
-
-    const friendships: Friendship[] = [
-      ...user.friendships_sent,
-      ...user.friendships_received,
-    ];
-
-    if (friendships.length !== 0) {
-      friendships.sort(
-        (a, b) =>
-          new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime(),
-      );
-
-      friendships.forEach(friendship =>
-        friends.push(
-          friendship.author_id === id ? friendship.receiver : friendship.author,
-        ),
-      );
-    }
-
-    return friends;
-  }
-
-  async findLatestFriendsByUserId(
-    id: string,
-    page: number,
-    limit: number,
-  ): Promise<User[]> {
-    const user = await this.ormRepository
-      .createQueryBuilder('user')
-      .where('user.id_user = :id', {
-        id,
-      })
-      .leftJoinAndSelect('user.friendships_sent', 'friendships_sent')
-      .leftJoinAndSelect('user.friendships_received', 'friendships_received')
-      .leftJoinAndSelect('friendships_received.author', 'author')
-      .leftJoinAndSelect('friendships_sent.receiver', 'receiver')
-      .andWhere('friendships_sent.confirmed = true')
-      .andWhere('friendships_received.confirmed = true')
-      .orderBy(
-        'friendships_sent.updated_at, friendships_received.updated_at',
-        'DESC',
-      )
-      .take(limit)
-      .skip((page - 1) * limit)
-      .getOne();
-
-    if (!user) return [];
-
-    const friends: User[] = [];
-
-    const friendships: Friendship[] = [
-      ...user.friendships_sent,
-      ...user.friendships_received,
-    ];
-
-    if (friendships.length !== 0) {
-      friendships.sort(
-        (a, b) =>
-          new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime(),
-      );
-
-      friendships.forEach(friendship =>
-        friends.push(
-          friendship.author_id === id ? friendship.receiver : friendship.author,
-        ),
-      );
-    }
-
-    return friends;
-  }
-
-  async checkFriends(user_id: string, friend_ids: string[]): Promise<User[]> {
-    const user = await this.ormRepository
-      .createQueryBuilder('user')
-      .leftJoinAndSelect('user.friendships_sent', 'friendships_sent')
-      .leftJoinAndSelect('user.friendships_received', 'friendships_received')
-      .leftJoinAndSelect('friendships_received.author', 'author')
-      .leftJoinAndSelect('friendships_sent.receiver', 'receiver')
-      .where('friendships_sent.confirmed = true')
-      .andWhere('friendships_received.confirmed = true')
-      .andWhere(
-        '(friendships_sent.author_id = :user_id AND friendships_sent.receiver_id IN(:...friend_ids)) OR (friendships_received.author_id IN(:...friend_ids) AND friendships_received.receiver_id = :user_id)',
-        {
-          user_id,
-          friend_ids,
-        },
-      )
-      .getMany();
-
-    const friends: User[] = [];
-
-    user.forEach(userFound => {
-      const friendSent = userFound.friendships_sent.map(sent => sent.receiver);
-      const friendReceived = userFound.friendships_received.map(
-        received => received.author,
-      );
-
-      friends.push(...friendSent, ...friendReceived);
-    });
-
-    return friends;
-  }
-
-  // findByDocument(doc: string, roleName: string): Promise<User | undefined> {
-  //   const user = this.ormRepository
-  //     .createQueryBuilder('user')
-  //     .where('(user.role_name = :roleName OR :nullRole::text IS NULL)', {
-  //       roleName,
-  //       nullRole: roleName,
-  //     })
-  //     .andWhere({ document: doc })
-  //     .getOne();
-  //   return user;
-  // }
-
-  // async findByPhone(
-  //   phone: string,
-  //   roleName: string,
-  // ): Promise<User | undefined> {
-  //   const user = await this.ormRepository
-  //     .createQueryBuilder('user')
-  //     .where('(user.role_name = :roleName OR :nullRole::text IS NULL)', {
-  //       roleName,
-  //       nullRole: roleName,
-  //     })
-  //     .andWhere('user.phone = :phone', { phone })
-  //     .getOne();
-
-  //   return user;
-  // }
-
-  // async findByWorkshop(
-  //   workshopId: string,
-  //   initialDate?: string,
-  //   finalDate?: string,
-  // ): Promise<Transaction[]> {
-  //   const queryBuilder = this.ormRepository
-  //     .createQueryBuilder('transaction')
-  //     .where('transaction.workshop_id = :id', {
-  //       id: workshopId,
-  //     });
-
-  //   if (initialDate && finalDate) {
-  //     queryBuilder
-  //       .andWhere(
-  //         '( :nullInitialDate::text IS NULL OR :initialDate <= transaction.due_date )',
-  //         { nullInitialDate: initialDate, initialDate },
-  //       )
-  //       .andWhere(
-  //         '( :nullFinalDate::text IS NULL OR :finalDate >= transaction.due_date )',
-  //         {
-  //           nullFinalDate: finalDate,
-  //           finalDate,
-  //         },
-  //       );
-  //   } else if (initialDate) {
-  //     queryBuilder.andWhere(
-  //       '( :nullInitialDate::text IS NULL OR :initialDate <= transaction.due_date )',
-  //       { nullInitialDate: initialDate, initialDate },
-  //     );
-  //   } else if (finalDate) {
-  //     queryBuilder.andWhere(
-  //       '( :nullFinalDate::text IS NULL OR :finalDate >= transaction.due_date )',
-  //       {
-  //         nullFinalDate: finalDate,
-  //         finalDate,
-  //       },
-  //     );
-  //   }
-
-  //   const transactions = await queryBuilder
-  //     .select([
-  //       'transaction.total',
-  //       'transaction.due_date',
-  //       'transaction.type',
-  //       'transaction.finished',
-  //     ])
-  //     .getMany();
-
-  //   return transactions;
-  // }
-
-  // async findByWorkshop(
-  //   workshopId: string,
-  //   page: number,
-  //   limit: number,
-  // ): Promise<Repair[]> {
-  //   const repairs = await this.ormRepository.find({
-  //     relations: [
-  //       'vehicle',
-  //       'user_workshop',
-  //       'user_workshop.user',
-  //       'checklist',
-  //       'checklist.banners',
-  //     ],
-  //     order: {
-  //       finished: 'ASC',
-  //       finish_date: 'DESC',
-  //       finish_time: 'DESC',
-  //       updated_at: 'DESC',
-  //     },
-  //     where: { workshop_id: workshopId },
-  //     take: limit,
-  //     skip: page && limit ? limit * (page - 1) : undefined,
-  //   });
-
-  //   return repairs;
-  // }
-
-  // async findByCoordinates(
-  //   lat: number,
-  //   long: number,
-  //   radius: number,
-  //   services?: string,
-  // ): Promise<Workshop[]> {
-  //   const workshops = await this.ormRepository
-  //     .createQueryBuilder('workshop')
-  //     .leftJoinAndSelect('workshop.address', 'address')
-  //     .leftJoinAndSelect('workshop.child_services', 'services')
-  //     .leftJoinAndSelect('services.service', 'masterservices')
-  //     .leftJoinAndSelect(
-  //       'workshop.partners',
-  //       'partners',
-  //       'partners.active = true',
-  //     )
-  //     .leftJoinAndSelect(
-  //       'workshop.banners',
-  //       'banners',
-  //       'banners.type = :type',
-  //       { type: 'profile' },
-  //     )
-  //     .leftJoinAndSelect('partners.address', 'partner_address')
-  //     .where(
-  //       `(6371 * acos( cos(radians(address.lat)) * cos(radians(${lat})) * cos(radians(address.long) - radians(${long})) + sin(radians(address.lat)) * sin(radians(${lat})))) <= ${radius}`,
-  //     )
-  //     .andWhere(
-  //       new Brackets(qb => {
-  //         qb.where(
-  //           '(:nullService::text IS NULL OR unaccent(LOWER(services.name)) ~~ unaccent(:queryServices) OR unaccent(LOWER(workshop.fantasy_name)) ~~ unaccent(:workshopName))',
-  //           {
-  //             queryServices: `%${services}%`,
-  //             workshopName: `%${services}%`,
-  //             nullService: services,
-  //           },
-  //         );
-
-  //         qb.andWhere('workshop.active = true');
-
-  //         return qb;
-  //       }),
-  //     )
-  //     .getMany();
-
-  //   return workshops;
-  // }
-
-  // async findClosest(
-  //   lat: number,
-  //   long: number,
-  //   services?: string,
-  // ): Promise<Workshop[]> {
-  //   const subQuery = `SELECT (6371 * acos( cos(radians(addresses.lat)) * cos(radians(${lat})) * cos(radians(addresses.long) - radians(${long})) + sin(radians(addresses.lat)) * sin(radians(${lat})))) AS distance FROM workshops LEFT JOIN addresses ON workshops.address_id = addresses.id_address WHERE workshops.id_workshop = workshop.id_workshop`;
-
-  //   const workshops = await this.ormRepository
-  //     .createQueryBuilder('workshop')
-  //     .leftJoinAndSelect('workshop.address', 'address')
-  //     .leftJoinAndSelect('workshop.child_services', 'services')
-  //     .leftJoinAndSelect('services.service', 'masterservices')
-  //     .leftJoinAndSelect(
-  //       'workshop.partners',
-  //       'partners',
-  //       'partners.active = true',
-  //     )
-  //     .leftJoinAndSelect(
-  //       'workshop.banners',
-  //       'banners',
-  //       'banners.type = :type',
-  //       { type: 'profile' },
-  //     )
-  //     .leftJoinAndSelect('partners.address', 'partner_address')
-  //     .where(
-  //       new Brackets(qb => {
-  //         // qb.where(
-  //         //   '(:nullService::text IS NULL OR LOWER(services.name) ~~ :queryServices OR LOWER(workshop.fantasy_name) ~~ :workshopName)',
-  //         //   {
-  //         //     queryServices: `%${services}%`,
-  //         //     workshopName: `%${services}%`,
-  //         //     nullService: services,
-  //         //   },
-  //         // );
-  //         qb.where(
-  //           '(:nullService::text IS NULL OR unaccent(LOWER(services.name)) ~~ unaccent(:queryServices) OR unaccent(LOWER(workshop.fantasy_name)) ~~ unaccent(:workshopName))',
-  //           {
-  //             queryServices: `%${services}%`,
-  //             workshopName: `%${services}%`,
-  //             nullService: services,
-  //           },
-  //         );
-
-  //         qb.andWhere('workshop.active = true');
-
-  //         return qb;
-  //       }),
-  //     )
-  //     .addSelect(`(${subQuery})`, 'distance')
-  //     .orderBy('distance', 'ASC')
-  //     .take(1)
-  //     .getMany();
-
-  //   return workshops;
-  // }
 
   async findByRole(role: string): Promise<User[]> {
     const users = await this.ormRepository.find({

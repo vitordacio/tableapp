@@ -16,6 +16,11 @@ export interface IFriendshipRepository {
     name: string,
   ): Promise<Friendship[]>;
   checkFriends(user_id: string, friend_ids: string[]): Promise<Friendship[]>;
+  findLatestByUserId(
+    id: string,
+    page: number,
+    limit: number,
+  ): Promise<Friendship[]>;
   delete(id: string): Promise<void>;
   remove(entitie: Friendship): Promise<void>;
 }

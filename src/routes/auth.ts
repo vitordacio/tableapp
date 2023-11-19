@@ -6,6 +6,7 @@ import { loginMiddleware } from '../middlewares/validators/Authorization/login';
 import { loginMasterController } from '../main/Authorization/loginMaster';
 import { loginUserController } from '../main/Authorization/loginUser';
 import { loginPubController } from '../main/Authorization/loginPub';
+import { loginTokenController } from '../main/Authorization/loginToken';
 import { loginGoogleController } from '../main/Authorization/loginGoogle';
 
 const authRouter = Router();
@@ -27,7 +28,7 @@ authRouter.post('/auth/pub', loginMiddleware, async (req, res) => {
 });
 
 authRouter.post('/auth/token', verifyToken, async (req, res) => {
-  return loginPubController.handle(req, res);
+  return loginTokenController.handle(req, res);
 });
 
 export { authRouter };

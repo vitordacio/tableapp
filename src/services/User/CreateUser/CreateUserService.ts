@@ -26,6 +26,10 @@ class CreateUserService {
     username,
     password,
   }: ICreateUserDTO): Promise<User> {
+    if (name.trim().split(' ')[0].length < 4) {
+      throw new AppError('Primeiro nome precisa ter ao menos 4 dígitos.', 400);
+    }
+
     const emailExists = await this.userRepository.findByEmail(email.trim());
 
     if (emailExists) {

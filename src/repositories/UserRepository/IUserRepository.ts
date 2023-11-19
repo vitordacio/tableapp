@@ -14,16 +14,4 @@ export interface IUserRepository {
   findByRole(role: string): Promise<User[]>;
   delete(id: string): Promise<void>;
   remove(entitie: User): Promise<void>;
-  checkFriends(user_id: string, friend_ids: string[]): Promise<User[]>;
-  findFriendsByUserId(
-    id: string,
-    page: number,
-    limit: number,
-    name: string,
-  ): Promise<User[]>;
-  findLatestFriendsByUserId(
-    id: string,
-    page: number,
-    limit: number,
-  ): Promise<User[]>;
 }

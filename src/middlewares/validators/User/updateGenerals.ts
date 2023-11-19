@@ -8,7 +8,7 @@ export const updateUsernameMiddleware = celebrate({
 
 export const updateNameMiddleware = celebrate({
   [Segments.BODY]: {
-    name: Joi.string().min(3).max(30).required(),
+    name: Joi.string().min(4).max(30).required(),
   },
 });
 
