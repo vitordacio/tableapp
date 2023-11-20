@@ -4,7 +4,7 @@ import { instanceToPlain } from 'class-transformer';
 import { pubPerm, userPerm } from '@config/constants';
 import { hasPermission } from '@utils/hasPermission';
 import { AppError } from '@utils/AppError';
-import { DeleteSocialNetworkService } from '@services/SocialNetwork/DeleteSocialNetwork/DeleteSocialNetworkService';
+import { DeleteSocialNetworkService } from '@services/User/UpdateUser/DeleteSocialNetworkService';
 
 class DeleteSocialNetworkController {
   private deleteSocialNetworkService: DeleteSocialNetworkService;

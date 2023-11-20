@@ -4,7 +4,7 @@ import { instanceToPlain } from 'class-transformer';
 import { pubPerm, userPerm } from '@config/constants';
 import { hasPermission } from '@utils/hasPermission';
 import { AppError } from '@utils/AppError';
-import { CreateSocialNetworkService } from '@services/SocialNetwork/CreateSocialNetwork/CreaterSocialNetworkService';
+import { CreateSocialNetworkService } from '@services/User/UpdateUser/CreaterSocialNetworkService';
 
 class CreateSocialNetworkController {
   private createSocialNetworkService: CreateSocialNetworkService;
@@ -16,7 +16,7 @@ class CreateSocialNetworkController {
   }
 
   async handle(req: Request, res: Response): Promise<Response> {
-    const { username, type } = req.body;
+    const { username, type_id } = req.body;
 
     if (
       !hasPermission(req.user, userPerm) &&
@@ -28,7 +28,7 @@ class CreateSocialNetworkController {
     const socialNetworkInstance = await this.createSocialNetworkService.execute(
       {
         username,
-        type,
+        type_id,
         user: req.user,
       },
     );

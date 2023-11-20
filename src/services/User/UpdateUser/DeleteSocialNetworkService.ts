@@ -3,6 +3,7 @@ import { inject, injectable } from 'tsyringe';
 import { AppError } from '@utils/AppError';
 import { ISocialNetworkRepository } from '@repositories/SocialNetworkRepository/ISocialNetworkRepository';
 import { IUserRepository } from '@repositories/UserRepository/IUserRepository';
+import { User } from '@entities/User/User';
 
 @injectable()
 class DeleteSocialNetworkService {
@@ -17,7 +18,7 @@ class DeleteSocialNetworkService {
   async execute(
     social_network_id: string,
     user: AuthorizedUser<UserPerm | PubPerm>,
-  ): Promise<void> {
+  ): Promise<User> {
     const foundUser = await this.userRepository.findById(user.id);
 
     if (!foundUser) {
@@ -33,6 +34,12 @@ class DeleteSocialNetworkService {
     }
 
     await this.socialNetworkRepository.remove(social);
+
+    foundUser.social_networks = foundUser.social_networks.filter(
+      userSocial => userSocial.id_social_network !== social_network_id,
+    );
+
+    return foundUser;
   }
 }
 

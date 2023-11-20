@@ -16,6 +16,7 @@ class SocialNetworkTypeRepository implements ISocialNetworkTypeRepository {
       id_social_network_type: data.id_social_network_type,
       type: data.type,
       base_url: data.base_url,
+      deep_link: data.deep_link,
     });
 
     return socialType;
@@ -39,6 +40,12 @@ class SocialNetworkTypeRepository implements ISocialNetworkTypeRepository {
     const socialType = await this.ormRepository.findOne({
       where: { id_social_network_type: id },
     });
+
+    return socialType;
+  }
+
+  async findIndex(): Promise<SocialNetworkType[]> {
+    const socialType = await this.ormRepository.find({});
 
     return socialType;
   }

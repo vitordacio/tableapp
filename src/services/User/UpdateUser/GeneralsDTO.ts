@@ -54,3 +54,9 @@ export interface IUpdateCoverPhotoDTO {
   cover_photo: string;
   user: AuthorizedUser<UserPerm>;
 }
+
+export interface ICreateSocialNetworkDTO {
+  username: string;
+  user: AuthorizedUser<UserPerm | PubPerm>;
+  type_id: string;
+}

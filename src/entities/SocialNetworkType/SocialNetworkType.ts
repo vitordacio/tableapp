@@ -22,6 +22,9 @@ class SocialNetworkType {
   @Column()
   base_url: string;
 
+  @Column({ nullable: true })
+  deep_link: string;
+
   @OneToMany(() => SocialNetwork, social_network => social_network.type)
   social_networks: SocialNetwork[];
 

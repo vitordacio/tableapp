@@ -6,6 +6,7 @@ export interface ISocialNetworkTypeRepository {
   create(data: ISocialNetworkType): SocialNetworkType;
   findByType(type: string): Promise<SocialNetworkType | undefined>;
   findById(id: string): Promise<SocialNetworkType | undefined>;
+  findIndex(): Promise<SocialNetworkType[]>;
   delete(id: string): Promise<void>;
   remove(entitie: SocialNetworkType): Promise<void>;
 }

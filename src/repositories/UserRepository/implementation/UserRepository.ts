@@ -61,22 +61,6 @@ class UserRepository implements IUserRepository {
     return users;
   }
 
-  // async findByUsername(username: string): Promise<User | undefined> {
-  //   const query = this.ormRepository.createQueryBuilder('user').where(
-  //     new Brackets(qb => {
-  //       qb.where('unaccent(LOWER(user.username)) ~~ unaccent(:query)', {
-  //         query: username,
-  //       });
-
-  //       return qb;
-  //     }),
-  //   );
-
-  //   const user = await query.getOne();
-
-  //   return user;
-  // }
-
   async findSearch(
     query: string,
     page: number,
@@ -132,6 +116,8 @@ class UserRepository implements IUserRepository {
   async findByEmail(email: string): Promise<User | undefined> {
     const user = await this.ormRepository
       .createQueryBuilder('user')
+      .leftJoinAndSelect('user.social_networks', 'social_networks')
+      .leftJoinAndSelect('social_networks.type', 'type')
       .where('LOWER(user.email) = :query', {
         query: email.toLowerCase().trim(),
       })
@@ -143,6 +129,8 @@ class UserRepository implements IUserRepository {
   async findByUsername(username: string): Promise<User | undefined> {
     const user = await this.ormRepository
       .createQueryBuilder('user')
+      .leftJoinAndSelect('user.social_networks', 'social_networks')
+      .leftJoinAndSelect('social_networks.type', 'type')
       .where('LOWER(user.username) = :query', {
         query: clearUsername(username),
       })
@@ -153,7 +141,7 @@ class UserRepository implements IUserRepository {
 
   async findByGoogleId(google_id: string): Promise<User | undefined> {
     const user = await this.ormRepository.findOne({
-      // relations: ['permissions', 'vehicles', 'address'],
+      relations: ['social_networks', 'social_networks.type'],
       where: { google_id },
     });
 
@@ -171,6 +159,7 @@ class UserRepository implements IUserRepository {
 
   async findByRole(role: string): Promise<User[]> {
     const users = await this.ormRepository.find({
+      relations: ['social_networks', 'social_networks.type'],
       where: { role_name: role },
     });
 

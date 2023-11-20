@@ -32,8 +32,8 @@ import { updateGenderController } from '../main/User/updateGenerals/updateGender
 import { updateNameController } from '../main/User/updateGenerals/updateName';
 import { findFriendsMiddleware } from '../middlewares/validators/User/findFriends';
 import { findFriendsController } from '../main/User/findFriends';
-import { createSocialNetworkController } from '../main/User/createSocialNetwork';
-import { deleteSocialNetworkController } from '../main/User/deleteSocialNetwork';
+import { createSocialNetworkController } from '../main/User/updateGenerals/createSocialNetwork';
+import { deleteSocialNetworkController } from '../main/User/updateGenerals/deleteSocialNetwork';
 
 const userRouter = Router();
 
