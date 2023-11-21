@@ -19,7 +19,7 @@ class UpdateGenderService {
       throw new AppError('Usuário não encontrado.', 404);
     }
 
-    foundUser.gender = gender;
+    foundUser.gender = gender || (null as unknown as string);
 
     await this.userRepository.save(foundUser);
 

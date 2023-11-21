@@ -26,7 +26,7 @@ export const updateLocationMiddleware = celebrate({
 
 export const updateGenderMiddleware = celebrate({
   [Segments.BODY]: {
-    gender: Joi.string().max(30).required(),
+    gender: Joi.string().max(30).allow(''),
   },
 });
 
