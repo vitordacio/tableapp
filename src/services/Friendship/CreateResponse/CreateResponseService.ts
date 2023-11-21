@@ -47,14 +47,9 @@ class CreateResponseService {
     }
 
     response.confirmed = true;
-    // await this.friendshipRepository.save(response);
 
     response.author.friends_count += 1;
     response.receiver.friends_count += 1;
-    // await this.userRepository.saveMany([
-    //   response.author,
-    //   response.receiver,
-    // ]);
 
     const notification = this.notificationRepository.create({
       id: v4(),

@@ -41,7 +41,7 @@ class FindUserByIdService {
         friendship.author_id === user.id ? 'request_sent' : 'request_received';
     }
 
-    return foundUser;
+    return friend;
   }
 }
 

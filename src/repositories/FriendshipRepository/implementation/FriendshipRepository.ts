@@ -40,51 +40,14 @@ class FriendshipRepository implements IFriendshipRepository {
     return friendship;
   }
 
-  // async findFriendsByUserId(
-  //   id: string,
-  //   page: number,
-  //   limit: number,
-  //   query: string,
-  // ): Promise<Friendship[]> {
-  //   let tagName: string[] = [];
-  //   if (query) tagName = extractTagsFromText(query);
-
-  //   const conditions =
-  //     tagName.length !== 0
-  //       ? tagName
-  //           .map(
-  //             word =>
-  //               `similarity(unaccent(LOWER(tag)), unaccent(lower('${word}'))) > ${similarity}`,
-  //           )
-  //           .join(' OR ')
-  //       : `''::text IS NULL`;
-
-  //   const friendships = await this.ormRepository
-  //     .createQueryBuilder('friendship')
-  //     .leftJoinAndSelect('friendship.author', 'author')
-  //     .leftJoinAndSelect('friendship.receiver', 'receiver')
-  //     .where('friendship.confirmed = true')
-  //     .andWhere(
-  //       `((friendship.author_id = :user_id AND EXISTS (SELECT 1 FROM unnest(receiver.tags) tag WHERE ${conditions})) OR (friendship.receiver_id = :user_id AND EXISTS (SELECT 1 FROM unnest(author.tags) tag WHERE ${conditions})))`,
-  //       {
-  //         user_id: id,
-  //       },
-  //     )
-  //     .take(limit)
-  //     .skip((page - 1) * limit)
-  //     .getMany();
-
-  //   return friendships;
-  // }
-
-  async findFriendsByUserId(
+  async findFriendsByUserIdAndName(
     id: string,
     page: number,
     limit: number,
-    query: string,
+    name: string,
   ): Promise<Friendship[]> {
     let tagName: string[] = [];
-    if (query) tagName = extractTagsFromText(query);
+    tagName = extractTagsFromText(name);
 
     const conditions =
       tagName.length !== 0
@@ -111,8 +74,8 @@ class FriendshipRepository implements IFriendshipRepository {
             }`,
             {
               user_id: id,
-              query: `%${query}%`,
-              nullName: query,
+              query: `%${name}%`,
+              nullName: name,
             },
           );
 
@@ -143,12 +106,11 @@ class FriendshipRepository implements IFriendshipRepository {
       .leftJoinAndSelect('friendship.author', 'author')
       .leftJoinAndSelect('friendship.receiver', 'receiver')
       .where(
-        'friendship.author_id = :user_id OR friendship.receiver_id = :user_id',
+        '(friendship.author_id = :user_id OR friendship.receiver_id = :user_id) AND friendship.confirmed = true',
         {
           user_id: id,
         },
       )
-      .andWhere('friendship.confirmed = true')
       .select([
         'friendship.id_friendship',
         'author',
@@ -159,7 +121,6 @@ class FriendshipRepository implements IFriendshipRepository {
       .take(limit)
       .skip((page - 1) * limit)
       .getMany();
-
     return friendships;
   }
 
@@ -167,22 +128,27 @@ class FriendshipRepository implements IFriendshipRepository {
     user_id: string,
     friend_ids: string[],
   ): Promise<Friendship[]> {
-    const friendship = await this.ormRepository
+    const friendships = await this.ormRepository
       .createQueryBuilder('friendship')
       .leftJoinAndSelect('friendship.author', 'author')
       .leftJoinAndSelect('friendship.receiver', 'receiver')
-      .where('friendship.confirmed = true')
-      .andWhere(
+      // .where('friendship.confirmed = true')
+      .where(
         '(friendship.author_id = :user_id AND friendship.receiver_id IN(:...friend_ids)) OR (friendship.author_id IN(:...friend_ids) AND friendship.receiver_id = :user_id)',
         {
           user_id,
           friend_ids,
         },
       )
-      .select(['friendship.id_friendship', 'author', 'receiver'])
+      .select([
+        'friendship.id_friendship',
+        'friendship.confirmed',
+        'author',
+        'receiver',
+      ])
       .getMany();
 
-    return friendship;
+    return friendships;
   }
 
   async findByUserIds(

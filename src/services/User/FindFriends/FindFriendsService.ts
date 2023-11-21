@@ -33,7 +33,7 @@ class FindFriendsService {
     }
 
     const friendships = name
-      ? await this.friendshipRepository.findFriendsByUserId(
+      ? await this.friendshipRepository.findFriendsByUserIdAndName(
           friend_id,
           page || 1,
           limit || 20,
@@ -51,11 +51,9 @@ class FindFriendsService {
           ? friendship.receiver
           : friendship.author;
 
-      if (friend.id_user === user.id) return;
-
       friend.friendship_status = user.id === friend_id ? 'friends' : '';
 
-      friend_ids.push(friend.id_user);
+      if (friend.id_user !== user.id) friend_ids.push(friend.id_user);
       friends.push(friend);
     });
 
