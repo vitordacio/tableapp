@@ -13,9 +13,6 @@ import { findEventByLocationController } from '../main/Event/findEventByLocation
 import { createEventMiddleware } from '../middlewares/validators/Event/createEvent';
 import { updateEventActivedController } from '../main/Event/updateEventActived';
 import { updateEventActivedMiddleware } from '../middlewares/validators/Event/updateEventActived';
-import { createEventTypeController } from '../main/Event/createEventType';
-import { deleteEventTypeController } from '../main/Event/deleteEventType';
-import { createEventTypeMiddleware } from '../middlewares/validators/Event/createEventType';
 
 const eventRouter = Router();
 
@@ -76,22 +73,6 @@ eventRouter.delete(
   verifyToken,
   async (req: Request, res: Response) => {
     return deleteEventController.handle(req, res);
-  },
-);
-
-eventRouter.post(
-  '/event/type',
-  [verifyToken, createEventTypeMiddleware],
-  async (req: Request, res: Response) => {
-    return createEventTypeController.handle(req, res);
-  },
-);
-
-eventRouter.post(
-  '/event/:id',
-  verifyToken,
-  async (req: Request, res: Response) => {
-    return deleteEventTypeController.handle(req, res);
   },
 );
 

@@ -9,4 +9,5 @@ export interface ISocialNetworkTypeRepository {
   findIndex(): Promise<SocialNetworkType[]>;
   delete(id: string): Promise<void>;
   remove(entitie: SocialNetworkType): Promise<void>;
+  saveMany(entities: SocialNetworkType[]): Promise<SocialNetworkType[]>;
 }

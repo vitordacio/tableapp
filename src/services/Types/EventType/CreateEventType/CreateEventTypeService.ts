@@ -3,7 +3,7 @@ import { v4 } from 'uuid';
 import { EventType } from '@entities/EventType/EventType';
 import { AppError } from '@utils/AppError';
 import { IEventTypeRepository } from '@repositories/EventTypeRepository/IEventTypeRepository';
-import { ICreateEventTypeDTO } from './CreateEventTypeServiceDTO';
+import { ICreateEventTypeDTO } from './ICreateEventTypeServiceDTO';
 
 @injectable()
 class CreateEventTypeService {

@@ -4,14 +4,14 @@ import { instanceToPlain } from 'class-transformer';
 import { pubPerm, userPerm } from '@config/constants';
 import { hasPermission } from '@utils/hasPermission';
 import { AppError } from '@utils/AppError';
-import { FindSocialNetworkTypesService } from '@services/SocialNetworkType/FindSocialNetworkTypes/FindSocialNetworkTypesService';
+import { FetchSocialNetworkTypesService } from '@services/Types/SocialNetworkType/FetchSocialNetworkTypes/FetchSocialNetworkTypesService';
 
-class FindSocialNetworkTypesController {
-  private findSocialNetworkTypesService: FindSocialNetworkTypesService;
+class FetchSocialNetworkTypesController {
+  private fetchSocialNetworkTypesService: FetchSocialNetworkTypesService;
 
   constructor() {
-    this.findSocialNetworkTypesService = container.resolve(
-      FindSocialNetworkTypesService,
+    this.fetchSocialNetworkTypesService = container.resolve(
+      FetchSocialNetworkTypesService,
     );
   }
 
@@ -24,10 +24,10 @@ class FindSocialNetworkTypesController {
     }
 
     const socialNetworkInstance =
-      await this.findSocialNetworkTypesService.execute();
+      await this.fetchSocialNetworkTypesService.execute();
 
-    return res.status(200).json(instanceToPlain(socialNetworkInstance));
+    return res.status(201).json(instanceToPlain(socialNetworkInstance));
   }
 }
 
-export { FindSocialNetworkTypesController };
+export { FetchSocialNetworkTypesController };

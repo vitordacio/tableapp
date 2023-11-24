@@ -2,13 +2,16 @@ import { inject, injectable } from 'tsyringe';
 
 import { AppError } from '@utils/AppError';
 import { IEventRepository } from '@repositories/EventRepository/IEventRepository';
-// import { hasModPermission } from '@utils/validations';
+import { IEventTypeRepository } from '@repositories/EventTypeRepository/IEventTypeRepository';
 
 @injectable()
 class DeleteEventService {
   constructor(
     @inject('EventRepository')
     private eventRepository: IEventRepository,
+
+    @inject('EventTypeRepository')
+    private eventTypeRepository: IEventTypeRepository,
   ) {}
 
   async execute(
@@ -21,15 +24,9 @@ class DeleteEventService {
       throw new AppError('Evento não encontrado.', 404);
     }
 
-    // if (user.id !== event.author_id) {
-    //   const auth = hasModPermission(user.id, event.participations);
-
-    //   if (!auth) {
-    //     throw new AppError('Não autorizado.', 403);
-    //   }
-    // }
-
-    // await this.eventRepository.delete(table.id_event);
+    const eventType = event.type;
+    eventType.count -= 1;
+    await this.eventTypeRepository.save(eventType);
     await this.eventRepository.remove(event);
   }
 }

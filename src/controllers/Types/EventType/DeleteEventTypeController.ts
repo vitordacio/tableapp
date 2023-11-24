@@ -4,29 +4,26 @@ import { instanceToPlain } from 'class-transformer';
 import { hasPermission } from '@utils/hasPermission';
 import { AppError } from '@utils/AppError';
 import { masterPerm } from '@config/constants';
-import { CreateEventTypeService } from '@services/Event/CreateEventType/CreateEventTypeService';
+import { DeleteEventTypeService } from '@services/Types/EventType/DeleteEventType/DeleteEventTypeService';
 
-class CreateEventTypeController {
-  private createEventTypeService: CreateEventTypeService;
+class DeleteEventTypeController {
+  private deleteEventTypeService: DeleteEventTypeService;
 
   constructor() {
-    this.createEventTypeService = container.resolve(CreateEventTypeService);
+    this.deleteEventTypeService = container.resolve(DeleteEventTypeService);
   }
 
   async handle(req: Request, res: Response): Promise<Response> {
-    const { name, free_access } = req.body;
+    const { id } = req.params;
 
     if (!hasPermission(req.user, masterPerm)) {
       throw new AppError('Operação não permitida.', 403);
     }
 
-    const eventTypeInstance = await this.createEventTypeService.execute({
-      name,
-      free_access,
-    });
+    const eventTypeInstance = await this.deleteEventTypeService.execute(id);
 
     return res.status(201).json(instanceToPlain(eventTypeInstance));
   }
 }
 
-export { CreateEventTypeController };
+export { DeleteEventTypeController };

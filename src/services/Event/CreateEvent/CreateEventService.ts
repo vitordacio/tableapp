@@ -92,6 +92,8 @@ class CreateEventService {
     event.participations = [];
 
     await this.eventRepository.save(event);
+    type.count += 1;
+    await this.eventTypeRepository.save(type);
 
     return event;
   }

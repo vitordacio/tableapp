@@ -9,4 +9,5 @@ export interface IEventTypeRepository {
   findIndex(): Promise<EventType[]>;
   delete(id: string): Promise<void>;
   remove(entitie: EventType): Promise<void>;
+  saveMany(entities: EventType[]): Promise<EventType[]>;
 }

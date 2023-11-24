@@ -7,17 +7,17 @@ import { eventRouter } from './routes/event';
 import { participationRouter } from './routes/participation';
 import { friendshipRouter } from './routes/friendship';
 import { notificationRouter } from './routes/notification';
-import { socialNetworkRouter } from './routes/social_network';
+import { typeRouter } from './routes/type';
 
 const router = Router();
 
 router.use(userRouter);
 router.use(authRouter);
+router.use(typeRouter);
 router.use(addressRouter);
 router.use(eventRouter);
 router.use(participationRouter);
 router.use(friendshipRouter);
 router.use(notificationRouter);
-router.use(socialNetworkRouter);
 
 export { router };

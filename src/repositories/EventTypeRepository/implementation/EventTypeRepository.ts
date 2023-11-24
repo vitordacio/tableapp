@@ -22,8 +22,8 @@ class EventTypeRepository implements IEventTypeRepository {
     return eventType;
   }
 
-  async save(event: EventType): Promise<EventType> {
-    const newEventType = await this.ormRepository.save(event);
+  async save(entitie: EventType): Promise<EventType> {
+    const newEventType = await this.ormRepository.save(entitie);
 
     return newEventType;
   }
@@ -58,6 +58,12 @@ class EventTypeRepository implements IEventTypeRepository {
 
   async remove(entitie: EventType): Promise<void> {
     await this.ormRepository.softRemove(entitie);
+  }
+
+  async saveMany(entities: EventType[]): Promise<EventType[]> {
+    const newTypes = await this.ormRepository.save(entities);
+
+    return newTypes;
   }
 }
 

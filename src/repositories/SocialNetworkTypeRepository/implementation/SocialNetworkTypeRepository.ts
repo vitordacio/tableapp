@@ -58,6 +58,12 @@ class SocialNetworkTypeRepository implements ISocialNetworkTypeRepository {
   async remove(entitie: SocialNetworkType): Promise<void> {
     await this.ormRepository.softRemove(entitie);
   }
+
+  async saveMany(entities: SocialNetworkType[]): Promise<SocialNetworkType[]> {
+    const newTypes = await this.ormRepository.save(entities);
+
+    return newTypes;
+  }
 }
 
 export { SocialNetworkTypeRepository };

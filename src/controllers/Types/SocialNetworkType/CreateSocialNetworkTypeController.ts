@@ -4,29 +4,33 @@ import { instanceToPlain } from 'class-transformer';
 import { masterPerm } from '@config/constants';
 import { hasPermission } from '@utils/hasPermission';
 import { AppError } from '@utils/AppError';
-import { DeleteSocialNetworkTypeService } from '@services/SocialNetworkType/DeleteSocialNetworkType/DeleteSocialNetworkTypeService';
+import { CreateSocialNetworkTypeService } from '@services/Types/SocialNetworkType/CreateSocialNetworkType/CreaterSocialNetworkTypeService';
 
-class DeleteSocialNetworkTypeController {
-  private deleteSocialNetworkTypeService: DeleteSocialNetworkTypeService;
+class CreateSocialNetworkTypeController {
+  private createSocialNetworkTypeService: CreateSocialNetworkTypeService;
 
   constructor() {
-    this.deleteSocialNetworkTypeService = container.resolve(
-      DeleteSocialNetworkTypeService,
+    this.createSocialNetworkTypeService = container.resolve(
+      CreateSocialNetworkTypeService,
     );
   }
 
   async handle(req: Request, res: Response): Promise<Response> {
-    const { id } = req.params;
+    const { name, base_url, deep_link } = req.body;
 
     if (!hasPermission(req.user, masterPerm)) {
       throw new AppError('Operação não permitida.', 403);
     }
 
     const socialNetworkInstance =
-      await this.deleteSocialNetworkTypeService.execute(id);
+      await this.createSocialNetworkTypeService.execute({
+        name,
+        base_url,
+        deep_link,
+      });
 
     return res.status(201).json(instanceToPlain(socialNetworkInstance));
   }
 }
 
-export { DeleteSocialNetworkTypeController };
+export { CreateSocialNetworkTypeController };

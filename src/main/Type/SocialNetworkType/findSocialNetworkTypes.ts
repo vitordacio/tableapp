@@ -1,4 +1,4 @@
-import { FindSocialNetworkTypesController } from '@controllers/SocialNetworkType/FindSocialNetworkTypesController';
+import { FindSocialNetworkTypesController } from '@controllers/Types/SocialNetworkType/FindSocialNetworkTypesController';
 
 function FindSocialNetworkTypesControllerFactory() {
   const findSocialNetworkTypesController =
