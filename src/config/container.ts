@@ -9,6 +9,9 @@ import { HashProvider } from '@providers/HashProvider/implementation/HashProvide
 import { IEventRepository } from '@repositories/EventRepository/IEventRepository';
 import { EventRepository } from '@repositories/EventRepository/implementation/EventRepository';
 
+import { IEventTypeRepository } from '@repositories/EventTypeRepository/IEventTypeRepository';
+import { EventTypeRepository } from '@repositories/EventTypeRepository/implementation/EventTypeRepository';
+
 import { IParticipationRepository } from '@repositories/ParticipationRepository/IParticipationRepository';
 import { ParticipationRepository } from '@repositories/ParticipationRepository/implementation/ParticipationRepository';
 
@@ -32,6 +35,11 @@ container.registerSingleton<IUserRepository>('UserRepository', UserRepository);
 container.registerSingleton<IEventRepository>(
   'EventRepository',
   EventRepository,
+);
+
+container.registerSingleton<IEventTypeRepository>(
+  'EventTypeRepository',
+  EventTypeRepository,
 );
 
 container.registerSingleton<IParticipationRepository>(

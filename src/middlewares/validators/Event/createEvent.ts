@@ -2,7 +2,7 @@ import { celebrate, Segments, Joi } from 'celebrate';
 
 export const createEventMiddleware = celebrate({
   [Segments.BODY]: {
-    type: Joi.string().valid('table', 'party').required(),
+    type_id: Joi.string().required(),
     name: Joi.string().required(),
     location: Joi.string().required(),
     date: Joi.string().allow(''),
@@ -13,8 +13,11 @@ export const createEventMiddleware = celebrate({
     performer: Joi.string().allow(''),
     additional: Joi.string().allow(''),
     drink_preferences: Joi.string().allow(''),
-    age_limit: Joi.number().allow(''),
-    free_ticket: Joi.number().allow(''),
-    private: Joi.boolean().allow(''),
+    is_private: Joi.boolean().allow(''),
+    address_id: Joi.string().allow(''),
+    cover_photo: Joi.string().allow(''),
+    ticket_value: Joi.number().allow(''),
+    tickets_free: Joi.number().allow(''),
+    min_amount: Joi.number().allow(''),
   },
 });

@@ -13,8 +13,9 @@ class SocialNetworkTypeRepository implements ISocialNetworkTypeRepository {
 
   create(data: ISocialNetworkType): SocialNetworkType {
     const socialType = this.ormRepository.create({
-      id_social_network_type: data.id_social_network_type,
-      type: data.type,
+      id_social_network_type: data.id,
+      name: data.name,
+      count: data.count,
       base_url: data.base_url,
       deep_link: data.deep_link,
     });
@@ -28,9 +29,9 @@ class SocialNetworkTypeRepository implements ISocialNetworkTypeRepository {
     return newSocialNetworkType;
   }
 
-  async findByType(type: string): Promise<SocialNetworkType | undefined> {
+  async findByName(name: string): Promise<SocialNetworkType | undefined> {
     const socialType = await this.ormRepository.findOne({
-      where: { type },
+      where: { name },
     });
 
     return socialType;

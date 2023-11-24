@@ -15,7 +15,7 @@ class CreateEventController {
 
   async handle(req: Request, res: Response): Promise<Response> {
     const {
-      type,
+      type_id,
       name,
       location,
       date,
@@ -24,8 +24,11 @@ class CreateEventController {
       finish_time,
       additional,
       drink_preferences,
-      age_limit,
-      free_ticket,
+      ticket_value,
+      tickets_free,
+      min_amount,
+      address_id,
+      cover_photo,
       is_private,
       club_name,
       performer,
@@ -40,7 +43,7 @@ class CreateEventController {
 
     const eventInstance = await this.createEventService.execute({
       user: req.user,
-      type,
+      type_id,
       name,
       location,
       date,
@@ -49,8 +52,11 @@ class CreateEventController {
       finish_time,
       additional,
       drink_preferences,
-      age_limit,
-      free_ticket,
+      ticket_value,
+      tickets_free,
+      min_amount,
+      address_id,
+      cover_photo,
       is_private,
       club_name,
       performer,

@@ -59,13 +59,17 @@ class CreateSocialNetworkService {
     }
 
     social = this.socialNetworkRepository.create({
-      id_social_network: v4(),
+      id: v4(),
       username,
       type_id: socialType.id_social_network_type,
       user_id: user.id,
     });
 
     await this.socialNetworkRepository.save(social);
+
+    socialType.count += 1;
+    await this.socialNetworkTypeRepository.save(socialType);
+
     social.type = socialType;
     foundUser.social_networks = [...foundUser.social_networks, social];
 

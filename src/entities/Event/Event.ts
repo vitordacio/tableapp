@@ -64,7 +64,7 @@ class Event {
   @Column({ default: 0 })
   tickets_free: number;
 
-  @Column({ nullable: true })
+  @Column({ default: 0 })
   ticket_value: number;
 
   @Column({ nullable: true })

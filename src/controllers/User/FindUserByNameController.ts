@@ -23,11 +23,12 @@ class FindUserByNameController {
       throw new AppError('Operação não permitida.', 403);
     }
 
-    const UserInstance = await this.findUserByNameService.execute(
-      name as string,
-      parseInt(page as string, 10) || 1,
-      parseInt(limit as string, 10) || 15,
-    );
+    const UserInstance = await this.findUserByNameService.execute({
+      user: req.user,
+      name: name as string,
+      page: parseInt(page as string, 10),
+      limit: parseInt(limit as string, 10),
+    });
 
     return res.status(201).json(instanceToPlain(UserInstance));
   }

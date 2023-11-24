@@ -7,6 +7,7 @@ import { IUserRepository } from '@repositories/UserRepository/IUserRepository';
 import { AppError } from '@utils/AppError';
 import { IEventRepository } from '@repositories/EventRepository/IEventRepository';
 import { extractTagsFromText } from '@utils/generateTags';
+import { IEventTypeRepository } from '@repositories/EventTypeRepository/IEventTypeRepository';
 import { ICreateEventDTO } from './CreateEventServiceDTO';
 
 dayjs.extend(utc);
@@ -14,14 +15,18 @@ dayjs.extend(utc);
 @injectable()
 class CreateEventService {
   constructor(
+    @inject('UserRepository')
+    private userRepository: IUserRepository,
+
     @inject('EventRepository')
     private eventRepository: IEventRepository,
 
-    @inject('UserRepository')
-    private userRepository: IUserRepository,
+    @inject('EventTypeRepository')
+    private eventTypeRepository: IEventTypeRepository,
   ) {}
 
   async execute({
+    type_id,
     user,
     name,
     location,
@@ -37,6 +42,8 @@ class CreateEventService {
     is_private,
     club_name,
     performer,
+    address_id,
+    cover_photo,
   }: ICreateEventDTO): Promise<Event> {
     const author = await this.userRepository.findById(user.id);
 
@@ -44,16 +51,22 @@ class CreateEventService {
       throw new AppError('Usuário não encontrado.', 404);
     }
 
-    // if (author.role_name === 'user' && type !== 'table') {
-    //   throw new AppError('Não autorizado.', 403);
-    // }
+    const type = await this.eventTypeRepository.findById(type_id);
+
+    if (!type) {
+      throw new AppError('Tipo de evento não encontrado.', 404);
+    }
+
+    if (author.role_name === 'user' && !type.free_access) {
+      throw new AppError('Não autorizado.', 403);
+    }
 
     const formatedDate = dayjs.utc();
 
     const event = this.eventRepository.create({
       id: v4(),
       author_id: author.id_user,
-      type_id: '',
+      type_id,
       name,
       location,
       date: date || formatedDate.format('YYYY-MM-DD'),
@@ -69,6 +82,8 @@ class CreateEventService {
       private: is_private,
       club_name,
       performer,
+      address_id,
+      cover_photo,
       tags: extractTagsFromText(
         `${name} ${location} ${author.name} ${author.username}`,
       ),

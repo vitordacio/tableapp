@@ -1,6 +1,7 @@
 export interface ISocialNetworkType {
-  id_social_network_type: string;
-  type: string;
+  id: string;
+  name: string;
   base_url: string;
   deep_link?: string;
+  count?: number;
 }

@@ -4,7 +4,7 @@ import { SocialNetworkType } from '../../entities/SocialNetworkType/SocialNetwor
 export interface ISocialNetworkTypeRepository {
   save(entitie: SocialNetworkType): Promise<SocialNetworkType>;
   create(data: ISocialNetworkType): SocialNetworkType;
-  findByType(type: string): Promise<SocialNetworkType | undefined>;
+  findByName(name: string): Promise<SocialNetworkType | undefined>;
   findById(id: string): Promise<SocialNetworkType | undefined>;
   findIndex(): Promise<SocialNetworkType[]>;
   delete(id: string): Promise<void>;

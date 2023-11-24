@@ -13,7 +13,7 @@ class SocialNetworkRepository implements ISocialNetworkRepository {
 
   create(data: ISocialNetwork): SocialNetwork {
     const social = this.ormRepository.create({
-      id_social_network: data.id_social_network,
+      id_social_network: data.id,
       username: data.username,
       type_id: data.type_id,
       user_id: data.user_id,

@@ -4,6 +4,7 @@ import { AppError } from '@utils/AppError';
 import { ISocialNetworkRepository } from '@repositories/SocialNetworkRepository/ISocialNetworkRepository';
 import { IUserRepository } from '@repositories/UserRepository/IUserRepository';
 import { User } from '@entities/User/User';
+import { ISocialNetworkTypeRepository } from '@repositories/SocialNetworkTypeRepository/ISocialNetworkTypeRepository';
 
 @injectable()
 class DeleteSocialNetworkService {
@@ -13,6 +14,9 @@ class DeleteSocialNetworkService {
 
     @inject('SocialNetworkRepository')
     private socialNetworkRepository: ISocialNetworkRepository,
+
+    @inject('SocialNetworkTypeRepository')
+    private socialNetworkTypeRepository: ISocialNetworkTypeRepository,
   ) {}
 
   async execute(
@@ -34,6 +38,10 @@ class DeleteSocialNetworkService {
     }
 
     await this.socialNetworkRepository.remove(social);
+
+    const socialType = social.type;
+    socialType.count -= 1;
+    await this.socialNetworkTypeRepository.remove(socialType);
 
     foundUser.social_networks = foundUser.social_networks.filter(
       userSocial => userSocial.id_social_network !== social_network_id,

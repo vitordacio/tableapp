@@ -16,7 +16,7 @@ class CreateSocialNetworkTypeController {
   }
 
   async handle(req: Request, res: Response): Promise<Response> {
-    const { type, base_url, deep_link } = req.body;
+    const { name, base_url, deep_link } = req.body;
 
     if (!hasPermission(req.user, masterPerm)) {
       throw new AppError('Operação não permitida.', 403);
@@ -24,7 +24,7 @@ class CreateSocialNetworkTypeController {
 
     const socialNetworkInstance =
       await this.createSocialNetworkTypeService.execute({
-        type,
+        name,
         base_url,
         deep_link,
       });

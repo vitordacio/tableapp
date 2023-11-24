@@ -19,11 +19,11 @@ class EventType {
   @Column({ unique: true })
   name: string;
 
-  @Column()
-  title: string;
+  @Column({ default: true })
+  free_access: boolean;
 
-  @Column({ nullable: true })
-  description: string;
+  @Column({ default: 0 })
+  count: number;
 
   @OneToMany(() => Event, event => event.type)
   events: Event[];

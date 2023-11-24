@@ -10,7 +10,8 @@ export interface IUserRepository {
   findByEmail(email: string): Promise<User | undefined>;
   findByUsername(username: string): Promise<User | undefined>;
   findByGoogleId(google_id: string): Promise<User | undefined>;
-  findSearch(query: string, page: number, limit: number): Promise<User[]>;
+  findByName(name: string, page: number, limit: number): Promise<User[]>;
+  findLatest(): Promise<User[]>;
   findByRole(role: string): Promise<User[]>;
   delete(id: string): Promise<void>;
   remove(entitie: User): Promise<void>;

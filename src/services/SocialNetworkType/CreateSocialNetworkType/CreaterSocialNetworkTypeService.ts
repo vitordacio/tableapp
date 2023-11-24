@@ -24,11 +24,11 @@ class CreateSocialNetworkTypeService {
   async execute({
     base_url,
     deep_link,
-    type,
+    name,
   }: ICreateSocialNetworkTypeDTO): Promise<SocialNetworkType> {
     let socialType: SocialNetworkType | undefined;
 
-    socialType = await this.socialNetworkTypeRepository.findByType(type);
+    socialType = await this.socialNetworkTypeRepository.findByName(name);
 
     if (socialType) {
       throw new AppError('Tipo de rede social já cadastrada.', 400);
@@ -36,8 +36,8 @@ class CreateSocialNetworkTypeService {
 
     if (!socialType) {
       socialType = this.socialNetworkTypeRepository.create({
-        id_social_network_type: v4(),
-        type,
+        id: v4(),
+        name,
         base_url,
         deep_link,
       });

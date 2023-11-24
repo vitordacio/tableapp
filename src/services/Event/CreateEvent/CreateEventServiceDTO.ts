@@ -14,5 +14,7 @@ export interface ICreateEventDTO {
   tickets_free?: number;
   min_amount?: number;
   is_private?: boolean;
+  address_id?: string;
+  cover_photo?: string;
   user: AuthorizedUser<UserPerm | PubPerm>;
 }

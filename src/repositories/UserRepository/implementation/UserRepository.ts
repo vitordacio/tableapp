@@ -61,13 +61,9 @@ class UserRepository implements IUserRepository {
     return users;
   }
 
-  async findSearch(
-    query: string,
-    page: number,
-    limit: number,
-  ): Promise<User[]> {
+  async findByName(name: string, page: number, limit: number): Promise<User[]> {
     let tagName: string[] = [];
-    if (query) tagName = extractTagsFromText(query);
+    tagName = extractTagsFromText(name);
 
     const conditions =
       tagName.length !== 0
@@ -90,8 +86,8 @@ class UserRepository implements IUserRepository {
                 : '(:nullName::text IS NULL OR EXISTS (SELECT 1 FROM unnest(user.tags) tag WHERE unaccent(LOWER(tag)) ~~ unaccent(:query)))'
             }`,
             {
-              query: `%${query}%`,
-              nullName: query,
+              query: `%${name}%`,
+              nullName: name,
             },
           );
 
@@ -109,6 +105,14 @@ class UserRepository implements IUserRepository {
       .take(limit)
       .skip(page && limit ? limit * (page - 1) : undefined)
       .getMany();
+
+    return users;
+  }
+
+  async findLatest(): Promise<User[]> {
+    const users = await this.ormRepository.find({
+      order: { created_at: 'DESC' },
+    });
 
     return users;
   }
