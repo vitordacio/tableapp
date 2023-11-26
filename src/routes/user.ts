@@ -10,7 +10,7 @@ import { deleteUserController } from '../main/User/deleteUser';
 import { findUserIndexController } from '../main/User/findUserIndex';
 import { findUserdByIdController } from '../main/User/findUserById';
 import { findUsersByNameMiddleware } from '../middlewares/validators/User/findUsersByName';
-import { findUserByNameController } from '../main/User/findUserByName';
+import { findUsersByNameController } from '../main/User/findUsersByName';
 import { findCheckUsernameController } from '../main/User/findCheckUsername';
 import { updateUsernameController } from '../main/User/updateGenerals/updateUsername';
 import { updateEmailController } from '../main/User/updateGenerals/updateEmail';
@@ -53,7 +53,7 @@ userRouter.get(
   '/user/search',
   [verifyToken, findUsersByNameMiddleware],
   async (req: Request, res: Response) => {
-    return findUserByNameController.handle(req, res);
+    return findUsersByNameController.handle(req, res);
   },
 );
 

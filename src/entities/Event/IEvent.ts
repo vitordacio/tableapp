@@ -7,9 +7,8 @@ export interface IEvent {
   location: string;
   date: string;
   time: string;
-  finish_date?: string;
-  finish_time?: string;
-  actived?: boolean;
+  finish_date: string;
+  finish_time: string;
   additional?: string;
   drink_preferences?: string;
   min_amount?: number;
@@ -20,4 +19,6 @@ export interface IEvent {
   cover_photo?: string;
   private?: boolean;
   tags: string[];
+  participating_count?: number;
+  emojis_count?: number;
 }

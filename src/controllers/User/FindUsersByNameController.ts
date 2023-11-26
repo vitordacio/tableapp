@@ -4,13 +4,13 @@ import { instanceToPlain } from 'class-transformer';
 import { hasPermission } from '@utils/hasPermission';
 import { AppError } from '@utils/AppError';
 import { userPerm, pubPerm } from '@config/constants';
-import { FindUserByNameService } from '@services/User/FindUser/FindUsersByNameService';
+import { FindUsersByNameService } from '@services/User/FindUser/FindUsersByNameService';
 
-class FindUserByNameController {
-  private findUserByNameService: FindUserByNameService;
+class FindUsersByNameController {
+  private findUserByNameService: FindUsersByNameService;
 
   constructor() {
-    this.findUserByNameService = container.resolve(FindUserByNameService);
+    this.findUserByNameService = container.resolve(FindUsersByNameService);
   }
 
   async handle(req: Request, res: Response): Promise<Response> {
@@ -34,4 +34,4 @@ class FindUserByNameController {
   }
 }
 
-export { FindUserByNameController };
+export { FindUsersByNameController };

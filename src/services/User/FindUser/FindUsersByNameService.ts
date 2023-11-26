@@ -6,7 +6,7 @@ import { IFriendshipRepository } from '@repositories/FriendshipRepository/IFrien
 import { IFindUsersServiceDTO } from './IFindUsersServiceDTO';
 
 @injectable()
-class FindUserByNameService {
+class FindUsersByNameService {
   constructor(
     @inject('UserRepository')
     private userRepository: IUserRepository,
@@ -85,4 +85,4 @@ class FindUserByNameService {
   }
 }
 
-export { FindUserByNameService };
+export { FindUsersByNameService };

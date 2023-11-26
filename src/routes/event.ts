@@ -13,6 +13,8 @@ import { findEventByLocationController } from '../main/Event/findEventByLocation
 import { createEventMiddleware } from '../middlewares/validators/Event/createEvent';
 import { updateEventActivedController } from '../main/Event/updateEventActived';
 import { updateEventActivedMiddleware } from '../middlewares/validators/Event/updateEventActived';
+import { findEventsByNameMiddleware } from '../middlewares/validators/Event/findEventsByName';
+import { findEventsByNameController } from '../main/Event/findEventsByName';
 
 const eventRouter = Router();
 
@@ -31,6 +33,14 @@ eventRouter.post(
 //     return createPartyController.handle(req, res);
 //   },
 // );
+
+eventRouter.get(
+  '/event/search',
+  [verifyToken, findEventsByNameMiddleware],
+  async (req: Request, res: Response) => {
+    return findEventsByNameController.handle(req, res);
+  },
+);
 
 eventRouter.get('/event', verifyToken, async (req: Request, res: Response) => {
   return findEventIndexController.handle(req, res);

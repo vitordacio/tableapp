@@ -3,7 +3,7 @@ import { Request, Response } from 'express';
 import { instanceToPlain } from 'class-transformer';
 import { hasPermission } from '@utils/hasPermission';
 import { AppError } from '@utils/AppError';
-import { masterPerm } from '@config/constants';
+import { userPerm, pubPerm } from '@config/constants';
 import { FindEventTypesService } from '@services/Types/EventType/FindEventTypes/FindEventTypesService';
 
 class FindEventTypesController {
@@ -14,7 +14,10 @@ class FindEventTypesController {
   }
 
   async handle(req: Request, res: Response): Promise<Response> {
-    if (!hasPermission(req.user, masterPerm)) {
+    if (
+      !hasPermission(req.user, userPerm) &&
+      !hasPermission(req.user, pubPerm)
+    ) {
       throw new AppError('Operação não permitida.', 403);
     }
 

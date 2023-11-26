@@ -49,8 +49,13 @@ class Event {
   @Column({ type: 'time' })
   finish_time: Date;
 
-  @Column({ default: true })
-  actived: boolean;
+  @Column({ default: 1 })
+  participating_count: number;
+
+  @Column({ default: 0 })
+  emojis_count: number;
+
+  status?: 'awaiting' | 'in_progress' | 'finished';
 
   @Column({ nullable: true })
   additional: string;

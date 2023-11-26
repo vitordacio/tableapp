@@ -1,5 +1,5 @@
 // import { Brackets, getRepository, Repository } from 'typeorm';
-import { getRepository, Repository } from 'typeorm';
+import { Brackets, getRepository, Repository } from 'typeorm';
 import { IEvent } from '@entities/Event/IEvent';
 import { Event } from '@entities/Event/Event';
 import { extractTagsFromText } from '@utils/generateTags';
@@ -26,9 +26,10 @@ class EventRepository implements IEventRepository {
       finish_date: data.finish_date,
       finish_time: data.finish_time,
       cover_photo: data.cover_photo,
+      participating_count: data.participating_count,
+      emojis_count: data.emojis_count,
       address_id: data.address_id,
       additional: data.additional,
-      actived: data.actived,
       club_name: data.club_name,
       performer: data.performer,
       drink_preferences: data.drink_preferences,
@@ -91,14 +92,13 @@ class EventRepository implements IEventRepository {
     return events;
   }
 
-  async findSearch(
-    query: string,
+  async findByName(
+    name: string,
     page: number,
     limit: number,
   ): Promise<Event[]> {
-    // CREATE EXTENSION IF NOT EXISTS unaccent;
     let tagName: string[] = [];
-    if (query) tagName = extractTagsFromText(query);
+    tagName = extractTagsFromText(name);
 
     const conditions =
       tagName.length !== 0
@@ -108,24 +108,55 @@ class EventRepository implements IEventRepository {
                 `similarity(unaccent(LOWER(tag)), unaccent(lower('${word}'))) > ${similarity}`,
             )
             .join(' OR ')
-        : `''::text IS NULL`;
+        : null;
 
-    const events = this.ormRepository
+    const users = this.ormRepository
       .createQueryBuilder('event')
+      .leftJoin('event.author', 'author')
+      .leftJoin('event.type', 'type')
       .where(
-        `EXISTS (SELECT 1 FROM unnest(event.tags) tag WHERE ${conditions})`,
+        new Brackets(qb => {
+          qb.where(
+            `${
+              conditions
+                ? `EXISTS (SELECT 1 FROM unnest(event.tags) tag WHERE ${conditions})`
+                : '(:nullName::text IS NULL OR EXISTS (SELECT 1 FROM unnest(event.tags) tag WHERE unaccent(LOWER(tag)) ~~ unaccent(:query)))'
+            }`,
+            {
+              query: `%${name}%`,
+              nullName: name,
+            },
+          );
+
+          return qb;
+        }),
       )
       .select([
         'event.id_event',
         'event.name',
-        `(SELECT count(*) FROM unnest(event.tags) as tag WHERE ${conditions}) as qtd`,
+        'event.location',
+        'event.cover_photo',
+        'event.date',
+        'event.time',
+        'event.finish_date',
+        'event.finish_time',
+        'event.participating_count',
+        'event.emojis_count',
+        'author.name',
+        'author.username',
+        'author.picture',
+        'type.name',
       ])
+      .addSelect(
+        `(SELECT count(*) FROM unnest(event.tags) as tag WHERE ${conditions})`,
+        'qtd',
+      )
       .orderBy('qtd', 'DESC')
       .take(limit)
       .skip(page && limit ? limit * (page - 1) : undefined)
       .getMany();
 
-    return events;
+    return users;
   }
 
   async findClosest(lat: number, long: number): Promise<Event[]> {

@@ -2,14 +2,15 @@ import { Request, Response, Router } from 'express';
 import { verifyToken } from '../middlewares/verifyToken';
 
 import { createEventTypeMiddleware } from '../middlewares/validators/Event/createEventType';
-import { createEventTypeController } from '../main/Event/createEventType';
-import { deleteEventTypeController } from '../main/Event/deleteEventType';
-import { findEventTypesController } from '../main/Type/EventType/findEventTypes';
-
 import { createSocialNetworkTypeMiddleware } from '../middlewares/validators/Type/SocialNetworkType/createSocialNetworkType';
+
+import { findEventTypesController } from '../main/Type/EventType/findEventTypes';
 import { createSocialNetworkTypeController } from '../main/Type/SocialNetworkType/createSocialNetworkType';
 import { deleteSocialNetworkTypeController } from '../main/Type/SocialNetworkType/deleteSocialNetworkType';
 import { findSocialNetworkTypesController } from '../main/Type/SocialNetworkType/findSocialNetworkTypes';
+import { createEventTypeController } from '../main/Type/EventType/createEventType';
+import { deleteEventTypeController } from '../main/Type/EventType/deleteEventType';
+import { fetchEventTypesController } from '../main/Type/EventType/fetchEventTypes';
 
 const typeRouter = Router();
 
@@ -34,7 +35,7 @@ typeRouter.post(
   '/type/event/fetch',
   verifyToken,
   async (req: Request, res: Response) => {
-    return createEventTypeController.handle(req, res);
+    return fetchEventTypesController.handle(req, res);
   },
 );
 
