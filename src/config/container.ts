@@ -15,6 +15,9 @@ import { EventTypeRepository } from '@repositories/EventTypeRepository/implement
 import { IParticipationRepository } from '@repositories/ParticipationRepository/IParticipationRepository';
 import { ParticipationRepository } from '@repositories/ParticipationRepository/implementation/ParticipationRepository';
 
+import { IParticipationTypeRepository } from '@repositories/ParticipationTypeRepository/IParticipationTypeRepository';
+import { ParticipationTypeRepository } from '@repositories/ParticipationTypeRepository/implementation/ParticipationTypeRepository';
+
 import { IAddressRepository } from '@repositories/AddressRepository/IAddressRepository';
 import { AddressRepository } from '@repositories/AddressRepository/implementation/AddressRepository';
 
@@ -45,6 +48,11 @@ container.registerSingleton<IEventTypeRepository>(
 container.registerSingleton<IParticipationRepository>(
   'ParticipationRepository',
   ParticipationRepository,
+);
+
+container.registerSingleton<IParticipationTypeRepository>(
+  'ParticipationTypeRepository',
+  ParticipationTypeRepository,
 );
 
 container.registerSingleton<IAddressRepository>(

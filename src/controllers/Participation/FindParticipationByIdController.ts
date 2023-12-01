@@ -25,10 +25,10 @@ class FindParticipationByIdController {
       throw new AppError('Operação não permitida.', 403);
     }
 
-    const ParticipationInstance =
+    const participationInstance =
       await this.findParticipationByIdService.execute(id);
 
-    return res.status(201).json(instanceToPlain(ParticipationInstance));
+    return res.status(201).json(instanceToPlain(participationInstance));
   }
 }
 

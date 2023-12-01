@@ -12,6 +12,7 @@ import {
 import { Exclude } from 'class-transformer';
 import { User } from '@entities/User/User';
 import { Event } from '@entities/Event/Event';
+import { ParticipationType } from '@entities/ParticipationType/ParticipationType';
 import { Notification } from '@entities/Notification/Notification';
 
 @Entity('participations')
@@ -20,7 +21,11 @@ class Participation {
   id_participation: string;
 
   @Column()
-  type: string;
+  type_id: string;
+
+  @ManyToOne(() => ParticipationType, type => type.participations)
+  @JoinColumn({ name: 'type_id' })
+  type: ParticipationType;
 
   @Column({ default: false })
   in: boolean;

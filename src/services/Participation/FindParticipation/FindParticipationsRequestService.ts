@@ -4,7 +4,6 @@ import { IParticipationRepository } from '@repositories/ParticipationRepository/
 import { IEventRepository } from '@repositories/EventRepository/IEventRepository';
 import { Participation } from '@entities/Participation/Participation';
 import { AppError } from '@utils/AppError';
-import { hasModPermission } from '@utils/validations';
 
 @injectable()
 class FindParticipationsRequestService {
@@ -27,30 +26,19 @@ class FindParticipationsRequestService {
     }
 
     if (user.id !== event.author_id) {
-      const auth = hasModPermission(user.id, event.participations);
+      const hasAuth = await this.participationRepository.checkMod(
+        user.id,
+        event.id_event,
+      );
 
-      if (!auth) {
+      if (!hasAuth) {
         throw new AppError('Não autorizado.', 403);
       }
     }
 
-    let participations = await this.participationRepository.findByEventId(
+    const participations = await this.participationRepository.findByEventId(
       event_id,
     );
-    const reviwed: Participation[] = [];
-    const noReviwed: Participation[] = [];
-
-    participations.sort(
-      (a, b) =>
-        new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime(),
-    );
-
-    participations.map(participation => {
-      if (!participation.reviwed_by_event) return noReviwed.push(participation);
-      return reviwed.push(participation);
-    });
-
-    participations = [...noReviwed, ...reviwed];
 
     return participations;
   }

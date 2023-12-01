@@ -5,7 +5,7 @@ export interface IParticipationRepository {
   save(Participation: Participation): Promise<Participation>;
   create(data: IParticipation): Participation;
   findById(id: string): Promise<Participation | undefined>;
-  findMod(
+  checkMod(
     user_id: string,
     event_id: string,
   ): Promise<Participation | undefined>;

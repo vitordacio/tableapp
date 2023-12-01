@@ -2,17 +2,16 @@ import { inject, injectable } from 'tsyringe';
 import { v4 } from 'uuid';
 
 import { Participation } from '@entities/Participation/Participation';
-
 import { IParticipationRepository } from '@repositories/ParticipationRepository/IParticipationRepository';
 
 import { AppError } from '@utils/AppError';
 import { INotificationRepository } from '@repositories/NotificationRepository/INotificationRepository';
-import { IUserRepository } from '@repositories/UserRepository/IUserRepository';
 import { IEventRepository } from '@repositories/EventRepository/IEventRepository';
-import { ICreateParticipationByEventDTO } from './CreateParticipationByEventServiceDTO';
+import { IUserRepository } from '@repositories/UserRepository/IUserRepository';
+import { ICreateInviteResponseDTO } from './CreateInviteResponseServiceDTO';
 
 @injectable()
-class CreateParticipationByEventService {
+class CreateInviteResponseService {
   constructor(
     @inject('ParticipationRepository')
     private participationRepository: IParticipationRepository,
@@ -28,49 +27,42 @@ class CreateParticipationByEventService {
   ) {}
 
   async execute({
-    participation_id,
+    event_id,
     user,
-  }: ICreateParticipationByEventDTO): Promise<Participation> {
-    const [participation, foundUser] = await Promise.all([
-      this.participationRepository.findById(participation_id),
+  }: ICreateInviteResponseDTO): Promise<Participation> {
+    const [foundUser, event] = await Promise.all([
       this.userRepository.findById(user.id),
+      this.eventRepository.findById(event_id),
     ]);
-
-    if (!participation) {
-      throw new AppError('Solicitação não encontrada.', 404);
-    }
 
     if (!foundUser) {
       throw new AppError('Usuário não encontrado.', 404);
     }
 
-    if (participation.reviwer_id) {
-      throw new AppError('Essa participação já foi revisada.', 404);
+    if (!event) {
+      throw new AppError('Evento não encontrado.', 404);
     }
 
-    if (user.id !== participation.event.author_id) {
-      const hasAuth = await this.participationRepository.checkMod(
-        user.id,
-        participation.event_id,
-      );
+    const participation = await this.participationRepository.findByUserAndEvent(
+      user.id,
+      event.id_event,
+    );
 
-      if (!hasAuth) {
-        throw new AppError('Não autorizado.', 403);
-      }
+    if (!participation) {
+      throw new AppError('Convite não encontrado.', 404);
     }
 
-    participation.reviwer_id = user.id;
-    participation.confirmed_by_event = true;
+    participation.confirmed_by_user = true;
     participation.in = true;
 
     participation.event.participating_count += 1;
 
     const notification = this.notificationRepository.create({
       id: v4(),
-      message: `${foundUser.name} confirmou sua participação no evento ${participation.event.name}! 🎉`,
+      message: `${event.name} está participando do evento ${event.name}! 🎉`,
       type: 'participation',
       author_id: foundUser.id_user,
-      user_id: participation.user_id,
+      user_id: event.author_id,
       participation_id: participation.id_participation,
     });
 
@@ -84,4 +76,4 @@ class CreateParticipationByEventService {
   }
 }
 
-export { CreateParticipationByEventService };
+export { CreateInviteResponseService };

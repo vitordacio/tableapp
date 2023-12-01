@@ -14,12 +14,10 @@ class ParticipationRepository implements IParticipationRepository {
   create(data: IParticipation): Participation {
     const participation = this.ormRepository.create({
       id_participation: data.id,
-      type: data.type,
+      type_id: data.type_id,
       in: data.in,
       confirmed_by_user: data.confirmed_by_user,
       confirmed_by_event: data.confirmed_by_event,
-      reviwed_by_user: data.reviwed_by_user,
-      reviwed_by_event: data.reviwed_by_event,
       reviwer_id: data.reviwer_id,
       user_id: data.user_id,
       event_id: data.event_id,
@@ -36,20 +34,29 @@ class ParticipationRepository implements IParticipationRepository {
 
   async findById(id: string): Promise<Participation | undefined> {
     const participation = await this.ormRepository.findOne({
-      relations: ['event', 'event.participations', 'user'],
+      relations: ['event', 'user'],
       where: { id_participation: id },
     });
 
     return participation;
   }
 
-  async findMod(
+  async checkMod(
     user_id: string,
     event_id: string,
   ): Promise<Participation | undefined> {
-    const participation = await this.ormRepository.findOne({
-      where: { user_id, event_id, type: 'mod' },
-    });
+    const participation = await this.ormRepository
+      .createQueryBuilder('participation')
+      .leftJoin('participation.type', 'type')
+      .where(
+        'participation.user_id = :user_id AND participation.event_id = :event_id',
+        {
+          user_id,
+          event_id,
+        },
+      )
+      .andWhere('type.name = :type', { type: 'mod' })
+      .getOne();
 
     return participation;
   }
@@ -66,7 +73,7 @@ class ParticipationRepository implements IParticipationRepository {
   async findByEventId(event_id: string): Promise<Participation[]> {
     const participations = await this.ormRepository.find({
       relations: ['user'],
-      where: { event_id },
+      where: { event_id, reviwer_id: undefined || null },
     });
 
     return participations;
@@ -87,7 +94,7 @@ class ParticipationRepository implements IParticipationRepository {
     event_id: string,
   ): Promise<Participation | undefined> {
     const participation = await this.ormRepository.findOne({
-      relations: ['event'],
+      relations: ['event', 'type'],
       where: { user_id, event_id },
     });
 

@@ -10,7 +10,7 @@ export const checkEventStatus = (event: Event): Event['status'] => {
     return 'awaiting';
   }
   if (startDateTime <= nowDateTime && nowDateTime <= finishDateTime) {
-    return 'in_progress';
+    return 'ongoing';
   }
 
   return 'finished';

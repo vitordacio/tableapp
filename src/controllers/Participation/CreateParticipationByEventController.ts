@@ -16,7 +16,7 @@ class CreateParticipationByEventController {
   }
 
   async handle(req: Request, res: Response): Promise<Response> {
-    const { participation_id, confirmed_by_event } = req.body;
+    const { participation_id } = req.params;
 
     if (
       !hasPermission(req.user, userPerm) &&
@@ -28,7 +28,6 @@ class CreateParticipationByEventController {
     const participationInstance =
       await this.createParticipationByEventService.execute({
         participation_id,
-        confirmed_by_event,
         user: req.user,
       });
 

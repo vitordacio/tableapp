@@ -4,19 +4,19 @@ import { instanceToPlain } from 'class-transformer';
 import { hasPermission } from '@utils/hasPermission';
 import { AppError } from '@utils/AppError';
 import { pubPerm, userPerm } from '@config/constants';
-import { CreateParticipationInviteService } from '@services/Participation/CreateParticipationInvite/CreateParticipationInviteService';
+import { CreateInviteResponseService } from '@services/Participation/CreateInviteResponse/CreateInviteResponseService';
 
-class CreateParticipationInviteController {
-  private createParticipationInviteService: CreateParticipationInviteService;
+class CreateInviteResponseController {
+  private createInviteResponseService: CreateInviteResponseService;
 
   constructor() {
-    this.createParticipationInviteService = container.resolve(
-      CreateParticipationInviteService,
+    this.createInviteResponseService = container.resolve(
+      CreateInviteResponseService,
     );
   }
 
   async handle(req: Request, res: Response): Promise<Response> {
-    const { event_id, user_id, type } = req.body;
+    const { event_id } = req.params;
 
     if (
       !hasPermission(req.user, userPerm) &&
@@ -26,10 +26,8 @@ class CreateParticipationInviteController {
     }
 
     const participationInstance =
-      await this.createParticipationInviteService.execute({
+      await this.createInviteResponseService.execute({
         event_id,
-        user_id,
-        type,
         user: req.user,
       });
 
@@ -37,4 +35,4 @@ class CreateParticipationInviteController {
   }
 }
 
-export { CreateParticipationInviteController };
+export { CreateInviteResponseController };

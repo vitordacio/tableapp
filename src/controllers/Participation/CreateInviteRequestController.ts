@@ -4,19 +4,19 @@ import { instanceToPlain } from 'class-transformer';
 import { hasPermission } from '@utils/hasPermission';
 import { AppError } from '@utils/AppError';
 import { pubPerm, userPerm } from '@config/constants';
-import { DeleteParticipationService } from '@services/Participation/DeleteParticipation/DeleteParticipationService';
+import { CreateInviteRequestService } from '@services/Participation/CreateInviteRequest/CreateInviteRequestService';
 
-class DeleteParticipationController {
-  private deleteParticipationService: DeleteParticipationService;
+class CreateInviteRequestController {
+  private createInviteRequestService: CreateInviteRequestService;
 
   constructor() {
-    this.deleteParticipationService = container.resolve(
-      DeleteParticipationService,
+    this.createInviteRequestService = container.resolve(
+      CreateInviteRequestService,
     );
   }
 
   async handle(req: Request, res: Response): Promise<Response> {
-    const { id } = req.params;
+    const { event_id, user_id, type_id } = req.body;
 
     if (
       !hasPermission(req.user, userPerm) &&
@@ -25,13 +25,17 @@ class DeleteParticipationController {
       throw new AppError('Operação não permitida.', 403);
     }
 
-    const participationInstance = await this.deleteParticipationService.execute(
-      id,
-      req.user,
+    const participationInstance = await this.createInviteRequestService.execute(
+      {
+        event_id,
+        user_id,
+        type_id,
+        user: req.user,
+      },
     );
 
     return res.status(201).json(instanceToPlain(participationInstance));
   }
 }
 
-export { DeleteParticipationController };
+export { CreateInviteRequestController };

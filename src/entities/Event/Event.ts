@@ -49,13 +49,25 @@ class Event {
   @Column({ type: 'time' })
   finish_time: Date;
 
-  @Column({ default: 1 })
+  @Column({ default: 0 })
   participating_count: number;
 
   @Column({ default: 0 })
   emojis_count: number;
 
-  status?: 'awaiting' | 'in_progress' | 'finished';
+  status?: 'awaiting' | 'ongoing' | 'finished';
+
+  participation_status?:
+    | 'author'
+    | 'user_in'
+    | 'user_out'
+    | 'guest_in'
+    | 'guest_out'
+    | 'mod_in'
+    | 'mod_out'
+    | 'vip_in'
+    | 'vip_out'
+    | '';
 
   @Column({ nullable: true })
   additional: string;
@@ -113,8 +125,7 @@ class Event {
   pictures: EventPicture[];
 
   @OneToMany(() => Participation, participation => participation.event, {
-    cascade: ['insert', 'recover', 'remove', 'update'],
-    eager: true,
+    cascade: true,
   })
   participations: Participation[];
 

@@ -51,7 +51,7 @@ class EventRepository implements IEventRepository {
 
   async findById(id: string): Promise<Event | undefined> {
     const event = await this.ormRepository.findOne({
-      relations: ['type', 'address', 'author', 'participations'],
+      relations: ['type', 'address', 'author'],
       where: { id_event: id },
     });
 
@@ -145,6 +145,7 @@ class EventRepository implements IEventRepository {
         'author.name',
         'author.username',
         'author.picture',
+        'author.locale',
         'type.name',
       ])
       .addSelect(

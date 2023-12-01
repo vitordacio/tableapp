@@ -1,9 +1,9 @@
 import { celebrate, Segments, Joi } from 'celebrate';
 
-export const createParticipationInviteMiddleware = celebrate({
+export const createInviteRequestMiddleware = celebrate({
   [Segments.BODY]: {
     event_id: Joi.string().uuid().required(),
     user_id: Joi.string().uuid().required(),
-    type: Joi.string().valid('mod', 'vip').allow(''),
+    type_id: Joi.string().required(),
   },
 });

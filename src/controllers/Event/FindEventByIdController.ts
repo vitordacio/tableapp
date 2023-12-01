@@ -23,7 +23,7 @@ class FindEventByIdController {
       throw new AppError('Operação não permitida.', 403);
     }
 
-    const eventInstance = await this.findEventByIdService.execute(id);
+    const eventInstance = await this.findEventByIdService.execute(id, req.user);
 
     return res.status(201).json(instanceToPlain(eventInstance));
   }

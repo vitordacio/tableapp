@@ -32,7 +32,13 @@ class FetchEventTypesService {
         name: 'meeting',
       },
       {
+        name: 'moon',
+      },
+      {
         name: 'auditorium',
+      },
+      {
+        name: 'fishing',
       },
       {
         name: 'games',
@@ -45,6 +51,9 @@ class FetchEventTypesService {
       },
       {
         name: 'boat',
+      },
+      {
+        name: 'pool',
       },
     ];
 
