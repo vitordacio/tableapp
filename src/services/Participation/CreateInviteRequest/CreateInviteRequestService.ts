@@ -62,7 +62,7 @@ class CreateInviteRequestService {
     }
 
     if (!participationType) {
-      throw new AppError('Tipo de evento não encontrado.', 404);
+      throw new AppError('Tipo de participação não encontrado.', 404);
     }
 
     if (user.id !== event.author_id) {

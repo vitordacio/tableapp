@@ -29,6 +29,7 @@ class FindEventByIdService {
       throw new AppError('Evento não encontrado.', 404);
     }
 
+    event.participation_id = participation?.id_participation;
     event.status = checkEventStatus(event);
 
     event.participation_status = checkParticipationStatus({

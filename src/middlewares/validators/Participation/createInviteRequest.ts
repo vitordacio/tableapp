@@ -4,6 +4,6 @@ export const createInviteRequestMiddleware = celebrate({
   [Segments.BODY]: {
     event_id: Joi.string().uuid().required(),
     user_id: Joi.string().uuid().required(),
-    type_id: Joi.string().required(),
+    type_id: Joi.string().uuid().required(),
   },
 });

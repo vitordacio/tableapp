@@ -69,6 +69,8 @@ class Event {
     | 'vip_out'
     | '';
 
+  participation_id?: string;
+
   @Column({ nullable: true })
   additional: string;
 
