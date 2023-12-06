@@ -2,19 +2,16 @@ export interface ICreateEventDTO {
   type_id: string;
   name: string;
   location: string;
-  date?: string;
-  time?: string;
-  finish_date?: string;
-  finish_time?: string;
-  club_name?: string;
-  performer?: string;
+  start_time?: Date;
+  finish_time?: Date;
+  is_private?: boolean;
   additional?: string;
   drink_preferences?: string;
-  ticket_value?: number;
+  min_amount?: string;
+  performer?: string;
+  club_name?: string;
+  ticket_value?: string;
   tickets_free?: number;
-  min_amount?: number;
-  is_private?: boolean;
   address_id?: string;
-  cover_photo?: string;
   user: AuthorizedUser<UserPerm | PubPerm>;
 }

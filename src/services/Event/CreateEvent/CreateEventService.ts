@@ -30,9 +30,7 @@ class CreateEventService {
     user,
     name,
     location,
-    date,
-    time,
-    finish_date,
+    start_time,
     finish_time,
     additional,
     drink_preferences,
@@ -43,15 +41,19 @@ class CreateEventService {
     club_name,
     performer,
     address_id,
-    cover_photo,
   }: ICreateEventDTO): Promise<Event> {
-    const author = await this.userRepository.findById(user.id);
+    const [author, type] = await Promise.all([
+      this.userRepository.findById(user.id),
+      this.eventTypeRepository.findById(type_id),
+    ]);
+
+    // const author = await this.userRepository.findById(user.id);
 
     if (!author) {
       throw new AppError('Usuário não encontrado.', 404);
     }
 
-    const type = await this.eventTypeRepository.findById(type_id);
+    // const type = await this.eventTypeRepository.findById(type_id);
 
     if (!type) {
       throw new AppError('Tipo de evento não encontrado.', 404);
@@ -61,7 +63,9 @@ class CreateEventService {
       throw new AppError('Não autorizado.', 403);
     }
 
-    const formatedDate = dayjs.utc();
+    const currentTime = new Date();
+    const finishTime = new Date(currentTime);
+    finishTime.setHours(currentTime.getHours() + 24);
 
     const event = this.eventRepository.create({
       id: v4(),
@@ -69,31 +73,33 @@ class CreateEventService {
       type_id,
       name,
       location,
-      date: date || formatedDate.format('YYYY-MM-DD'),
-      time: time || formatedDate.format('HH:mm'),
-      finish_date:
-        finish_date || formatedDate.add(24, 'hour').format('YYYY-MM-DD'),
-      finish_time: finish_time || formatedDate.add(24, 'hour').format('HH:mm'),
+      start_time: start_time || currentTime,
+      finish_time: finish_time || finishTime,
       additional,
       drink_preferences,
-      ticket_value,
-      tickets_free,
-      min_amount,
+      ticket_value: ticket_value || undefined,
+      tickets_free: tickets_free || undefined,
+      min_amount: min_amount || undefined,
       private: is_private,
       club_name,
       performer,
-      address_id,
-      cover_photo,
+      address_id: address_id || undefined,
       tags: extractTagsFromText(
         `${name} ${location} ${author.name} ${author.username}`,
       ),
     });
 
     event.participations = [];
-
-    await this.eventRepository.save(event);
     type.count += 1;
-    await this.eventTypeRepository.save(type);
+
+    await Promise.all([
+      await this.eventRepository.save(event),
+      await this.eventTypeRepository.save(type),
+    ]);
+
+    // await this.eventRepository.save(event);
+    // type.count += 1;
+    // await this.eventTypeRepository.save(type);
 
     return event;
   }

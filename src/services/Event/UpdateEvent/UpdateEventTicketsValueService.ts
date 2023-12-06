@@ -1,23 +1,25 @@
 import { inject, injectable } from 'tsyringe';
-
 import { AppError } from '@utils/AppError';
 import { IEventRepository } from '@repositories/EventRepository/IEventRepository';
-import { hasModPermission } from '@utils/validations';
+import { IParticipationRepository } from '@repositories/ParticipationRepository/IParticipationRepository';
 import { Event } from '@entities/Event/Event';
-import { IUpdateEventActivedDTO } from './UpdateEventDTO';
+import { IUpdateEventTicketsValueDTO } from './UpdateEventDTO';
 
 @injectable()
-class UpdateEventActivedService {
+class UpdateEventTicketsValueService {
   constructor(
     @inject('EventRepository')
     private eventRepository: IEventRepository,
+
+    @inject('ParticipationRepository')
+    private participationRepository: IParticipationRepository,
   ) {}
 
   async execute({
     user,
     event_id,
-    actived,
-  }: IUpdateEventActivedDTO): Promise<Event> {
+    ticket_value,
+  }: IUpdateEventTicketsValueDTO): Promise<Event> {
     const event = await this.eventRepository.findById(event_id);
 
     if (!event) {
@@ -25,14 +27,17 @@ class UpdateEventActivedService {
     }
 
     if (user.id !== event.author_id) {
-      const auth = hasModPermission(user.id, event.participations);
+      const auth = await this.participationRepository.checkMod(
+        user.id,
+        event_id,
+      );
 
       if (!auth) {
         throw new AppError('Não autorizado.', 403);
       }
     }
 
-    event.actived = actived;
+    event.ticket_value = ticket_value;
 
     await this.eventRepository.save(event);
 
@@ -40,4 +45,4 @@ class UpdateEventActivedService {
   }
 }
 
-export { UpdateEventActivedService };
+export { UpdateEventTicketsValueService };

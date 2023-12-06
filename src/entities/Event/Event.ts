@@ -37,17 +37,23 @@ class Event {
   @Column()
   location: string;
 
-  @Column({ type: 'date' })
-  date: Date;
+  @Column()
+  start_time: Date;
 
-  @Column({ type: 'time' })
-  time: Date;
-
-  @Column({ type: 'date' })
-  finish_date: Date;
-
-  @Column({ type: 'time' })
+  @Column()
   finish_time: Date;
+
+  // @Column({ type: 'date' })
+  // date: Date;
+
+  // @Column({ type: 'time' })
+  // time: Date;
+
+  // @Column({ type: 'date' })
+  // finish_date: Date;
+
+  // @Column({ type: 'time' })
+  // finish_time: Date;
 
   @Column({ default: 0 })
   participating_count: number;
@@ -78,13 +84,13 @@ class Event {
   drink_preferences: string;
 
   @Column({ nullable: true })
-  min_amount: number;
+  min_amount: string;
 
   @Column({ default: 0 })
   tickets_free: number;
 
-  @Column({ default: 0 })
-  ticket_value: number;
+  @Column({ nullable: true })
+  ticket_value: string;
 
   @Column({ nullable: true })
   club_name: string;

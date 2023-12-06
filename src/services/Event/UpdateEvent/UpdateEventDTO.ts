@@ -1,25 +1,72 @@
-export interface IUpdateEventDTO {
+export interface IUpdateEventNameDTO {
   event_id: string;
-  type_id: string;
   name: string;
-  location: string;
-  date?: string;
-  time?: string;
-  finish_date?: string;
-  finish_time?: string;
-  club_name?: string;
-  performer?: string;
-  additional?: string;
-  drink_preferences?: string;
-  ticket_value?: number;
-  tickets_free?: number;
-  min_amount?: number;
-  is_private?: boolean;
   user: AuthorizedUser<UserPerm | PubPerm>;
 }
 
-export interface IUpdateEventActivedDTO {
+export interface IUpdateEventLocationDTO {
   event_id: string;
-  actived: boolean;
+  location: string;
+  user: AuthorizedUser<UserPerm | PubPerm>;
+}
+
+export interface IUpdateEventHoursDTO {
+  event_id: string;
+  start_time: Date;
+  finish_time?: Date;
+  user: AuthorizedUser<UserPerm | PubPerm>;
+}
+
+export interface IUpdateEventPrivateDTO {
+  event_id: string;
+  is_private: boolean;
+  user: AuthorizedUser<UserPerm | PubPerm>;
+}
+
+export interface IUpdateEventAdditionalDTO {
+  event_id: string;
+  additional: string;
+  user: AuthorizedUser<UserPerm | PubPerm>;
+}
+
+export interface IUpdateEventDrinkPreferencesDTO {
+  event_id: string;
+  drink_preferences: string;
+  user: AuthorizedUser<UserPerm | PubPerm>;
+}
+
+export interface IUpdateEventMinAmountDTO {
+  event_id: string;
+  min_amount: string;
+  user: AuthorizedUser<UserPerm | PubPerm>;
+}
+
+export interface IUpdateEventPerformerDTO {
+  event_id: string;
+  performer: string;
+  user: AuthorizedUser<UserPerm | PubPerm>;
+}
+
+export interface IUpdateEventClubNameDTO {
+  event_id: string;
+  club_name: string;
+  user: AuthorizedUser<UserPerm | PubPerm>;
+}
+
+export interface IUpdateEventTicketsValueDTO {
+  event_id: string;
+  ticket_value: string;
+  user: AuthorizedUser<UserPerm | PubPerm>;
+}
+
+export interface IUpdateEventTicketsFreeDTO {
+  event_id: string;
+  tickets_free: number;
+  user: AuthorizedUser<UserPerm | PubPerm>;
+}
+
+export interface IUpdateEventAddressIdDTO {
+  event_id: string;
+  address_id: string;
   user: AuthorizedUser<UserPerm | PubPerm>;
 }
