@@ -14,6 +14,7 @@ export interface IEventRepository {
   ): Promise<Event[]>;
   findClosest(lat: number, long: number): Promise<Event[]>;
   findByName(name: string, page: number, limit: number): Promise<Event[]>;
+  findByUserId(user_id: string, page: number, limit: number): Promise<Event[]>;
   delete(id: string): Promise<void>;
   remove(entitie: Event): Promise<void>;
 }

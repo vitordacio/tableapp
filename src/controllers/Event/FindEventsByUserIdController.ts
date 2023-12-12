@@ -4,17 +4,18 @@ import { instanceToPlain } from 'class-transformer';
 import { hasPermission } from '@utils/hasPermission';
 import { AppError } from '@utils/AppError';
 import { userPerm, pubPerm } from '@config/constants';
-import { FindEventsByNameService } from '@services/Event/FindEvent/FindEventsByNameService';
+import { FindEventsByUserIdService } from '@services/Event/FindEvent/FindEventsByUserIdService';
 
-class FindEventsByNameController {
-  private findEventByNameService: FindEventsByNameService;
+class FindEventsByUserIdController {
+  private findEventByUserService: FindEventsByUserIdService;
 
   constructor() {
-    this.findEventByNameService = container.resolve(FindEventsByNameService);
+    this.findEventByUserService = container.resolve(FindEventsByUserIdService);
   }
 
   async handle(req: Request, res: Response): Promise<Response> {
-    const { name, page, limit } = req.query;
+    const { user_id } = req.params;
+    const { page, limit } = req.query;
 
     if (
       !hasPermission(req.user, userPerm) &&
@@ -23,14 +24,14 @@ class FindEventsByNameController {
       throw new AppError('Operação não permitida.', 403);
     }
 
-    const eventInstance = await this.findEventByNameService.execute({
-      name: name as string,
+    const eventInstance = await this.findEventByUserService.execute({
+      user_id,
       page: parseInt(page as string, 10),
       limit: parseInt(limit as string, 10),
     });
 
-    return res.status(201).json(instanceToPlain(eventInstance));
+    return res.status(200).json(instanceToPlain(eventInstance));
   }
 }
 
-export { FindEventsByNameController };
+export { FindEventsByUserIdController };

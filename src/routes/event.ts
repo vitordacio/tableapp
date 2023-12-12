@@ -15,6 +15,8 @@ import { updateEventNameController } from '../main/Event/updateEventName';
 import { updateEventNameMiddleware } from '../middlewares/validators/Event/updateEventName';
 import { findEventsByNameMiddleware } from '../middlewares/validators/Event/findEventsByName';
 import { findEventsByNameController } from '../main/Event/findEventsByName';
+import { findEventsByUserIdMiddleware } from '../middlewares/validators/Event/findEventsByUserId';
+import { findEventsByUserIdController } from '../main/Event/findEventsByUserId';
 import { updateEventAdditionalController } from '../main/Event/updateEventAdditional';
 import { updateEventClubNameController } from '../main/Event/updateEventClubName';
 import { updateEventDrinkPreferencesController } from '../main/Event/updateEventDrinkPreferences';
@@ -54,10 +56,19 @@ eventRouter.get(
   },
 );
 
+eventRouter.get(
+  '/event/user/:user_id',
+  [verifyToken, findEventsByUserIdMiddleware],
+  async (req: Request, res: Response) => {
+    return findEventsByUserIdController.handle(req, res);
+  },
+);
+
 eventRouter.get('/event', verifyToken, async (req: Request, res: Response) => {
   return findEventIndexController.handle(req, res);
 });
 
+// TO DO
 eventRouter.get(
   '/event/location',
   [verifyToken, findEventByLocationMiddleware],

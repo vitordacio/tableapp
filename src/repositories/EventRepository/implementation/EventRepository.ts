@@ -65,6 +65,22 @@ class EventRepository implements IEventRepository {
     return events;
   }
 
+  // async findByUserId(
+  //   user_id: string,
+  //   page: number,
+  //   limit: number,
+  // ): Promise<Event[]> {
+  //   const events = await this.ormRepository.find({
+  //     relations: ['type'],
+  //     where: { author_id: user_id },
+  //     order: { created_at: 'DESC' },
+  //     take: limit,
+  //     skip: page && limit ? limit * (page - 1) : undefined,
+  //   });
+
+  //   return events;
+  // }
+
   async findByCoordinates(
     lat: number,
     long: number,
@@ -89,6 +105,35 @@ class EventRepository implements IEventRepository {
     return events;
   }
 
+  async findByUserId(
+    user_id: string,
+    page: number,
+    limit: number,
+  ): Promise<Event[]> {
+    const events = this.ormRepository
+      .createQueryBuilder('event')
+      .leftJoin('event.type', 'type')
+      .where('event.author_id = :user_id', { user_id })
+      .select([
+        'event.id_event',
+        'event.name',
+        'event.location',
+        'event.cover_photo',
+        'event.start_time',
+        'event.finish_time',
+        'event.participating_count',
+        'event.emojis_count',
+        'type.name',
+      ])
+      .addSelect('event.created_at', 'created_at')
+      .orderBy('created_at', 'DESC')
+      .take(limit)
+      .skip(page && limit ? limit * (page - 1) : undefined)
+      .getMany();
+
+    return events;
+  }
+
   async findByName(
     name: string,
     page: number,
@@ -107,7 +152,7 @@ class EventRepository implements IEventRepository {
             .join(' OR ')
         : null;
 
-    const users = this.ormRepository
+    const events = this.ormRepository
       .createQueryBuilder('event')
       .leftJoin('event.author', 'author')
       .leftJoin('event.type', 'type')
@@ -133,9 +178,7 @@ class EventRepository implements IEventRepository {
         'event.name',
         'event.location',
         'event.cover_photo',
-        'event.date',
-        'event.time',
-        'event.finish_date',
+        'event.start_time',
         'event.finish_time',
         'event.participating_count',
         'event.emojis_count',
@@ -154,7 +197,7 @@ class EventRepository implements IEventRepository {
       .skip(page && limit ? limit * (page - 1) : undefined)
       .getMany();
 
-    return users;
+    return events;
   }
 
   async findClosest(lat: number, long: number): Promise<Event[]> {
@@ -176,29 +219,6 @@ class EventRepository implements IEventRepository {
 
     return events;
   }
-
-  // async searchClosests(
-  //   lat: number,
-  //   long: number,
-  //   radius: number,
-  // ): Promise<Event[]> {
-  //   const events = await this.ormRepository
-  //     .createQueryBuilder('event')
-  //     .leftJoinAndSelect('event.address', 'address')
-  //     .where(
-  //       `calculate_distance(${lat}, ${long}, address.lat, address.long) <= ${radius}`,
-  //     )
-  //     .select(['event.id_event', 'event.type', 'address.lat', 'address.long'])
-  //     .addSelect(
-  //       `calculate_distance(${lat}, ${long}, address.lat, address.long)`,
-  //       'distance',
-  //     )
-  //     .orderBy('distance', 'ASC')
-  //     .take(10)
-  //     .getMany();
-
-  //   return events;
-  // }
 
   async findIndex(): Promise<Event[]> {
     const events = await this.ormRepository.find({

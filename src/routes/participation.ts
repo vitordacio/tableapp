@@ -5,9 +5,10 @@ import { verifyToken } from '../middlewares/verifyToken';
 import { createParticipationByUserController } from '../main/Participation/createParticipationByUser';
 import { findParticipationByIdController } from '../main/Participation/findParticipationById';
 import { deleteParticipationController } from '../main/Participation/deleteParticipation';
-import { findParticipationsByUserController } from '../main/Participation/findParticipationsByUser';
-import { findParticipationByEventIdController } from '../main/Participation/findParticipationByEventId';
-
+import { findParticipationsByUserIdController } from '../main/Participation/findParticipationsByUserId';
+import { findParticipationsByUserIdMiddleware } from '../middlewares/validators/Participation/findParticipationsByUserId';
+import { findParticipationsByEventIdController } from '../main/Participation/findParticipationsByEventId';
+import { findParticipationsByEventIdMiddleware } from '../middlewares/validators/Participation/findParticipationsByEventId';
 import { createParticipationByEventController } from '../main/Participation/createParticipationByEvent';
 import { findParticipationsRequestController } from '../main/Participation/findParticipationsRequest';
 import { createInviteRequestController } from '../main/Participation/createInviteRequest';
@@ -49,26 +50,18 @@ participationRouter.post(
 );
 
 participationRouter.get(
-  '/participation/:id',
-  verifyToken,
+  '/participation/user/:user_id',
+  [verifyToken, findParticipationsByUserIdMiddleware],
   async (req: Request, res: Response) => {
-    return findParticipationByIdController.handle(req, res);
+    return findParticipationsByUserIdController.handle(req, res);
   },
 );
 
 participationRouter.get(
-  '/participation',
-  verifyToken,
+  '/participation/event/:event_id',
+  [verifyToken, findParticipationsByEventIdMiddleware],
   async (req: Request, res: Response) => {
-    return findParticipationsByUserController.handle(req, res);
-  },
-);
-
-participationRouter.get(
-  '/participation/user/:event_id',
-  verifyToken,
-  async (req: Request, res: Response) => {
-    return findParticipationByEventIdController.handle(req, res);
+    return findParticipationsByEventIdController.handle(req, res);
   },
 );
 
@@ -77,6 +70,14 @@ participationRouter.get(
   verifyToken,
   async (req: Request, res: Response) => {
     return findParticipationsRequestController.handle(req, res);
+  },
+);
+
+participationRouter.get(
+  '/participation/:id',
+  verifyToken,
+  async (req: Request, res: Response) => {
+    return findParticipationByIdController.handle(req, res);
   },
 );
 

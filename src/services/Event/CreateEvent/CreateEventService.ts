@@ -8,7 +8,7 @@ import { AppError } from '@utils/AppError';
 import { IEventRepository } from '@repositories/EventRepository/IEventRepository';
 import { extractTagsFromText } from '@utils/generateTags';
 import { IEventTypeRepository } from '@repositories/EventTypeRepository/IEventTypeRepository';
-import { ICreateEventDTO } from './CreateEventServiceDTO';
+import { ICreateEventDTO } from './ICreateEventServiceDTO';
 
 dayjs.extend(utc);
 
