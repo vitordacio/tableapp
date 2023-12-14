@@ -1,6 +1,7 @@
 import { Request, Response, Router } from 'express';
 
 import { verifyToken } from '../middlewares/verifyToken';
+import { verifyParamId } from '../middlewares/verifyParamId';
 import { createUserMiddleware } from '../middlewares/validators/User/createUser';
 import { createSocialNetworkMiddleware } from '../middlewares/validators/User/createSocialNetwork';
 
@@ -74,7 +75,7 @@ userRouter.get(
 
 userRouter.get(
   '/user/:id',
-  verifyToken,
+  [verifyToken, verifyParamId],
   async (req: Request, res: Response) => {
     return findUserdByIdController.handle(req, res);
   },

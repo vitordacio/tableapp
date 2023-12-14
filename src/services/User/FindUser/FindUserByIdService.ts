@@ -3,6 +3,8 @@ import { User } from '@entities/User/User';
 import { IUserRepository } from '@repositories/UserRepository/IUserRepository';
 import { AppError } from '@utils/AppError';
 import { IFriendshipRepository } from '@repositories/FriendshipRepository/IFriendshipRepository';
+import { checkFriendship } from '@utils/handleFriendship';
+import { checkCanSeeContent } from '@utils/handleUser';
 
 @injectable()
 class FindUserByIdService {
@@ -18,30 +20,31 @@ class FindUserByIdService {
     friend_id: string,
     user: AuthorizedUser<UserPerm | PubPerm>,
   ): Promise<User> {
-    const [foundUser, friend, friendship] = await Promise.all([
+    const [requester, profile, friendship] = await Promise.all([
       this.userRepository.findById(user.id),
       this.userRepository.findById(friend_id),
       this.friendshipRepository.findByUserIds(user.id, friend_id),
     ]);
 
-    if (!foundUser) {
+    if (!requester) {
       throw new AppError('Token expirado, realize login novamente.', 403);
     }
 
-    if (!friend) {
+    if (!profile) {
       throw new AppError('Usuário não encontrado.', 404);
     }
 
-    if (!friendship) {
-      friend.friendship_status = '';
-    } else if (friendship.confirmed) {
-      friend.friendship_status = 'friends';
-    } else {
-      friend.friendship_status =
-        friendship.author_id === user.id ? 'request_sent' : 'request_received';
-    }
+    profile.friendship_status = checkFriendship({
+      user_id: requester.id_user,
+      friendship,
+    });
 
-    return friend;
+    profile.can_see_content = checkCanSeeContent({
+      user_id: requester.id_user,
+      profile,
+    });
+
+    return profile;
   }
 }
 

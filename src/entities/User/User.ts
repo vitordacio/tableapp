@@ -122,6 +122,8 @@ class User {
 
   friendship_status?: 'friends' | 'request_sent' | 'request_received' | '';
 
+  can_see_content?: boolean;
+
   @Column({ default: 0 })
   emojis_count: number;
 
