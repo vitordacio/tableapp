@@ -4,19 +4,20 @@ import { instanceToPlain } from 'class-transformer';
 import { hasPermission } from '@utils/hasPermission';
 import { AppError } from '@utils/AppError';
 import { pubPerm, userPerm } from '@config/constants';
-import { FindParticipationsRequestService } from '@services/Participation/FindParticipation/FindParticipationsRequestService';
+import { FindRequestsPendingService } from '@services/Participation/FindParticipation/FindRequestsPendingService';
 
-class FindParticipationsRequestController {
-  private findParticipationsRequestService: FindParticipationsRequestService;
+class FindRequestsPendingController {
+  private findRequestsPendingService: FindRequestsPendingService;
 
   constructor() {
-    this.findParticipationsRequestService = container.resolve(
-      FindParticipationsRequestService,
+    this.findRequestsPendingService = container.resolve(
+      FindRequestsPendingService,
     );
   }
 
   async handle(req: Request, res: Response): Promise<Response> {
     const { event_id } = req.params;
+    const { page, limit } = req.query;
 
     if (
       !hasPermission(req.user, userPerm) &&
@@ -25,11 +26,17 @@ class FindParticipationsRequestController {
       throw new AppError('Operação não permitida.', 403);
     }
 
-    const participationInstance =
-      await this.findParticipationsRequestService.execute(event_id, req.user);
+    const participationInstance = await this.findRequestsPendingService.execute(
+      {
+        event_id,
+        page: parseInt(page as string, 10),
+        limit: parseInt(limit as string, 10),
+        user: req.user,
+      },
+    );
 
     return res.status(201).json(instanceToPlain(participationInstance));
   }
 }
 
-export { FindParticipationsRequestController };
+export { FindRequestsPendingController };

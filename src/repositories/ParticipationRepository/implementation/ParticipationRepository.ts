@@ -1,5 +1,5 @@
 // import { Brackets, getRepository, Repository } from 'typeorm';
-import { getRepository, Repository } from 'typeorm';
+import { getRepository, IsNull, Not, Repository } from 'typeorm';
 import { IParticipation } from '@entities/Participation/IParticipation';
 import { Participation } from '@entities/Participation/Participation';
 import { IParticipationRepository } from '../IParticipationRepository';
@@ -78,6 +78,7 @@ class ParticipationRepository implements IParticipationRepository {
     const participations = await this.ormRepository.find({
       // relations: ['user'],
       where: { event_id, in: true },
+      order: { created_at: 'DESC' },
       take: limit,
       skip: page && limit ? limit * (page - 1) : undefined,
     });
@@ -101,12 +102,44 @@ class ParticipationRepository implements IParticipationRepository {
     return participations;
   }
 
+  async findRequestsPending(
+    event_id: string,
+    page: number,
+    limit: number,
+  ): Promise<Participation[]> {
+    const participations = await this.ormRepository.find({
+      relations: ['type'],
+      where: { event_id, reviwer_id: IsNull() },
+      order: { created_at: 'DESC' },
+      take: limit,
+      skip: page && limit ? limit * (page - 1) : undefined,
+    });
+
+    return participations;
+  }
+
+  async findRequestsReviwed(
+    event_id: string,
+    page: number,
+    limit: number,
+  ): Promise<Participation[]> {
+    const participations = await this.ormRepository.find({
+      relations: ['type'],
+      where: { event_id, reviwer_id: Not(IsNull()) },
+      order: { created_at: 'DESC' },
+      take: limit,
+      skip: page && limit ? limit * (page - 1) : undefined,
+    });
+
+    return participations;
+  }
+
   async findByUserAndEvent(
     user_id: string,
     event_id: string,
   ): Promise<Participation | undefined> {
     const participation = await this.ormRepository.findOne({
-      relations: ['event', 'type'],
+      relations: ['type'],
       where: { user_id, event_id },
     });
 

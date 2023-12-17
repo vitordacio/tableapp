@@ -2,6 +2,7 @@ import { inject, injectable } from 'tsyringe';
 import { v4 } from 'uuid';
 
 import { Participation } from '@entities/Participation/Participation';
+import { Notification } from '@entities/Notification/Notification';
 import { IParticipationRepository } from '@repositories/ParticipationRepository/IParticipationRepository';
 
 import { AppError } from '@utils/AppError';
@@ -37,9 +38,10 @@ class CreateInviteRequestService {
     user,
   }: ICreateInviteRequestDTO): Promise<Participation> {
     let participation: Participation | undefined;
+    let notification: Notification | undefined;
 
     if (user.id === user_id) {
-      throw new AppError('Usuário já está participando.', 400);
+      throw new AppError('Não é possível convidar a si mesmo.', 400);
     }
 
     const [foundUser, customer, event, participationType] = await Promise.all([
@@ -81,29 +83,47 @@ class CreateInviteRequestService {
       event.id_event,
     );
 
-    if (participation) {
-      throw new AppError('Participação já cadastrada no evento.', 400);
+    if (!participation) {
+      participation = this.participationRepository.create({
+        id: v4(),
+        type_id,
+        user_id,
+        event_id,
+        confirmed_by_event: true,
+        reviwer_id: user.id,
+      });
+
+      notification = this.notificationRepository.create({
+        id: v4(),
+        message: `Você foi convidado para participar do evento ${event.name}! 🎉`,
+        type: 'participation',
+        author_id: foundUser.id_user,
+        user_id,
+        participation_id: participation.id_participation,
+      });
+    } else {
+      participation.type_id = type_id;
+      participation.confirmed_by_event = true;
+      participation.reviwer_id = user.id;
+
+      notification = this.notificationRepository.create({
+        id: v4(),
+        message: '',
+        type: 'participation',
+        author_id: foundUser.id_user,
+        user_id,
+        participation_id: participation.id_participation,
+      });
+
+      notification.message = `Sua participação no evento ${event.name} foi ${
+        participation.in ? 'alterada' : 'confirmada'
+      }! 🎉`;
+
+      participation.in =
+        participation.confirmed_by_user && participation.confirmed_by_event;
     }
 
-    participation = this.participationRepository.create({
-      id: v4(),
-      type_id,
-      user_id,
-      event_id,
-      confirmed_by_event: true,
-      reviwer_id: user.id,
-    });
-
     await this.participationRepository.save(participation);
-
-    const notification = this.notificationRepository.create({
-      id: v4(),
-      message: `Você foi convidado para participar do evento ${event.name}! 🎉`,
-      type: 'participation',
-      author_id: foundUser.id_user,
-      user_id,
-      participation_id: participation.id_participation,
-    });
 
     await this.notificationRepository.save(notification);
 

@@ -36,6 +36,18 @@ class Participation {
   @Column({ default: false })
   confirmed_by_event: boolean;
 
+  participation_status?:
+    | 'author'
+    | 'user_in'
+    | 'user_out'
+    | 'guest_in'
+    | 'guest_out'
+    | 'mod_in'
+    | 'mod_out'
+    | 'vip_in'
+    | 'vip_out'
+    | '';
+
   @Column()
   user_id: string;
 

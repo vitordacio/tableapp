@@ -4,20 +4,19 @@ import { instanceToPlain } from 'class-transformer';
 import { hasPermission } from '@utils/hasPermission';
 import { AppError } from '@utils/AppError';
 import { pubPerm, userPerm } from '@config/constants';
-import { FindParticipationsByUserIdService } from '@services/Participation/FindParticipation/FindParticipationsByUserIdService';
+import { FindParticipationByEventAndUserService } from '@services/Participation/FindParticipation/FindParticipationByEventAndUserService';
 
-class FindParticipationsByUserIdController {
-  private findParticipationsByUserIdService: FindParticipationsByUserIdService;
+class FindParticipationByEventAndUserController {
+  private findParticipationsByUserIdService: FindParticipationByEventAndUserService;
 
   constructor() {
     this.findParticipationsByUserIdService = container.resolve(
-      FindParticipationsByUserIdService,
+      FindParticipationByEventAndUserService,
     );
   }
 
   async handle(req: Request, res: Response): Promise<Response> {
-    const { user_id } = req.params;
-    const { page, limit } = req.query;
+    const { user_id, event_id } = req.params;
 
     if (
       !hasPermission(req.user, userPerm) &&
@@ -29,12 +28,12 @@ class FindParticipationsByUserIdController {
     const participationInstance =
       await this.findParticipationsByUserIdService.execute({
         user_id,
-        page: parseInt(page as string, 10),
-        limit: parseInt(limit as string, 10),
+        event_id,
+        reqUser: req.user,
       });
 
     return res.status(200).json(instanceToPlain(participationInstance));
   }
 }
 
-export { FindParticipationsByUserIdController };
+export { FindParticipationByEventAndUserController };

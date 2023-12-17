@@ -4,9 +4,10 @@ import { IParticipationRepository } from '@repositories/ParticipationRepository/
 import { IEventRepository } from '@repositories/EventRepository/IEventRepository';
 import { Participation } from '@entities/Participation/Participation';
 import { AppError } from '@utils/AppError';
+import { IFindRequestsDTO } from './IFindParticipationsDTO';
 
 @injectable()
-class FindParticipationsRequestService {
+class FindRequestsPendingService {
   constructor(
     @inject('ParticipationRepository')
     private participationRepository: IParticipationRepository,
@@ -15,10 +16,13 @@ class FindParticipationsRequestService {
     private eventRepository: IEventRepository,
   ) {}
 
-  async execute(
-    event_id: string,
-    user: AuthorizedUser<UserPerm | PubPerm>,
-  ): Promise<Participation[]> {
+  async execute({
+    event_id,
+    page,
+    limit,
+    user,
+  }: IFindRequestsDTO): Promise<Participation[]> {
+    let participations: Participation[] = [];
     const event = await this.eventRepository.findById(event_id);
 
     if (!event) {
@@ -36,12 +40,21 @@ class FindParticipationsRequestService {
       }
     }
 
-    const participations = await this.participationRepository.findByEventId(
-      event_id,
+    participations = await this.participationRepository.findRequestsPending(
+      event.id_event,
+      page || 1,
+      limit || 20,
     );
+
+    if (participations.length !== 0) {
+      participations.map(participation => ({
+        ...participation,
+        participation_status: 'user_out',
+      }));
+    }
 
     return participations;
   }
 }
 
-export { FindParticipationsRequestService };
+export { FindRequestsPendingService };

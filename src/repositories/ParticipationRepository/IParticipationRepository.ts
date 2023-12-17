@@ -15,6 +15,16 @@ export interface IParticipationRepository {
     page: number,
     limit: number,
   ): Promise<Participation[]>;
+  findRequestsPending(
+    event_id: string,
+    page: number,
+    limit: number,
+  ): Promise<Participation[]>;
+  findRequestsReviwed(
+    event_id: string,
+    page: number,
+    limit: number,
+  ): Promise<Participation[]>;
   findByUserId(
     user_id: string,
     page: number,
