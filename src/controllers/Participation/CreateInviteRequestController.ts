@@ -30,7 +30,7 @@ class CreateInviteRequestController {
         event_id,
         user_id,
         type_id,
-        user: req.user,
+        reqUser: req.user,
       },
     );
 

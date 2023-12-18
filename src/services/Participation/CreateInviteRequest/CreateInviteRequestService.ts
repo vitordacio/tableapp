@@ -10,6 +10,7 @@ import { INotificationRepository } from '@repositories/NotificationRepository/IN
 import { IEventRepository } from '@repositories/EventRepository/IEventRepository';
 import { IUserRepository } from '@repositories/UserRepository/IUserRepository';
 import { IParticipationTypeRepository } from '@repositories/ParticipationTypeRepository/IParticipationTypeRepository';
+import { checkParticipationStatus } from '@utils/handleParticipation';
 import { ICreateInviteRequestDTO } from './CreateInviteRequestServiceDTO';
 
 @injectable()
@@ -35,17 +36,17 @@ class CreateInviteRequestService {
     event_id,
     user_id,
     type_id,
-    user,
+    reqUser,
   }: ICreateInviteRequestDTO): Promise<Participation> {
     let participation: Participation | undefined;
     let notification: Notification | undefined;
 
-    if (user.id === user_id) {
+    if (reqUser.id === user_id) {
       throw new AppError('Não é possível convidar a si mesmo.', 400);
     }
 
-    const [foundUser, customer, event, participationType] = await Promise.all([
-      this.userRepository.findById(user.id),
+    const [foundUser, user, event, participationType] = await Promise.all([
+      this.userRepository.findById(reqUser.id),
       this.userRepository.findById(user_id),
       this.eventRepository.findById(event_id),
       this.participationTypeRepository.findById(type_id),
@@ -55,7 +56,7 @@ class CreateInviteRequestService {
       throw new AppError('Usuário não encontrado.', 404);
     }
 
-    if (!customer) {
+    if (!user) {
       throw new AppError('Usuário não encontrado.', 404);
     }
 
@@ -67,9 +68,9 @@ class CreateInviteRequestService {
       throw new AppError('Tipo de participação não encontrado.', 404);
     }
 
-    if (user.id !== event.author_id) {
+    if (foundUser.id_user !== event.author_id) {
       const hasAuth = await this.participationRepository.checkMod(
-        user.id,
+        foundUser.id_user,
         event.id_event,
       );
 
@@ -90,7 +91,7 @@ class CreateInviteRequestService {
         user_id,
         event_id,
         confirmed_by_event: true,
-        reviwer_id: user.id,
+        reviwer_id: foundUser.id_user,
       });
 
       notification = this.notificationRepository.create({
@@ -102,9 +103,10 @@ class CreateInviteRequestService {
         participation_id: participation.id_participation,
       });
     } else {
-      participation.type_id = type_id;
+      if (type_id !== participation.type_id)
+        participation.type = participationType;
       participation.confirmed_by_event = true;
-      participation.reviwer_id = user.id;
+      participation.reviwer_id = foundUser.id_user;
 
       notification = this.notificationRepository.create({
         id: v4(),
@@ -126,6 +128,14 @@ class CreateInviteRequestService {
     await this.participationRepository.save(participation);
 
     await this.notificationRepository.save(notification);
+
+    if (!participation.type) participation.type = participationType;
+
+    participation.participation_status = checkParticipationStatus({
+      event,
+      user_id,
+      participation,
+    });
 
     return participation;
   }

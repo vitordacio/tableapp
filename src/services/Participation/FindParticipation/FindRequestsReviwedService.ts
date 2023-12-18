@@ -48,11 +48,11 @@ class FindRequestsReviwedService {
     );
 
     if (participations.length !== 0) {
-      participations.map(participation => ({
+      participations = participations.map(participation => ({
         ...participation,
         participation_status: checkParticipationStatus({
           event,
-          user_id: user.id,
+          user_id: participation.user_id,
           participation,
         }),
       }));

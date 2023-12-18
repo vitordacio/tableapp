@@ -29,6 +29,7 @@ class CreateParticipationByEventService {
 
   async execute({
     participation_id,
+    confirm,
     user,
   }: ICreateParticipationByEventDTO): Promise<Participation> {
     const [participation, foundUser] = await Promise.all([
@@ -59,26 +60,30 @@ class CreateParticipationByEventService {
       }
     }
 
-    participation.reviwer_id = user.id;
-    participation.confirmed_by_event = true;
-    participation.in = true;
+    participation.reviwer_id = foundUser.id_user;
+    participation.confirmed_by_event = confirm;
+    participation.in =
+      participation.confirmed_by_user && participation.confirmed_by_event;
 
     participation.event.participating_count += 1;
-
-    const notification = this.notificationRepository.create({
-      id: v4(),
-      message: `${foundUser.name} confirmou sua participação no evento ${participation.event.name}! 🎉`,
-      type: 'participation',
-      author_id: foundUser.id_user,
-      user_id: participation.user_id,
-      participation_id: participation.id_participation,
-    });
 
     await Promise.all([
       this.participationRepository.save(participation),
       this.eventRepository.save(participation.event),
-      this.notificationRepository.save(notification),
     ]);
+
+    if (participation.in) {
+      const notification = this.notificationRepository.create({
+        id: v4(),
+        message: `${foundUser.name} confirmou sua participação no evento ${participation.event.name}! 🎉`,
+        type: 'participation',
+        author_id: foundUser.id_user,
+        user_id: participation.user_id,
+        participation_id: participation.id_participation,
+      });
+
+      await this.notificationRepository.save(notification);
+    }
 
     return participation;
   }

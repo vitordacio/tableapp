@@ -53,7 +53,8 @@ class CreateInviteResponseService {
     }
 
     participation.confirmed_by_user = true;
-    participation.in = true;
+    participation.in =
+      participation.confirmed_by_event && participation.confirmed_by_user;
 
     participation.event.participating_count += 1;
 

@@ -108,7 +108,7 @@ class ParticipationRepository implements IParticipationRepository {
     limit: number,
   ): Promise<Participation[]> {
     const participations = await this.ormRepository.find({
-      relations: ['type'],
+      relations: ['type', 'user', 'reviwer'],
       where: { event_id, reviwer_id: IsNull() },
       order: { created_at: 'DESC' },
       take: limit,
@@ -124,7 +124,7 @@ class ParticipationRepository implements IParticipationRepository {
     limit: number,
   ): Promise<Participation[]> {
     const participations = await this.ormRepository.find({
-      relations: ['type'],
+      relations: ['type', 'user', 'reviwer'],
       where: { event_id, reviwer_id: Not(IsNull()) },
       order: { created_at: 'DESC' },
       take: limit,
@@ -139,7 +139,7 @@ class ParticipationRepository implements IParticipationRepository {
     event_id: string,
   ): Promise<Participation | undefined> {
     const participation = await this.ormRepository.findOne({
-      relations: ['type'],
+      relations: ['type', 'event'],
       where: { user_id, event_id },
     });
 

@@ -47,7 +47,7 @@ class FindRequestsPendingService {
     );
 
     if (participations.length !== 0) {
-      participations.map(participation => ({
+      participations = participations.map(participation => ({
         ...participation,
         participation_status: 'user_out',
       }));

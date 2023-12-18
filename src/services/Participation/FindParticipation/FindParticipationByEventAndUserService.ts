@@ -53,7 +53,7 @@ class FindParticipationByEventAndUserService {
     if (participation)
       participation.participation_status = checkParticipationStatus({
         event,
-        user_id: reqUser.id,
+        user_id,
         participation,
       });
 
