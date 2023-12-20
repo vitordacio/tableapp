@@ -229,6 +229,25 @@ class EventRepository implements IEventRepository {
     return events;
   }
 
+  async findToRemove(id: string): Promise<Event | undefined> {
+    const event = await this.ormRepository.findOne({
+      relations: [
+        'type',
+        'pictures',
+        'achievements',
+        'achievements.notifications',
+        'participations',
+        'participations.notifications',
+        'emojis',
+        'emojis.notifications',
+        'reports',
+      ],
+      where: { id_event: id },
+    });
+
+    return event;
+  }
+
   async delete(id: string): Promise<void> {
     await this.ormRepository.delete(id);
   }

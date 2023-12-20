@@ -43,18 +43,6 @@ class Event {
   @Column()
   finish_time: Date;
 
-  // @Column({ type: 'date' })
-  // date: Date;
-
-  // @Column({ type: 'time' })
-  // time: Date;
-
-  // @Column({ type: 'date' })
-  // finish_date: Date;
-
-  // @Column({ type: 'time' })
-  // finish_time: Date;
-
   @Column({ default: 0 })
   participating_count: number;
 
@@ -123,12 +111,12 @@ class Event {
   address: Address;
 
   @OneToMany(() => Achievement, achievement => achievement.event, {
-    cascade: false,
+    cascade: true,
   })
   achievements: Achievement[];
 
   @OneToMany(() => EventPicture, picture => picture.event, {
-    cascade: false,
+    cascade: true,
   })
   pictures: EventPicture[];
 
@@ -137,10 +125,14 @@ class Event {
   })
   participations: Participation[];
 
-  @OneToMany(() => Emoji, emoji => emoji.event)
+  @OneToMany(() => Emoji, emoji => emoji.event, {
+    cascade: true,
+  })
   emojis: Emoji[];
 
-  @OneToMany(() => Report, report => report.event)
+  @OneToMany(() => Report, report => report.event, {
+    cascade: true,
+  })
   reports: Report[];
 
   @CreateDateColumn()

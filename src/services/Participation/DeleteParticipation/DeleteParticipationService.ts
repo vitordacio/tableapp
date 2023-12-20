@@ -41,12 +41,12 @@ class DeleteParticipationService {
       }
     }
 
-    await this.participationRepository.remove(participation);
-
     if (participation.in) {
       participation.event.participating_count -= 1;
       await this.eventRepository.save(participation.event);
     }
+
+    await this.participationRepository.remove(participation);
   }
 }
 

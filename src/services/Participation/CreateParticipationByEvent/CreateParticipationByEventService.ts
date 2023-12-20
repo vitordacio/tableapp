@@ -1,10 +1,8 @@
 import { inject, injectable } from 'tsyringe';
 import { v4 } from 'uuid';
-
 import { Participation } from '@entities/Participation/Participation';
-
 import { IParticipationRepository } from '@repositories/ParticipationRepository/IParticipationRepository';
-
+import { checkParticipationStatus } from '@utils/handleParticipation';
 import { AppError } from '@utils/AppError';
 import { INotificationRepository } from '@repositories/NotificationRepository/INotificationRepository';
 import { IUserRepository } from '@repositories/UserRepository/IUserRepository';
@@ -84,6 +82,12 @@ class CreateParticipationByEventService {
 
       await this.notificationRepository.save(notification);
     }
+
+    participation.participation_status = checkParticipationStatus({
+      event: participation.event,
+      user_id: participation.user_id,
+      participation,
+    });
 
     return participation;
   }

@@ -13,6 +13,7 @@ import { User } from '@entities/User/User';
 import { Participation } from '@entities/Participation/Participation';
 import { Friendship } from '@entities/Friendship/Friendship';
 import { Emoji } from '@entities/Emoji/Emoji';
+import { Achievement } from '@entities/Achievement/Achievement';
 
 @Entity('notifications')
 class Notification {
@@ -62,6 +63,13 @@ class Notification {
   @ManyToOne(() => Participation, participation => participation.notifications)
   @JoinColumn({ name: 'participation_id' })
   participation: Participation;
+
+  @Column({ nullable: true })
+  achievement_id: string;
+
+  @ManyToOne(() => Achievement, achievement => achievement.notifications)
+  @JoinColumn({ name: 'achievement_id' })
+  achievement: Achievement;
 
   @CreateDateColumn()
   created_at: Date;

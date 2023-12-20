@@ -34,7 +34,7 @@ class ParticipationRepository implements IParticipationRepository {
 
   async findById(id: string): Promise<Participation | undefined> {
     const participation = await this.ormRepository.findOne({
-      relations: ['event', 'user'],
+      relations: ['event', 'user', 'type'],
       where: { id_participation: id },
     });
 
@@ -43,7 +43,7 @@ class ParticipationRepository implements IParticipationRepository {
 
   async findToRemove(id: string): Promise<Participation | undefined> {
     const participation = await this.ormRepository.findOne({
-      relations: ['notifications'],
+      relations: ['event', 'notifications'],
       where: { id_participation: id },
     });
 

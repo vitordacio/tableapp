@@ -7,9 +7,10 @@ import {
   DeleteDateColumn,
   ManyToOne,
   JoinColumn,
+  OneToMany,
 } from 'typeorm';
-
 import { Exclude } from 'class-transformer';
+import { Notification } from '@entities/Notification/Notification';
 import { User } from '@entities/User/User';
 import { Event } from '@entities/Event/Event';
 import { AchievementType } from '@entities/AchievementType/AchievementType';
@@ -39,6 +40,11 @@ class Achievement {
   @ManyToOne(() => Event, event => event.achievements)
   @JoinColumn({ name: 'event_id' })
   event: Event;
+
+  @OneToMany(() => Notification, notification => notification.achievement, {
+    cascade: true,
+  })
+  notifications: Notification[];
 
   @CreateDateColumn()
   created_at: Date;

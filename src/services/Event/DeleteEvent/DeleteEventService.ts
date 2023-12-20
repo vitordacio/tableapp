@@ -18,7 +18,7 @@ class DeleteEventService {
     event_id: string,
     user: AuthorizedUser<UserPerm | PubPerm>,
   ): Promise<void> {
-    const event = await this.eventRepository.findById(event_id);
+    const event = await this.eventRepository.findToRemove(event_id);
 
     if (!event || user.id !== event.author_id) {
       throw new AppError('Evento não encontrado.', 404);

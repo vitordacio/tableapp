@@ -102,6 +102,8 @@ class CreateParticipationByUserService {
       await this.notificationRepository.save(notification),
     ]);
 
+    participation.participation_status = 'user_out';
+
     return participation;
   }
 }
