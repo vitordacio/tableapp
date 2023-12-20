@@ -49,7 +49,9 @@ class Emoji {
   @JoinColumn({ name: 'event_id' })
   event: Event;
 
-  @OneToMany(() => Notification, notification => notification.emoji)
+  @OneToMany(() => Notification, notification => notification.emoji, {
+    cascade: true,
+  })
   notifications: Notification[];
 
   @CreateDateColumn()

@@ -35,5 +35,6 @@ export interface IParticipationRepository {
     event_id: string,
   ): Promise<Participation | undefined>;
   delete(id: string): Promise<void>;
+  findToRemove(id: string): Promise<Participation | undefined>;
   remove(entitie: Participation): Promise<void>;
 }

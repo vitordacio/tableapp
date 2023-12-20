@@ -22,5 +22,9 @@ export interface IFriendshipRepository {
     limit: number,
   ): Promise<Friendship[]>;
   delete(id: string): Promise<void>;
+  findToRemove(
+    user_id: string,
+    friend_id: string,
+  ): Promise<Friendship | undefined>;
   remove(entitie: Friendship): Promise<void>;
 }

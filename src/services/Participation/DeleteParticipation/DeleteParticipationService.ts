@@ -19,7 +19,7 @@ class DeleteParticipationService {
     participation_id: string,
     user: AuthorizedUser<UserPerm | PubPerm>,
   ): Promise<void> {
-    const participation = await this.participationRepository.findById(
+    const participation = await this.participationRepository.findToRemove(
       participation_id,
     );
 

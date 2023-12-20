@@ -41,6 +41,15 @@ class ParticipationRepository implements IParticipationRepository {
     return participation;
   }
 
+  async findToRemove(id: string): Promise<Participation | undefined> {
+    const participation = await this.ormRepository.findOne({
+      relations: ['notifications'],
+      where: { id_participation: id },
+    });
+
+    return participation;
+  }
+
   async checkMod(
     user_id: string,
     event_id: string,

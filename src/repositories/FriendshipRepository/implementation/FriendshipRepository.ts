@@ -155,12 +155,31 @@ class FriendshipRepository implements IFriendshipRepository {
     user_id: string,
     friend_id: string,
   ): Promise<Friendship | undefined> {
-    // const queryBuilder = this.ormRepository.createQueryBuilder('friendship');
-
     const friendship = await this.ormRepository
       .createQueryBuilder('friendship')
       .leftJoinAndSelect('friendship.author', 'author')
       .leftJoinAndSelect('friendship.receiver', 'receiver')
+      .where(
+        '(friendship.author_id = :user_id AND friendship.receiver_id = :friend_id) OR (friendship.author_id = :friend_id AND friendship.receiver_id = :user_id)',
+        {
+          user_id,
+          friend_id,
+        },
+      )
+      .getOne();
+
+    return friendship;
+  }
+
+  async findToRemove(
+    user_id: string,
+    friend_id: string,
+  ): Promise<Friendship | undefined> {
+    const friendship = await this.ormRepository
+      .createQueryBuilder('friendship')
+      .leftJoinAndSelect('friendship.author', 'author')
+      .leftJoinAndSelect('friendship.receiver', 'receiver')
+      .leftJoinAndSelect('friendship.notifications', 'notifications')
       .where(
         '(friendship.author_id = :user_id AND friendship.receiver_id = :friend_id) OR (friendship.author_id = :friend_id AND friendship.receiver_id = :user_id)',
         {
