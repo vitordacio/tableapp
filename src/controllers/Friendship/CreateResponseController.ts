@@ -14,7 +14,7 @@ class CreateResponseController {
   }
 
   async handle(req: Request, res: Response): Promise<Response> {
-    const { friend_id } = req.params;
+    const { user_id } = req.params;
 
     if (
       !hasPermission(req.user, userPerm) &&
@@ -24,8 +24,8 @@ class CreateResponseController {
     }
 
     const participationInstance = await this.createResponseService.execute({
-      friend_id,
-      user: req.user,
+      user_id,
+      reqUser: req.user,
     });
 
     return res.status(201).json(instanceToPlain(participationInstance));

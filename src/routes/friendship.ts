@@ -4,45 +4,48 @@ import { createRequestController } from '../main/Friendship/createRequest';
 import { findFriendshipByIdController } from '../main/Friendship/findFriendshipById';
 import { deleteFriendshipController } from '../main/Friendship/deleteFriendship';
 import { createResponseController } from '../main/Friendship/createResponse';
-import { findFriendshipByUserIdController } from '../main/Friendship/findFriendshipByUserId';
+import {
+  verifyParamFriendshipId,
+  verifyParamUserId,
+} from '../middlewares/verifyParamId';
 
 const friendshipRouter = Router();
 
 friendshipRouter.post(
-  '/friendship/request/:friend_id',
-  verifyToken,
+  '/friendship/request/:user_id',
+  [verifyToken, verifyParamUserId],
   async (req: Request, res: Response) => {
     return createRequestController.handle(req, res);
   },
 );
 
 friendshipRouter.post(
-  '/friendship/response/:friend_id',
-  verifyToken,
+  '/friendship/response/:user_id',
+  [verifyToken, verifyParamUserId],
   async (req: Request, res: Response) => {
     return createResponseController.handle(req, res);
   },
 );
 
-friendshipRouter.get(
-  '/friendship/user/:id',
-  verifyToken,
-  async (req: Request, res: Response) => {
-    return findFriendshipByUserIdController.handle(req, res);
-  },
-);
+// friendshipRouter.get(
+//   '/friendship/user/:user_id',
+//   [verifyToken, verifyParamUserId],
+//   async (req: Request, res: Response) => {
+//     return findFriendshipByUserIdController.handle(req, res);
+//   },
+// );
 
 friendshipRouter.get(
-  '/friendship/:id',
-  verifyToken,
+  '/friendship/:participation_id',
+  [verifyToken, verifyParamFriendshipId],
   async (req: Request, res: Response) => {
     return findFriendshipByIdController.handle(req, res);
   },
 );
 
 friendshipRouter.delete(
-  '/friendship/:friend_id',
-  verifyToken,
+  '/friendship/:user_id',
+  [verifyToken, verifyParamUserId],
   async (req: Request, res: Response) => {
     return deleteFriendshipController.handle(req, res);
   },

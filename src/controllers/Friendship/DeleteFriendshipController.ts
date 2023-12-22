@@ -14,7 +14,7 @@ class DeleteFriendshipController {
   }
 
   async handle(req: Request, res: Response): Promise<Response> {
-    const { friend_id } = req.params;
+    const { user_id } = req.params;
 
     if (
       !hasPermission(req.user, userPerm) &&
@@ -24,7 +24,7 @@ class DeleteFriendshipController {
     }
 
     const friendshipInstance = await this.deleteFriendshipService.execute(
-      friend_id,
+      user_id,
       req.user,
     );
 

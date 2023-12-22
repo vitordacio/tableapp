@@ -14,7 +14,7 @@ class FindFriendsController {
   }
 
   async handle(req: Request, res: Response): Promise<Response> {
-    const { id } = req.params;
+    const { user_id } = req.params;
     const { name, page, limit } = req.query;
 
     if (
@@ -26,8 +26,8 @@ class FindFriendsController {
 
     const friendshipInstance = await this.findFriendshipByUserIdService.execute(
       {
-        friend_id: id,
-        user: req.user,
+        user_id,
+        reqUser: req.user,
         name: name as string,
         page: parseInt(page as string, 10),
         limit: parseInt(limit as string, 10),

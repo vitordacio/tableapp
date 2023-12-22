@@ -23,52 +23,56 @@ class CreateResponseService {
   ) {}
 
   async execute({
-    friend_id,
-    user,
+    user_id,
+    reqUser,
   }: ICreateResponseDTO): Promise<Friendship | void> {
-    if (user.id === friend_id) {
+    if (reqUser.id === user_id) {
       throw new AppError(
         'Não é possível responder solicitação de você mesmo.',
         400,
       );
     }
 
-    const response = await this.friendshipRepository.findByUserIds(
-      user.id,
-      friend_id,
+    const friendship = await this.friendshipRepository.findByUserIds(
+      reqUser.id,
+      user_id,
     );
 
-    if (!response) {
+    if (!friendship) {
       throw new AppError('Solicitação não encontrada.', 404);
     }
 
-    if (user.id !== response.receiver_id) {
+    if (reqUser.id !== friendship.receiver_id) {
       throw new AppError('Solicitação não pertence a esse usuário.', 403);
     }
 
-    response.confirmed = true;
+    friendship.confirmed = true;
 
-    response.author.friends_count += 1;
-    response.receiver.friends_count += 1;
+    friendship.author.friends_count += 1;
+    friendship.receiver.friends_count += 1;
 
     const notification = this.notificationRepository.create({
       id: v4(),
-      message: `${response.receiver.name} aceitou sua solicitação de amizade! 🤝`,
+      message: `${friendship.receiver.name} aceitou sua solicitação de amizade! 🤝`,
       type: 'friendship',
-      author_id: user.id,
-      user_id: response.author.id_user,
-      friendship_id: response.id_friendship,
+      author_id: reqUser.id,
+      user_id: friendship.author.id_user,
+      friendship_id: friendship.id_friendship,
     });
 
-    // await this.notificationRepository.save(notification);
-
     await Promise.all([
-      this.friendshipRepository.save(response),
-      this.userRepository.saveMany([response.author, response.receiver]),
+      this.friendshipRepository.save(friendship),
+      this.userRepository.saveMany([friendship.author, friendship.receiver]),
       await this.notificationRepository.save(notification),
     ]);
 
-    return response;
+    friendship.control = {
+      friendship_id: friendship.id_friendship,
+      friendship_status: 'friends',
+      can_see_content: true,
+    };
+
+    return friendship;
   }
 }
 

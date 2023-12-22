@@ -16,17 +16,18 @@ class DeleteFriendshipService {
   ) {}
 
   async execute(
-    friend_id: string,
-    user: AuthorizedUser<UserPerm | PubPerm>,
+    user_id: string,
+    reqUser: AuthorizedUser<UserPerm | PubPerm>,
   ): Promise<void> {
     const friendship = await this.friendshipRepository.findToRemove(
-      user.id,
-      friend_id,
+      reqUser.id,
+      user_id,
     );
 
     if (
       !friendship ||
-      (friendship.author_id !== user.id && friendship.receiver_id !== user.id)
+      (friendship.author_id !== reqUser.id &&
+        friendship.receiver_id !== reqUser.id)
     ) {
       throw new AppError('Amizade não encontrada.', 404);
     }

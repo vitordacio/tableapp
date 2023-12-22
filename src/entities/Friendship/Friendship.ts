@@ -11,7 +11,7 @@ import {
 } from 'typeorm';
 
 import { Exclude } from 'class-transformer';
-import { User } from '@entities/User/User';
+import { User, UserControl } from '@entities/User/User';
 import { Notification } from '@entities/Notification/Notification';
 
 @Entity('friendships')
@@ -50,6 +50,8 @@ class Friendship {
   @Exclude()
   @DeleteDateColumn()
   deleted_at: Date;
+
+  control: UserControl;
 }
 
 export { Friendship };

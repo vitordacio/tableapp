@@ -14,7 +14,7 @@ class FindUserByIdController {
   }
 
   async handle(req: Request, res: Response): Promise<Response> {
-    const { id } = req.params;
+    const { user_id } = req.params;
 
     if (
       !hasPermission(req.user, userPerm) &&
@@ -23,7 +23,10 @@ class FindUserByIdController {
       throw new AppError('Operação não permitida.', 403);
     }
 
-    const userInstance = await this.findUserByIdService.execute(id, req.user);
+    const userInstance = await this.findUserByIdService.execute(
+      user_id,
+      req.user,
+    );
 
     return res.status(201).json(instanceToPlain(userInstance));
   }

@@ -94,14 +94,18 @@ class UserRepository implements IUserRepository {
           return qb;
         }),
       )
-      .select([
-        'user.id_user',
-        'user.name',
-        'user.username',
-        'user.picture',
+      .addSelect(
         `(SELECT count(*) FROM unnest(user.tags) as tag WHERE ${conditions}) as qtd`,
-      ])
+      )
       .orderBy('qtd', 'DESC')
+      // .select([
+      //   'user.id_user',
+      //   'user.name',
+      //   'user.username',
+      //   'user.picture',
+      //   `(SELECT count(*) FROM unnest(user.tags) as tag WHERE ${conditions}) as qtd`,
+      // ])
+      // .orderBy('qtd', 'DESC')
       .take(limit)
       .skip(page && limit ? limit * (page - 1) : undefined)
       .getMany();

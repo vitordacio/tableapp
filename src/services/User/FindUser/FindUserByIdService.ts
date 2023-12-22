@@ -1,5 +1,5 @@
 import { inject, injectable } from 'tsyringe';
-import { User } from '@entities/User/User';
+import { User, UserControl } from '@entities/User/User';
 import { IUserRepository } from '@repositories/UserRepository/IUserRepository';
 import { AppError } from '@utils/AppError';
 import { IFriendshipRepository } from '@repositories/FriendshipRepository/IFriendshipRepository';
@@ -17,34 +17,48 @@ class FindUserByIdService {
   ) {}
 
   async execute(
-    friend_id: string,
-    user: AuthorizedUser<UserPerm | PubPerm>,
+    user_id: string,
+    reqUser: AuthorizedUser<UserPerm | PubPerm>,
   ): Promise<User> {
-    const [requester, profile, friendship] = await Promise.all([
-      this.userRepository.findById(user.id),
-      this.userRepository.findById(friend_id),
-      this.friendshipRepository.findByUserIds(user.id, friend_id),
+    const [requester, user, friendship] = await Promise.all([
+      this.userRepository.findById(reqUser.id),
+      this.userRepository.findById(user_id),
+      this.friendshipRepository.findByUserIds(reqUser.id, user_id),
     ]);
 
     if (!requester) {
       throw new AppError('Token expirado, realize login novamente.', 403);
     }
 
-    if (!profile) {
+    if (!user) {
       throw new AppError('Usuário não encontrado.', 404);
     }
 
-    profile.friendship_status = checkFriendship({
-      user_id: requester.id_user,
-      friendship,
-    });
+    const control: UserControl = {
+      friendship_id: friendship?.id_friendship || '',
+      friendship_status: checkFriendship({
+        user_id: requester.id_user,
+        friendship,
+      }),
+      can_see_content: checkCanSeeContent({
+        requester_id: requester.id_user,
+        user,
+      }),
+    };
 
-    profile.can_see_content = checkCanSeeContent({
-      user_id: requester.id_user,
-      profile,
-    });
+    user.control = control;
 
-    return profile;
+    // user.friendship_status = checkFriendship({
+    //   user_id: requester.id_user,
+    //   friendship,
+    // });
+
+    // user.can_see_content = checkCanSeeContent({
+    //   requester_id: requester.id_user,
+    //   user,
+    // });
+
+    return user;
   }
 }
 

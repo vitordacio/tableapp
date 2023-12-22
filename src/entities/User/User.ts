@@ -20,6 +20,12 @@ import { Report } from '@entities/Report/Report';
 import { Block } from '@entities/Block/Block';
 import { Suggestion } from '@entities/Suggestion/Suggestion';
 
+export type UserControl = {
+  friendship_id?: string;
+  friendship_status?: 'friends' | 'request_sent' | 'request_received' | '';
+  can_see_content?: boolean;
+};
+
 @Entity('users')
 class User {
   @PrimaryColumn('uuid')
@@ -120,10 +126,6 @@ class User {
   @OneToMany(() => Friendship, friendship => friendship.receiver)
   friendships_received: Friendship[];
 
-  friendship_status?: 'friends' | 'request_sent' | 'request_received' | '';
-
-  can_see_content?: boolean;
-
   @Column({ default: 0 })
   emojis_count: number;
 
@@ -154,6 +156,8 @@ class User {
   @Exclude()
   @DeleteDateColumn()
   deleted_at: Date;
+
+  control: UserControl;
 }
 
 export { User };

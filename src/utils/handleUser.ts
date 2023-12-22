@@ -33,17 +33,17 @@ export async function generateUniqueUsername(username: string) {
 }
 
 type checkCanSeeContent = {
-  user_id: string;
-  profile: User;
+  requester_id: string;
+  user: User;
 };
 
 export const checkCanSeeContent = ({
-  user_id,
-  profile,
+  requester_id,
+  user,
 }: checkCanSeeContent): boolean => {
-  if (user_id === profile.id_user) return true;
-  if (profile.role_name === 'pub' || !profile.private) return true;
-  if (profile.friendship_status === 'friends') return true;
+  if (requester_id === user.id_user) return true;
+  if (user.role_name === 'pub' || !user.private) return true;
+  if (user.control.friendship_status === 'friends') return true;
 
   return false;
 };

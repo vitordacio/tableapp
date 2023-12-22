@@ -11,12 +11,12 @@ class FindFriendshipByUserIdService {
   ) {}
 
   async execute(
-    friend_id: string,
-    user: AuthorizedUser<UserPerm | PubPerm>,
+    user_id: string,
+    reqUser: AuthorizedUser<UserPerm | PubPerm>,
   ): Promise<Friendship | undefined> {
     const friendship = await this.friendshipRepository.findByUserIds(
-      user.id,
-      friend_id,
+      reqUser.id,
+      user_id,
     );
 
     return friendship;

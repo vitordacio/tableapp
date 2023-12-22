@@ -1,7 +1,7 @@
 import { Request, Response, Router } from 'express';
 
 import { verifyToken } from '../middlewares/verifyToken';
-import { verifyParamId } from '../middlewares/verifyParamId';
+import { verifyParamUserId } from '../middlewares/verifyParamId';
 import { createUserMiddleware } from '../middlewares/validators/User/createUser';
 import { createSocialNetworkMiddleware } from '../middlewares/validators/User/createSocialNetwork';
 
@@ -66,16 +66,16 @@ userRouter.get(
 );
 
 userRouter.get(
-  '/user/friends/:id',
-  [verifyToken, findFriendsMiddleware],
+  '/user/friends/:user_id',
+  [verifyToken, findFriendsMiddleware, verifyParamUserId],
   async (req: Request, res: Response) => {
     return findFriendsController.handle(req, res);
   },
 );
 
 userRouter.get(
-  '/user/:id',
-  [verifyToken, verifyParamId],
+  '/user/:user_id',
+  [verifyToken, verifyParamUserId],
   async (req: Request, res: Response) => {
     return findUserdByIdController.handle(req, res);
   },

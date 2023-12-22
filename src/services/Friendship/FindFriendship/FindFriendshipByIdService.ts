@@ -14,13 +14,14 @@ class FindFriendshipByIdService {
 
   async execute(
     friendship_id: string,
-    user: AuthorizedUser<UserPerm | PubPerm>,
+    reqUser: AuthorizedUser<UserPerm | PubPerm>,
   ): Promise<Friendship> {
     const friendship = await this.friendshipRepository.findById(friendship_id);
 
     if (
       !friendship ||
-      (friendship.author_id !== user.id && friendship.receiver_id !== user.id)
+      (friendship.author_id !== reqUser.id &&
+        friendship.receiver_id !== reqUser.id)
     ) {
       throw new AppError('Amizade não encontrada.', 404);
     }

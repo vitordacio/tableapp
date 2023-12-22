@@ -6,6 +6,7 @@ import { Friendship } from '@entities/Friendship/Friendship';
 import { IFriendshipRepository } from '@repositories/FriendshipRepository/IFriendshipRepository';
 import { IUserRepository } from '@repositories/UserRepository/IUserRepository';
 import { INotificationRepository } from '@repositories/NotificationRepository/INotificationRepository';
+import { checkCanSeeContent } from '@utils/handleUser';
 import { ICreateRequestDTO } from './CreateRequestServiceDTO';
 
 @injectable()
@@ -21,55 +22,64 @@ class CreateRequestService {
     private notificationRepository: INotificationRepository,
   ) {}
 
-  async execute({ friend_id, user }: ICreateRequestDTO): Promise<Friendship> {
-    if (user.id === friend_id) {
+  async execute({ user_id, reqUser }: ICreateRequestDTO): Promise<Friendship> {
+    if (reqUser.id === user_id) {
       throw new AppError(
         'Não é possível enviar solicitação para você mesmo.',
         400,
       );
     }
 
-    const [foundUser, friend, friendship] = await Promise.all([
-      this.userRepository.findById(user.id),
-      this.userRepository.findById(friend_id),
-      this.friendshipRepository.findByUserIds(user.id, friend_id),
+    const [requester, user, alreadyFriendship] = await Promise.all([
+      this.userRepository.findById(reqUser.id),
+      this.userRepository.findById(user_id),
+      this.friendshipRepository.findByUserIds(reqUser.id, user_id),
     ]);
 
-    if (!foundUser) {
+    if (!requester) {
       throw new AppError('Token expirado, realize login novamente.', 403);
     }
 
-    if (!friend) {
+    if (!user) {
       throw new AppError('Usuário não encontrado.', 404);
     }
 
-    if (friendship) {
+    if (alreadyFriendship) {
       throw new AppError(
-        `${friendship.confirmed ? 'Amizade' : 'Solicitação'} já existe`,
+        `${alreadyFriendship.confirmed ? 'Amizade' : 'Solicitação'} já existe`,
         400,
       );
     }
 
-    const request = this.friendshipRepository.create({
+    const friendship = this.friendshipRepository.create({
       id: v4(),
-      author_id: foundUser.id_user,
-      receiver_id: friend.id_user,
+      author_id: requester.id_user,
+      receiver_id: user.id_user,
     });
 
-    await this.friendshipRepository.save(request);
+    await this.friendshipRepository.save(friendship);
 
     const notification = this.notificationRepository.create({
       id: v4(),
-      message: `${foundUser.name} quer ser seu amigo! 🤝`,
+      message: `${requester.name} quer ser seu amigo! 🤝`,
       type: 'friendship',
-      author_id: user.id,
-      user_id: friend_id,
-      friendship_id: request.id_friendship,
+      author_id: requester.id_user,
+      user_id: user.id_user,
+      friendship_id: friendship.id_friendship,
     });
 
     await this.notificationRepository.save(notification);
 
-    return request;
+    friendship.control = {
+      friendship_id: friendship.id_friendship,
+      friendship_status: 'request_sent',
+      can_see_content: checkCanSeeContent({
+        requester_id: requester.id_user,
+        user,
+      }),
+    };
+
+    return friendship;
   }
 }
 
