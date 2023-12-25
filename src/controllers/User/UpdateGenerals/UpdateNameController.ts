@@ -21,7 +21,7 @@ class UpdateNameController {
     }
 
     const user = await this.updateNameService.execute({
-      name,
+      name: name.trim(),
       user: req.user,
     });
 

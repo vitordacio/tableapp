@@ -15,9 +15,9 @@ class CreateUserController {
     const { name, email, username, password } = req.body;
 
     const userInstance = await this.createUserService.execute({
-      name,
-      email,
-      username,
+      name: name.trim(),
+      email: email.trim(),
+      username: username.trim(),
       password,
     });
 

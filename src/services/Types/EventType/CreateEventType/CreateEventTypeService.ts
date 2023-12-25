@@ -12,10 +12,7 @@ class CreateEventTypeService {
     private eventTypeRepository: IEventTypeRepository,
   ) {}
 
-  async execute({
-    name,
-    free_access,
-  }: ICreateEventTypeDTO): Promise<EventType> {
+  async execute({ name, verified }: ICreateEventTypeDTO): Promise<EventType> {
     const type = await this.eventTypeRepository.findByName(name);
 
     if (type) {
@@ -27,8 +24,8 @@ class CreateEventTypeService {
       name,
     });
 
-    if ((free_access as unknown as string).length !== 0)
-      eventType.free_access = free_access as boolean;
+    if ((verified as unknown as string).length !== 0)
+      eventType.verified = verified as boolean;
 
     await this.eventTypeRepository.save(eventType);
 

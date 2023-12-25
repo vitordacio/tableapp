@@ -35,6 +35,8 @@ import { findFriendsMiddleware } from '../middlewares/validators/User/findFriend
 import { findFriendsController } from '../main/User/findFriends';
 import { createSocialNetworkController } from '../main/User/updateGenerals/createSocialNetwork';
 import { deleteSocialNetworkController } from '../main/User/updateGenerals/deleteSocialNetwork';
+import { findCheckUpdateEmailController } from '../main/User/findCheckUpdateEmail';
+import { findCheckUpdateNameController } from '../main/User/findCheckUpdateName';
 
 const userRouter = Router();
 
@@ -62,6 +64,22 @@ userRouter.get(
   '/user/check-username/:username',
   async (req: Request, res: Response) => {
     return findCheckUsernameController.handle(req, res);
+  },
+);
+
+userRouter.get(
+  '/user/check-update/name',
+  verifyToken,
+  async (req: Request, res: Response) => {
+    return findCheckUpdateNameController.handle(req, res);
+  },
+);
+
+userRouter.get(
+  '/user/check-update/email',
+  verifyToken,
+  async (req: Request, res: Response) => {
+    return findCheckUpdateEmailController.handle(req, res);
   },
 );
 

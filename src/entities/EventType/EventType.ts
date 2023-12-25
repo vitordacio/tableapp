@@ -20,7 +20,7 @@ class EventType {
   name: string;
 
   @Column({ default: true })
-  free_access: boolean;
+  verified: boolean;
 
   @Column({ default: 0 })
   count: number;

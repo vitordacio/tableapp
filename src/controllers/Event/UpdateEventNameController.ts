@@ -26,7 +26,7 @@ class UpdateEventNameController {
     const event = await this.updateEventNameService.execute({
       user: req.user,
       event_id,
-      name,
+      name: name.trim(),
     });
 
     return res.status(200).json(instanceToPlain(event));

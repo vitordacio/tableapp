@@ -4,6 +4,7 @@ import { AppError } from '@utils/AppError';
 import { IEventRepository } from '@repositories/EventRepository/IEventRepository';
 import { IParticipationRepository } from '@repositories/ParticipationRepository/IParticipationRepository';
 import { Event } from '@entities/Event/Event';
+import { extractTagsFromText } from '@utils/generateTags';
 import { IUpdateEventLocationDTO } from './UpdateEventDTO';
 
 @injectable()
@@ -39,6 +40,10 @@ class UpdateEventLocationService {
     }
 
     event.location = location;
+
+    event.tags = extractTagsFromText(
+      `${event.name} ${location} ${event.author.name} ${event.author.username}`,
+    ).toString();
 
     await this.eventRepository.save(event);
 

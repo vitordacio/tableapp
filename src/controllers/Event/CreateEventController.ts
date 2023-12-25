@@ -41,8 +41,8 @@ class CreateEventController {
     const eventInstance = await this.createEventService.execute({
       user: req.user,
       type_id,
-      name,
-      location,
+      name: name.trim(),
+      location: location.trim(),
       start_time,
       finish_time,
       is_private,

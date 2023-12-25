@@ -16,7 +16,7 @@ class EventTypeRepository implements IEventTypeRepository {
       id_event_type: data.id,
       name: data.name.toLowerCase(),
       count: data.count,
-      free_access: data.free_access,
+      verified: data.verified,
     });
 
     return eventType;

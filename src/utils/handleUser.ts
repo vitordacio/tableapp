@@ -50,6 +50,25 @@ export const checkCanSeeUserContent = ({
   return false;
 };
 
+// type verifyCanUpdateEmail = {
+//   currentDate: Date;
+//   lastUpdateDate: Date;
+// };
+
+// export const verifyCanUpdateEmail = ({
+//   currentDate,
+//   lastUpdateDate,
+// }: verifyCanUpdateEmail): boolean => {
+//   const timeDifference: number =
+//     currentDate.getTime() - lastUpdateDate.getTime();
+
+//   const daysDifference: number = timeDifference / (1000 * 60 * 60 * 24);
+
+//   if (daysDifference >= 30) return false;
+
+//   return true;
+// };
+
 // export function sortByDate(
 //   // eslint-disable-next-line @typescript-eslint/no-explicit-any
 //   array: any[],

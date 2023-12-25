@@ -3,7 +3,7 @@ import { celebrate, Segments, Joi } from 'celebrate';
 export const createEventMiddleware = celebrate({
   [Segments.BODY]: {
     type_id: Joi.string().required(),
-    name: Joi.string().required(),
+    name: Joi.string().min(4).max(30).required(),
     location: Joi.string().required(),
     start_time: Joi.date().allow(''),
     finish_time: Joi.date().allow(''),

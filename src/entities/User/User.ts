@@ -34,6 +34,10 @@ class User {
   @Column()
   email: string;
 
+  @Column({ nullable: true })
+  @Exclude()
+  email_updated_at: Date;
+
   @Column({ unique: true })
   username: string;
 
@@ -43,6 +47,10 @@ class User {
 
   @Column()
   name: string;
+
+  @Column({ nullable: true })
+  @Exclude()
+  name_updated_at: Date;
 
   @Column({ nullable: true })
   bio: string;

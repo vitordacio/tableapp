@@ -28,7 +28,7 @@ export const checkCanSeeEventContent = ({
   event,
   participation_status,
 }: checkCanSeeEventContent): boolean => {
-  if (!event.type.free_access || !event.private) return true;
+  if (!event.type.verified || !event.private) return true;
   if (
     participation_status &&
     ['author', 'user_in', 'guest_in', 'mod_in', 'vip_in'].includes(

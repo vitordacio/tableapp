@@ -1,10 +1,8 @@
 import { inject, injectable } from 'tsyringe';
 import { v4 } from 'uuid';
-
 import { IHashProvider } from '@providers/HashProvider/IHashProvider';
 import { IUserRepository } from '@repositories/UserRepository/IUserRepository';
 import { User } from '@entities/User/User';
-
 import { AppError } from '@utils/AppError';
 import { isUsername } from '@utils/validations';
 import { extractTagsFromText } from '@utils/generateTags';
@@ -26,21 +24,22 @@ class CreateUserService {
     username,
     password,
   }: ICreateUserDTO): Promise<User> {
-    if (name.trim().split(' ')[0].length < 4) {
-      throw new AppError('Primeiro nome precisa ter ao menos 4 dígitos.', 400);
-    }
-
-    const emailExists = await this.userRepository.findByEmail(email.trim());
-
-    if (emailExists) {
-      throw new AppError('Email já cadastrado no sistema.', 400);
+    if (name.length < 4) {
+      throw new AppError('Nome precisa ter ao menos 4 dígitos.', 400);
     }
 
     if (!isUsername(username)) {
       throw new AppError('Nome de usuário inválido.', 400);
     }
 
-    const usernameExists = await this.userRepository.findByUsername(username);
+    const [emailExists, usernameExists] = await Promise.all([
+      this.userRepository.findByEmail(email),
+      this.userRepository.findByUsername(username),
+    ]);
+
+    if (emailExists) {
+      throw new AppError('Email já cadastrado no sistema.', 400);
+    }
 
     if (usernameExists) {
       throw new AppError('Nome de usuário já cadastrado no sistema.', 400);
@@ -51,7 +50,9 @@ class CreateUserService {
     const user = this.userRepository.create({
       id: v4(),
       name,
+      name_updated_at: new Date(),
       email,
+      email_updated_at: new Date(),
       username,
       password: hashedPassword,
       tags: extractTagsFromText(`${username} ${name}`),

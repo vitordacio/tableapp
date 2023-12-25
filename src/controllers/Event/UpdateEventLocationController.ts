@@ -28,7 +28,7 @@ class UpdateEventLocationController {
     const event = await this.updateEventLocationService.execute({
       user: req.user,
       event_id,
-      location,
+      location: location.trim(),
     });
 
     return res.status(200).json(instanceToPlain(event));

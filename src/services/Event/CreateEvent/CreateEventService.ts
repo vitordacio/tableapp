@@ -42,6 +42,10 @@ class CreateEventService {
     performer,
     address_id,
   }: ICreateEventDTO): Promise<Event> {
+    if (name.length < 4) {
+      throw new AppError('Nome precisa ter ao menos 4 dígitos.', 400);
+    }
+
     const [author, type] = await Promise.all([
       this.userRepository.findById(user.id),
       this.eventTypeRepository.findById(type_id),
@@ -59,7 +63,7 @@ class CreateEventService {
       throw new AppError('Tipo de evento não encontrado.', 404);
     }
 
-    if (author.role_name === 'user' && !type.free_access) {
+    if (author.role_name === 'user' && type.verified) {
       throw new AppError('Não autorizado.', 403);
     }
 

@@ -14,7 +14,7 @@ class CreateEventTypeController {
   }
 
   async handle(req: Request, res: Response): Promise<Response> {
-    const { name, free_access } = req.body;
+    const { name, verified } = req.body;
 
     if (!hasPermission(req.user, masterPerm)) {
       throw new AppError('Operação não permitida.', 403);
@@ -22,7 +22,7 @@ class CreateEventTypeController {
 
     const eventTypeInstance = await this.createEventTypeService.execute({
       name,
-      free_access,
+      verified,
     });
 
     return res.status(201).json(instanceToPlain(eventTypeInstance));

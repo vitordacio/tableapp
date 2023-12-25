@@ -14,7 +14,7 @@ class FetchEventTypesService {
     const fetchData = [
       {
         name: 'party',
-        free_access: false,
+        verified: false,
       },
       {
         name: 'table',
@@ -71,7 +71,7 @@ class FetchEventTypesService {
         name: data.name,
       });
 
-      if (data.free_access) newType.free_access = data.free_access;
+      if (data.verified) newType.verified = data.verified;
 
       newTypes.push(newType);
     });

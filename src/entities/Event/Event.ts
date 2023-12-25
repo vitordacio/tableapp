@@ -99,6 +99,10 @@ class Event {
   @Exclude()
   tags: string;
 
+  @Column({ default: false })
+  @Exclude()
+  computed: boolean;
+
   @Column()
   author_id: string;
 

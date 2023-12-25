@@ -1,6 +1,6 @@
 export interface IEventType {
   id: string;
   name: string;
-  free_access?: boolean;
+  verified?: boolean;
   count?: number;
 }

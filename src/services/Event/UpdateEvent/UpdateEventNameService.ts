@@ -4,6 +4,7 @@ import { AppError } from '@utils/AppError';
 import { IEventRepository } from '@repositories/EventRepository/IEventRepository';
 import { IParticipationRepository } from '@repositories/ParticipationRepository/IParticipationRepository';
 import { Event } from '@entities/Event/Event';
+import { extractTagsFromText } from '@utils/generateTags';
 import { IUpdateEventNameDTO } from './UpdateEventDTO';
 
 @injectable()
@@ -17,6 +18,10 @@ class UpdateEventNameService {
   ) {}
 
   async execute({ user, event_id, name }: IUpdateEventNameDTO): Promise<Event> {
+    if (name.length < 4) {
+      throw new AppError('Nome precisa ter ao menos 4 dígitos.', 400);
+    }
+
     const event = await this.eventRepository.findById(event_id);
 
     if (!event) {
@@ -35,6 +40,9 @@ class UpdateEventNameService {
     }
 
     event.name = name;
+    event.tags = extractTagsFromText(
+      `${name} ${event.location} ${event.author.name} ${event.author.username}`,
+    ).toString();
 
     await this.eventRepository.save(event);
 

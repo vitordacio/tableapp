@@ -8,10 +8,6 @@ export interface IEvent {
   start_time?: Date;
   finish_time?: Date;
   private?: boolean;
-  // date: string;
-  // time: string;
-  // finish_date: string;
-  // finish_time: string;
   additional?: string;
   drink_preferences?: string;
   min_amount?: string;
@@ -22,4 +18,5 @@ export interface IEvent {
   tags: string[];
   participating_count?: number;
   emojis_count?: number;
+  computed?: boolean;
 }
