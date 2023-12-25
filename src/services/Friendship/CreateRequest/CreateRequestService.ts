@@ -6,7 +6,7 @@ import { Friendship } from '@entities/Friendship/Friendship';
 import { IFriendshipRepository } from '@repositories/FriendshipRepository/IFriendshipRepository';
 import { IUserRepository } from '@repositories/UserRepository/IUserRepository';
 import { INotificationRepository } from '@repositories/NotificationRepository/INotificationRepository';
-import { checkCanSeeContent } from '@utils/handleUser';
+import { generateUserControl } from '@utils/handleControl';
 import { ICreateRequestDTO } from './CreateRequestServiceDTO';
 
 @injectable()
@@ -70,14 +70,11 @@ class CreateRequestService {
 
     await this.notificationRepository.save(notification);
 
-    friendship.control = {
-      friendship_id: friendship.id_friendship,
-      friendship_status: 'request_sent',
-      can_see_content: checkCanSeeContent({
-        requester_id: requester.id_user,
-        user,
-      }),
-    };
+    friendship.control = generateUserControl({
+      friendship,
+      requester,
+      user,
+    });
 
     return friendship;
   }

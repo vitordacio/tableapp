@@ -16,7 +16,7 @@ class FindFriendshipByIdController {
   }
 
   async handle(req: Request, res: Response): Promise<Response> {
-    const { participation_id } = req.params;
+    const { friendship_id } = req.params;
 
     if (
       !hasPermission(req.user, userPerm) &&
@@ -26,7 +26,7 @@ class FindFriendshipByIdController {
     }
 
     const friendshipInstance = await this.findFriendshipByIdService.execute(
-      participation_id,
+      friendship_id,
       req.user,
     );
 

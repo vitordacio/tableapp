@@ -19,6 +19,23 @@ import { Report } from '@entities/Report/Report';
 import { EventType } from '@entities/EventType/EventType';
 import { EventPicture } from '@entities/EventPicture/EventPicture';
 
+export type EventControl = {
+  participation_id?: string;
+  status?: 'awaiting' | 'ongoing' | 'finished';
+  participation_status?:
+    | 'author'
+    | 'user_in'
+    | 'user_out'
+    | 'guest_in'
+    | 'guest_out'
+    | 'mod_in'
+    | 'mod_out'
+    | 'vip_in'
+    | 'vip_out'
+    | '';
+  can_see_content?: boolean;
+};
+
 @Entity('events')
 class Event {
   @PrimaryColumn('uuid')
@@ -48,20 +65,6 @@ class Event {
 
   @Column({ default: 0 })
   emojis_count: number;
-
-  status?: 'awaiting' | 'ongoing' | 'finished';
-
-  participation_status?:
-    | 'author'
-    | 'user_in'
-    | 'user_out'
-    | 'guest_in'
-    | 'guest_out'
-    | 'mod_in'
-    | 'mod_out'
-    | 'vip_in'
-    | 'vip_out'
-    | '';
 
   participation_id?: string;
 
@@ -144,6 +147,8 @@ class Event {
   @Exclude()
   @DeleteDateColumn()
   deleted_at: Date;
+
+  control: EventControl;
 }
 
 export { Event };

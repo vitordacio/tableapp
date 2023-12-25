@@ -1,18 +1,19 @@
 import { Event } from '@entities/Event/Event';
 import { Participation } from '@entities/Participation/Participation';
+import { User } from '@entities/User/User';
 
 type checkParticipation = {
-  user_id: string;
+  user: User;
   event: Event;
   participation?: Participation;
 };
 
 export const checkParticipationStatus = ({
-  user_id,
+  user,
   event,
   participation,
-}: checkParticipation): Event['participation_status'] => {
-  if (user_id === event.author_id) return 'author';
+}: checkParticipation): Event['control']['participation_status'] => {
+  if (user.id_user === event.author_id) return 'author';
 
   if (!participation) return '';
 

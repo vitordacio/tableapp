@@ -14,7 +14,7 @@ class FindEventByIdController {
   }
 
   async handle(req: Request, res: Response): Promise<Response> {
-    const { id } = req.params;
+    const { event_id } = req.params;
 
     if (
       !hasPermission(req.user, userPerm) &&
@@ -23,7 +23,10 @@ class FindEventByIdController {
       throw new AppError('Operação não permitida.', 403);
     }
 
-    const eventInstance = await this.findEventByIdService.execute(id, req.user);
+    const eventInstance = await this.findEventByIdService.execute(
+      event_id,
+      req.user,
+    );
 
     return res.status(201).json(instanceToPlain(eventInstance));
   }

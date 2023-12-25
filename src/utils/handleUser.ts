@@ -32,18 +32,20 @@ export async function generateUniqueUsername(username: string) {
   return newUsername;
 }
 
-type checkCanSeeContent = {
-  requester_id: string;
+type checkCanSeeUserContent = {
+  requester: User;
   user: User;
+  friendship_status: User['control']['friendship_status'];
 };
 
-export const checkCanSeeContent = ({
-  requester_id,
+export const checkCanSeeUserContent = ({
+  requester,
   user,
-}: checkCanSeeContent): boolean => {
-  if (requester_id === user.id_user) return true;
+  friendship_status,
+}: checkCanSeeUserContent): boolean => {
+  if (requester.id_user === user.id_user) return true;
   if (user.role_name === 'pub' || !user.private) return true;
-  if (user.control.friendship_status === 'friends') return true;
+  if (friendship_status === 'friends') return true;
 
   return false;
 };

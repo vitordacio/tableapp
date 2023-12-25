@@ -37,6 +37,10 @@ import { updateEventPerformerMiddleware } from '../middlewares/validators/Event/
 import { updateEventPrivateMiddleware } from '../middlewares/validators/Event/updateEventPrivate';
 import { updateEventTicketsFreeMiddleware } from '../middlewares/validators/Event/updateEventTicketsFree';
 import { updateEventTicketsValueMiddleware } from '../middlewares/validators/Event/updateEventTicketsValue';
+import {
+  verifyParamEventId,
+  verifyParamUserId,
+} from '../middlewares/verifyParamId';
 
 const eventRouter = Router();
 
@@ -58,7 +62,7 @@ eventRouter.get(
 
 eventRouter.get(
   '/event/user/:user_id',
-  [verifyToken, findEventsByUserIdMiddleware],
+  [verifyToken, verifyParamUserId, findEventsByUserIdMiddleware],
   async (req: Request, res: Response) => {
     return findEventsByUserIdController.handle(req, res);
   },
@@ -78,8 +82,8 @@ eventRouter.get(
 );
 
 eventRouter.get(
-  '/event/:id',
-  verifyToken,
+  '/event/:event_id',
+  [verifyToken, verifyParamEventId],
   async (req: Request, res: Response) => {
     return findEventByIdController.handle(req, res);
   },

@@ -2,9 +2,9 @@ import { inject, injectable } from 'tsyringe';
 import { Event } from '@entities/Event/Event';
 import { IEventRepository } from '@repositories/EventRepository/IEventRepository';
 import { AppError } from '@utils/AppError';
-import { checkEventStatus } from '@utils/handleEvent';
 import { IParticipationRepository } from '@repositories/ParticipationRepository/IParticipationRepository';
-import { checkParticipationStatus } from '@utils/handleParticipation';
+import { generateEventControl } from '@utils/handleControl';
+import { IUserRepository } from '@repositories/UserRepository/IUserRepository';
 
 @injectable()
 class FindEventByIdService {
@@ -14,28 +14,33 @@ class FindEventByIdService {
 
     @inject('ParticipationRepository')
     private participationRepository: IParticipationRepository,
+
+    @inject('UserRepository')
+    private userRepository: IUserRepository,
   ) {}
 
   async execute(
     event_id: string,
-    user: AuthorizedUser<UserPerm | PubPerm>,
+    reqUser: AuthorizedUser<UserPerm | PubPerm>,
   ): Promise<Event> {
-    const [event, participation] = await Promise.all([
+    const [user, event, participation] = await Promise.all([
+      this.userRepository.findById(reqUser.id),
       this.eventRepository.findById(event_id),
-      this.participationRepository.findByUserAndEvent(user.id, event_id),
+      this.participationRepository.findByUserAndEvent(reqUser.id, event_id),
     ]);
+
+    if (!user) {
+      throw new AppError('Usuário não encontrado.', 404);
+    }
 
     if (!event) {
       throw new AppError('Evento não encontrado.', 404);
     }
 
-    event.participation_id = participation?.id_participation;
-    event.status = checkEventStatus(event);
-
-    event.participation_status = checkParticipationStatus({
-      user_id: user.id,
+    event.control = generateEventControl({
       event,
       participation,
+      user,
     });
 
     return event;

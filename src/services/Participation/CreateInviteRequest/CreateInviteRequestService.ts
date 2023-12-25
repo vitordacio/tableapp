@@ -10,7 +10,7 @@ import { INotificationRepository } from '@repositories/NotificationRepository/IN
 import { IEventRepository } from '@repositories/EventRepository/IEventRepository';
 import { IUserRepository } from '@repositories/UserRepository/IUserRepository';
 import { IParticipationTypeRepository } from '@repositories/ParticipationTypeRepository/IParticipationTypeRepository';
-import { checkParticipationStatus } from '@utils/handleParticipation';
+import { generateEventControl } from '@utils/handleControl';
 import { ICreateInviteRequestDTO } from './CreateInviteRequestServiceDTO';
 
 @injectable()
@@ -131,10 +131,10 @@ class CreateInviteRequestService {
 
     if (!participation.type) participation.type = participationType;
 
-    participation.participation_status = checkParticipationStatus({
+    participation.control = generateEventControl({
       event,
-      user_id,
       participation,
+      user: foundUser,
     });
 
     return participation;

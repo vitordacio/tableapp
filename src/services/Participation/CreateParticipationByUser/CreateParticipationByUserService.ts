@@ -9,6 +9,7 @@ import { IParticipationRepository } from '@repositories/ParticipationRepository/
 import { AppError } from '@utils/AppError';
 import { INotificationRepository } from '@repositories/NotificationRepository/INotificationRepository';
 import { IParticipationTypeRepository } from '@repositories/ParticipationTypeRepository/IParticipationTypeRepository';
+import { generateEventControl } from '@utils/handleControl';
 import { ICreateParticipationByUserDTO } from './CreateParticipationByUserServiceDTO';
 
 @injectable()
@@ -41,20 +42,16 @@ class CreateParticipationByUserService {
       await this.eventRepository.findById(event_id),
     ]);
 
-    // const foundUser = await this.userRepository.findById(user.id);
-
     if (!foundUser) {
       throw new AppError('Usuário não encontrado.', 404);
     }
-
-    // const event = await this.eventRepository.findById(event_id);
 
     if (!event) {
       throw new AppError('Evento não encontrado.', 404);
     }
 
     if (user.id === event.author_id) {
-      throw new AppError('Usuário já está participando.', 400);
+      throw new AppError('Usuário é autor do evento.', 400);
     }
 
     participation = await this.participationRepository.findByUserAndEvent(
@@ -102,7 +99,11 @@ class CreateParticipationByUserService {
       await this.notificationRepository.save(notification),
     ]);
 
-    participation.participation_status = 'user_out';
+    participation.control = generateEventControl({
+      event,
+      participation,
+      user: foundUser,
+    });
 
     return participation;
   }

@@ -1,6 +1,6 @@
 import { Event } from '@entities/Event/Event';
 
-export const checkEventStatus = (event: Event): Event['status'] => {
+export const checkEventStatus = (event: Event): Event['control']['status'] => {
   // const startDateTime: Date = new Date(`${event.date}T${event.time}`);
   // const finishDateTime: Date = new Date(
   //   `${event.finish_date}T${event.finish_time}`,
@@ -17,4 +17,25 @@ export const checkEventStatus = (event: Event): Event['status'] => {
   }
 
   return 'finished';
+};
+
+type checkCanSeeEventContent = {
+  event: Event;
+  participation_status: Event['control']['participation_status'];
+};
+
+export const checkCanSeeEventContent = ({
+  event,
+  participation_status,
+}: checkCanSeeEventContent): boolean => {
+  if (!event.type.free_access || !event.private) return true;
+  if (
+    participation_status &&
+    ['author', 'user_in', 'guest_in', 'mod_in', 'vip_in'].includes(
+      participation_status,
+    )
+  )
+    return true;
+
+  return false;
 };

@@ -36,7 +36,7 @@ friendshipRouter.post(
 // );
 
 friendshipRouter.get(
-  '/friendship/:participation_id',
+  '/friendship/:friendship_id',
   [verifyToken, verifyParamFriendshipId],
   async (req: Request, res: Response) => {
     return findFriendshipByIdController.handle(req, res);

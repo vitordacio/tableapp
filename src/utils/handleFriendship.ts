@@ -9,7 +9,7 @@ type checkFriendship = {
 export const checkFriendship = ({
   user_id,
   friendship,
-}: checkFriendship): User['friendship_status'] => {
+}: checkFriendship): User['control']['friendship_status'] => {
   if (!friendship) return '';
 
   if (friendship.confirmed) return 'friends';
