@@ -12,8 +12,8 @@ import {
 import { User } from '@entities/User/User';
 import { Participation } from '@entities/Participation/Participation';
 import { Friendship } from '@entities/Friendship/Friendship';
-import { Emoji } from '@entities/Emoji/Emoji';
 import { Achievement } from '@entities/Achievement/Achievement';
+import { React } from '@entities/React/React';
 
 @Entity('notifications')
 class Notification {
@@ -51,11 +51,11 @@ class Notification {
   friendship: Friendship;
 
   @Column({ nullable: true })
-  emoji_id: string;
+  react_id: string;
 
-  @ManyToOne(() => Emoji, emoji => emoji.notifications)
-  @JoinColumn({ name: 'emoji_id' })
-  emoji: Emoji;
+  @ManyToOne(() => React, react => react.notifications)
+  @JoinColumn({ name: 'react_id' })
+  react: React;
 
   @Column({ nullable: true })
   participation_id: string;

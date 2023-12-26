@@ -13,11 +13,11 @@ import { Exclude } from 'class-transformer';
 import { User } from '@entities/User/User';
 import { Participation } from '@entities/Participation/Participation';
 import { Address } from '@entities/Address/Address';
-import { Emoji } from '@entities/Emoji/Emoji';
 import { Achievement } from '@entities/Achievement/Achievement';
 import { Report } from '@entities/Report/Report';
 import { EventType } from '@entities/EventType/EventType';
 import { EventPicture } from '@entities/EventPicture/EventPicture';
+import { React } from '@entities/React/React';
 
 export type EventControl = {
   participation_id?: string;
@@ -132,10 +132,10 @@ class Event {
   })
   participations: Participation[];
 
-  @OneToMany(() => Emoji, emoji => emoji.event, {
+  @OneToMany(() => React, react => react.event, {
     cascade: true,
   })
-  emojis: Emoji[];
+  reacts: React[];
 
   @OneToMany(() => Report, report => report.event, {
     cascade: true,

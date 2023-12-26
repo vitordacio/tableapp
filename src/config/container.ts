@@ -12,6 +12,15 @@ import { EventRepository } from '@repositories/EventRepository/implementation/Ev
 import { IEventTypeRepository } from '@repositories/EventTypeRepository/IEventTypeRepository';
 import { EventTypeRepository } from '@repositories/EventTypeRepository/implementation/EventTypeRepository';
 
+import { IEmojiRepository } from '@repositories/EmojiRepository/IEmojiRepository';
+import { EmojiRepository } from '@repositories/EmojiRepository/implementation/EmojiRepository';
+
+import { IEmojiTypeRepository } from '@repositories/EmojiTypeRepository/IEmojiTypeRepository';
+import { EmojiTypeRepository } from '@repositories/EmojiTypeRepository/implementation/EmojiTypeRepository';
+
+import { IReactRepository } from '@repositories/ReactRepository/IReactRepository';
+import { ReactRepository } from '@repositories/ReactRepository/implementation/ReactRepository';
+
 import { IParticipationRepository } from '@repositories/ParticipationRepository/IParticipationRepository';
 import { ParticipationRepository } from '@repositories/ParticipationRepository/implementation/ParticipationRepository';
 
@@ -43,6 +52,21 @@ container.registerSingleton<IEventRepository>(
 container.registerSingleton<IEventTypeRepository>(
   'EventTypeRepository',
   EventTypeRepository,
+);
+
+container.registerSingleton<IEmojiRepository>(
+  'EmojiRepository',
+  EmojiRepository,
+);
+
+container.registerSingleton<IEmojiTypeRepository>(
+  'EmojiTypeRepository',
+  EmojiTypeRepository,
+);
+
+container.registerSingleton<IReactRepository>(
+  'ReactRepository',
+  ReactRepository,
 );
 
 container.registerSingleton<IParticipationRepository>(

@@ -17,16 +17,10 @@ class EmojiType {
   id_emoji_type: string;
 
   @Column({ unique: true })
-  emoji: string;
-
-  @Column({ unique: true })
-  name: string;
-
-  @Column()
-  shorthand: string;
-
-  @Column()
   category: string;
+
+  @Column()
+  order: number;
 
   @OneToMany(() => Emoji, emoji => emoji.type)
   emojis: Emoji[];

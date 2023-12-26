@@ -13,12 +13,12 @@ import { Event } from '@entities/Event/Event';
 import { Friendship } from '@entities/Friendship/Friendship';
 import { Address } from '@entities/Address/Address';
 import { Notification } from '@entities/Notification/Notification';
-import { Emoji } from '@entities/Emoji/Emoji';
 import { SocialNetwork } from '@entities/SocialNetwork/SocialNetwork';
 import { Achievement } from '@entities/Achievement/Achievement';
 import { Report } from '@entities/Report/Report';
 import { Block } from '@entities/Block/Block';
 import { Suggestion } from '@entities/Suggestion/Suggestion';
+import { React } from '@entities/React/React';
 
 export type UserControl = {
   friendship_id?: string;
@@ -135,13 +135,13 @@ class User {
   friendships_received: Friendship[];
 
   @Column({ default: 0 })
-  emojis_count: number;
+  reacts_count: number;
 
-  @OneToMany(() => Emoji, emoji => emoji.author)
-  emojis_sent: Emoji[];
+  @OneToMany(() => React, react => react.author)
+  reacts_sent: React[];
 
-  @OneToMany(() => Emoji, emoji => emoji.receiver)
-  emojis_received: Emoji[];
+  @OneToMany(() => React, react => react.receiver)
+  reacts_received: React[];
 
   @OneToMany(() => Report, report => report.author)
   reports_sent: Report[];

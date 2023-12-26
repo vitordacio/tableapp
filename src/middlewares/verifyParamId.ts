@@ -23,3 +23,9 @@ export const verifyParamFriendshipId = celebrate({
     friendship_id: Joi.string().uuid().required(),
   },
 });
+
+export const verifyParamEmojiId = celebrate({
+  [Segments.PARAMS]: {
+    emoji_id: Joi.string().uuid().required(),
+  },
+});

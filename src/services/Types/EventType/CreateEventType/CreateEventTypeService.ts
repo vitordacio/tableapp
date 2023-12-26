@@ -24,8 +24,8 @@ class CreateEventTypeService {
       name,
     });
 
-    if ((verified as unknown as string).length !== 0)
-      eventType.verified = verified as boolean;
+    if (verified !== null && verified !== undefined)
+      eventType.verified = verified;
 
     await this.eventTypeRepository.save(eventType);
 

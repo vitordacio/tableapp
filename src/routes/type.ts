@@ -1,7 +1,7 @@
 import { Request, Response, Router } from 'express';
 import { verifyToken } from '../middlewares/verifyToken';
 
-import { createEventTypeMiddleware } from '../middlewares/validators/Event/createEventType';
+import { createEventTypeMiddleware } from '../middlewares/validators/Type/EventType/createEventType';
 import { createSocialNetworkTypeMiddleware } from '../middlewares/validators/Type/SocialNetworkType/createSocialNetworkType';
 
 import { findEventTypesController } from '../main/Type/EventType/findEventTypes';
@@ -17,8 +17,46 @@ import { deleteParticipationTypeController } from '../main/Type/ParticipationTyp
 import { fetchParticipationTypesController } from '../main/Type/ParticipationType/fetchParticipationTypes';
 import { findParticipationTypesController } from '../main/Type/ParticipationType/findParticipationTypes';
 import { createParticipationTypeMiddleware } from '../middlewares/validators/Participation/createParticipationType';
+import { createEmojiTypeController } from '../main/Type/EmojiType/createEmojiType';
+import { deleteEmojiTypeController } from '../main/Type/EmojiType/deleteEmojiType';
+import { fetchEmojiTypesController } from '../main/Type/EmojiType/fetchEmojiTypes';
+import { findEmojiTypesController } from '../main/Type/EmojiType/findEmojiTypes';
+import { createEmojiTypeMiddleware } from '../middlewares/validators/Type/EmojiType/createEmojiType';
 
 const typeRouter = Router();
+
+// Emojis
+typeRouter.get(
+  '/type/emoji',
+  verifyToken,
+  async (req: Request, res: Response) => {
+    return findEmojiTypesController.handle(req, res);
+  },
+);
+
+typeRouter.post(
+  '/type/emoji',
+  [verifyToken, createEmojiTypeMiddleware],
+  async (req: Request, res: Response) => {
+    return createEmojiTypeController.handle(req, res);
+  },
+);
+
+typeRouter.post(
+  '/type/emoji/fetch',
+  verifyToken,
+  async (req: Request, res: Response) => {
+    return fetchEmojiTypesController.handle(req, res);
+  },
+);
+
+typeRouter.delete(
+  '/type/emoji/:id',
+  verifyToken,
+  async (req: Request, res: Response) => {
+    return deleteEmojiTypeController.handle(req, res);
+  },
+);
 
 // Events
 typeRouter.get(
