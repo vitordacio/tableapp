@@ -41,7 +41,7 @@ class ReactRepository implements IReactRepository {
 
   async findToRemove(id: string): Promise<React | undefined> {
     const event = await this.ormRepository.findOne({
-      relations: ['notifications'],
+      relations: ['notifications', 'emoji', 'author', 'receiver', 'event'],
       where: { id_react: id },
     });
 

@@ -29,3 +29,9 @@ export const verifyParamEmojiId = celebrate({
     emoji_id: Joi.string().uuid().required(),
   },
 });
+
+export const verifyParamReactId = celebrate({
+  [Segments.PARAMS]: {
+    react_id: Joi.string().uuid().required(),
+  },
+});

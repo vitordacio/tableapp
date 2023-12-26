@@ -19,14 +19,6 @@ emojiRouter.post(
   },
 );
 
-emojiRouter.post(
-  '/emoji/fetch/face',
-  verifyToken,
-  async (req: Request, res: Response) => {
-    return createEmojiController.handle(req, res);
-  },
-);
-
 emojiRouter.get(
   '/emoji/:emoji_id',
   [verifyToken, verifyParamEmojiId],
@@ -48,6 +40,15 @@ emojiRouter.delete(
   [verifyToken, verifyParamEmojiId],
   async (req: Request, res: Response) => {
     return deleteEmojiController.handle(req, res);
+  },
+);
+
+// to do
+emojiRouter.post(
+  '/emoji/fetch',
+  verifyToken,
+  async (req: Request, res: Response) => {
+    return createEmojiController.handle(req, res);
   },
 );
 

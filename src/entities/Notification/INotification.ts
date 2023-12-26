@@ -6,6 +6,7 @@ interface INotification {
   author_id?: string;
   friendship_id?: string;
   participation_id?: string;
+  react_id?: string;
   read?: boolean;
 }
 
