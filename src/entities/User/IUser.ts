@@ -10,7 +10,7 @@ export interface IUser {
   location?: string;
   gender?: string;
   friends_count?: number;
-  emojis_count?: number;
+  reacts_count?: number;
   picture?: string;
   cover_photo?: string;
   private?: boolean;

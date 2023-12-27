@@ -53,6 +53,32 @@ class EmojiRepository implements IEmojiRepository {
     return emoji;
   }
 
+  async findByCategoryMaster(category: string): Promise<Emoji[]> {
+    const emoji = await this.ormRepository.find({
+      relations: ['type'],
+      where: { type: { category } },
+    });
+
+    return emoji;
+  }
+
+  async findByCategory(
+    category: string,
+    page: number,
+    limit: number,
+  ): Promise<Emoji[]> {
+    const users = this.ormRepository
+      .createQueryBuilder('emoji')
+      .leftJoin('emoji.type', 'type')
+      .where('type.category = :category', { category })
+      .orderBy('order', 'DESC')
+      .take(limit)
+      .skip(page && limit ? limit * (page - 1) : undefined)
+      .getMany();
+
+    return users;
+  }
+
   async findLastInOrder(): Promise<Emoji | undefined> {
     const emoji = await this.ormRepository.findOne({
       order: { order: 'DESC' },

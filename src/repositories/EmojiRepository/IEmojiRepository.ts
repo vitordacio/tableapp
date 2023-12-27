@@ -10,4 +10,10 @@ export interface IEmojiRepository {
   findLastInOrder(): Promise<Emoji | undefined>;
   remove(entitie: Emoji): Promise<void>;
   saveMany(entities: Emoji[]): Promise<Emoji[]>;
+  findByCategoryMaster(category: string): Promise<Emoji[]>;
+  findByCategory(
+    category: string,
+    page: number,
+    limit: number,
+  ): Promise<Emoji[]>;
 }

@@ -22,6 +22,7 @@ import { deleteEmojiTypeController } from '../main/Type/EmojiType/deleteEmojiTyp
 import { fetchEmojiTypesController } from '../main/Type/EmojiType/fetchEmojiTypes';
 import { findEmojiTypesController } from '../main/Type/EmojiType/findEmojiTypes';
 import { createEmojiTypeMiddleware } from '../middlewares/validators/Type/EmojiType/createEmojiType';
+import { fetchMasterController } from '../main/Type/fetchMaster';
 
 const typeRouter = Router();
 
@@ -154,6 +155,14 @@ typeRouter.delete(
   verifyToken,
   async (req: Request, res: Response) => {
     return deleteSocialNetworkTypeController.handle(req, res);
+  },
+);
+
+typeRouter.post(
+  '/master/fetch',
+  verifyToken,
+  async (req: Request, res: Response) => {
+    return fetchMasterController.handle(req, res);
   },
 );
 
