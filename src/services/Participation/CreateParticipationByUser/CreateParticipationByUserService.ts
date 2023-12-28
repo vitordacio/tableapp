@@ -10,7 +10,7 @@ import { AppError } from '@utils/AppError';
 import { INotificationRepository } from '@repositories/NotificationRepository/INotificationRepository';
 import { IParticipationTypeRepository } from '@repositories/ParticipationTypeRepository/IParticipationTypeRepository';
 import { generateEventControl } from '@utils/handleControl';
-import { ICreateParticipationByUserDTO } from './CreateParticipationByUserServiceDTO';
+import { ICreateParticipationByUserDTO } from './ICreateParticipationByUserServiceDTO';
 
 @injectable()
 class CreateParticipationByUserService {
@@ -98,6 +98,8 @@ class CreateParticipationByUserService {
 
       await this.notificationRepository.save(notification),
     ]);
+
+    if (!participation.type) participation.type = participationType;
 
     participation.control = generateEventControl({
       event,

@@ -27,6 +27,7 @@ class FindEventsByNameController {
       name: name as string,
       page: parseInt(page as string, 10),
       limit: parseInt(limit as string, 10),
+      reqUser: req.user,
     });
 
     return res.status(201).json(instanceToPlain(eventInstance));

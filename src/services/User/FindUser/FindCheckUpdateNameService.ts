@@ -3,6 +3,11 @@ import { IUserRepository } from '@repositories/UserRepository/IUserRepository';
 import { verifyCanUpdateDate } from '@utils/handleDate';
 import { AppError } from '@utils/AppError';
 
+type CheckUpdateNameResponse = {
+  canUpdateName: boolean;
+  name_updated_at: Date | null;
+};
+
 @injectable()
 class FindCheckUpdateNameService {
   constructor(
@@ -12,26 +17,31 @@ class FindCheckUpdateNameService {
 
   async execute(
     reqUser: AuthorizedUser<UserPerm | PubPerm>,
-  ): Promise<{ canUpdateName: boolean; name_updated_at: Date }> {
+  ): Promise<CheckUpdateNameResponse> {
+    const response: CheckUpdateNameResponse = {
+      canUpdateName: true,
+      name_updated_at: null,
+    };
     const user = await this.userRepository.findById(reqUser.id);
 
     if (!user) {
       throw new AppError('Usuário não encontrado.', 404);
     }
 
-    const startDate: Date = new Date(user.name_updated_at);
-    const finishDate: Date = new Date();
+    if (user.name_updated_at) {
+      response.name_updated_at = user.name_updated_at;
 
-    const canUpdateName = verifyCanUpdateDate({
-      startDate,
-      finishDate,
-      days: 5,
-    });
+      const startDate: Date = new Date(user.name_updated_at);
+      const finishDate: Date = new Date();
 
-    return {
-      canUpdateName,
-      name_updated_at: user.name_updated_at,
-    };
+      response.canUpdateName = verifyCanUpdateDate({
+        startDate,
+        finishDate,
+        days: 5,
+      });
+    }
+
+    return response;
   }
 }
 

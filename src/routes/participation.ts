@@ -19,12 +19,16 @@ import { findParticipationByEventAndUserController } from '../main/Participation
 import { findRequestsPendingController } from '../main/Participation/findRequestsPending';
 import { findRequestsReviwedController } from '../main/Participation/findRequestsReviwed';
 import { createParticipationResponseMiddleware } from '../middlewares/validators/Participation/createParticipationResponse';
+import {
+  verifyParamEventId,
+  verifyParamUserId,
+} from '../middlewares/verifyParamId';
 
 const participationRouter = Router();
 
 participationRouter.post(
   '/participation/user/:event_id',
-  verifyToken,
+  [verifyToken, verifyParamEventId],
   async (req: Request, res: Response) => {
     return createParticipationByUserController.handle(req, res);
   },
@@ -48,7 +52,7 @@ participationRouter.post(
 
 participationRouter.post(
   '/participation/invite/response/:event_id',
-  verifyToken,
+  [verifyToken, verifyParamEventId],
   async (req: Request, res: Response) => {
     return createInviteResponseController.handle(req, res);
   },
@@ -64,7 +68,7 @@ participationRouter.get(
 
 participationRouter.get(
   '/participation/user/:user_id',
-  [verifyToken, findParticipationsByUserIdMiddleware],
+  [verifyToken, verifyParamUserId, findParticipationsByUserIdMiddleware],
   async (req: Request, res: Response) => {
     return findParticipationsByUserIdController.handle(req, res);
   },

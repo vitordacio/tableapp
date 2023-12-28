@@ -14,7 +14,7 @@ class FetchEventTypesService {
     const fetchData = [
       {
         name: 'party',
-        verified: false,
+        verified: true,
       },
       {
         name: 'table',

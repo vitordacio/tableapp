@@ -71,7 +71,7 @@ class EmojiRepository implements IEmojiRepository {
       .createQueryBuilder('emoji')
       .leftJoin('emoji.type', 'type')
       .where('type.category = :category', { category })
-      .orderBy('order', 'DESC')
+      .orderBy('emoji.order', 'ASC')
       .take(limit)
       .skip(page && limit ? limit * (page - 1) : undefined)
       .getMany();

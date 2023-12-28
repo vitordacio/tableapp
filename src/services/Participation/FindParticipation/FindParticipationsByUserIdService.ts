@@ -3,6 +3,7 @@ import { Participation } from '@entities/Participation/Participation';
 import { IParticipationRepository } from '@repositories/ParticipationRepository/IParticipationRepository';
 import { IUserRepository } from '@repositories/UserRepository/IUserRepository';
 import { AppError } from '@utils/AppError';
+import { generateEventControl } from '@utils/handleControl';
 import { IFindByUserIdDTO } from './IFindParticipationsDTO';
 
 @injectable()
@@ -19,20 +20,50 @@ class FindParticipationsByUserIdService {
     user_id,
     limit,
     page,
+    reqUser,
   }: IFindByUserIdDTO): Promise<Participation[]> {
-    const user = await this.userRepository.findById(user_id);
+    const [requester, user, participations] = await Promise.all([
+      this.userRepository.findById(reqUser.id),
+      this.userRepository.findById(user_id),
+      this.participationRepository.findByUserId(
+        user_id,
+        page || 1,
+        limit || 20,
+      ),
+    ]);
+
+    if (!requester) {
+      throw new AppError('Token expirado, realize login novamente.', 403);
+    }
 
     if (!user) {
       throw new AppError('Usuário não encontrado', 404);
     }
 
-    const participation = await this.participationRepository.findByUserId(
-      user.id_user,
-      page || 1,
-      limit || 20,
-    );
+    if (participations.length !== 0) {
+      const event_ids = participations.map(
+        participation => participation.event_id,
+      );
 
-    return participation;
+      const userParticipations =
+        await this.participationRepository.checkUserParticipations(
+          requester.id_user,
+          event_ids,
+        );
+
+      participations.forEach(participation => {
+        const userParticipation = userParticipations.find(
+          part => part.event_id === participation.event_id,
+        );
+        participation.event.control = generateEventControl({
+          event: participation.event,
+          participation: userParticipation,
+          user: requester,
+        });
+      });
+    }
+
+    return participations;
   }
 }
 

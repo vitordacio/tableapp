@@ -4,13 +4,15 @@ import { instanceToPlain } from 'class-transformer';
 import { hasPermission } from '@utils/hasPermission';
 import { AppError } from '@utils/AppError';
 import { pubPerm, userPerm } from '@config/constants';
-import { FindFriendsService } from '@services/User/FindFriends/FindFriendsService';
+import { FindUserFriendsService } from '@services/User/FindUser/FindUserFriendsService';
 
-class FindFriendsController {
-  private findFriendshipByUserIdService: FindFriendsService;
+class FindUserFriendsController {
+  private findUserFriendshipByUserIdService: FindUserFriendsService;
 
   constructor() {
-    this.findFriendshipByUserIdService = container.resolve(FindFriendsService);
+    this.findUserFriendshipByUserIdService = container.resolve(
+      FindUserFriendsService,
+    );
   }
 
   async handle(req: Request, res: Response): Promise<Response> {
@@ -24,18 +26,17 @@ class FindFriendsController {
       throw new AppError('Operação não permitida.', 403);
     }
 
-    const friendshipInstance = await this.findFriendshipByUserIdService.execute(
-      {
+    const friendshipInstance =
+      await this.findUserFriendshipByUserIdService.execute({
         user_id,
         reqUser: req.user,
         name: name as string,
         page: parseInt(page as string, 10),
         limit: parseInt(limit as string, 10),
-      },
-    );
+      });
 
     return res.status(201).json(instanceToPlain(friendshipInstance));
   }
 }
 
-export { FindFriendsController };
+export { FindUserFriendsController };

@@ -31,8 +31,8 @@ import { updateBioController } from '../main/User/updateGenerals/updateBio';
 import { updateLocationController } from '../main/User/updateGenerals/updateLocation';
 import { updateGenderController } from '../main/User/updateGenerals/updateGender';
 import { updateNameController } from '../main/User/updateGenerals/updateName';
-import { findFriendsMiddleware } from '../middlewares/validators/User/findFriends';
-import { findFriendsController } from '../main/User/findFriends';
+import { findUserFriendsMiddleware } from '../middlewares/validators/User/findUserFriends';
+import { findUserFriendsController } from '../main/User/findUserFriends';
 import { createSocialNetworkController } from '../main/User/updateGenerals/createSocialNetwork';
 import { deleteSocialNetworkController } from '../main/User/updateGenerals/deleteSocialNetwork';
 import { findCheckUpdateEmailController } from '../main/User/findCheckUpdateEmail';
@@ -85,9 +85,9 @@ userRouter.get(
 
 userRouter.get(
   '/user/friends/:user_id',
-  [verifyToken, findFriendsMiddleware, verifyParamUserId],
+  [verifyToken, findUserFriendsMiddleware, verifyParamUserId],
   async (req: Request, res: Response) => {
-    return findFriendsController.handle(req, res);
+    return findUserFriendsController.handle(req, res);
   },
 );
 

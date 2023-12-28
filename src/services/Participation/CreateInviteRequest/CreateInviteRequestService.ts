@@ -11,7 +11,7 @@ import { IEventRepository } from '@repositories/EventRepository/IEventRepository
 import { IUserRepository } from '@repositories/UserRepository/IUserRepository';
 import { IParticipationTypeRepository } from '@repositories/ParticipationTypeRepository/IParticipationTypeRepository';
 import { generateEventControl } from '@utils/handleControl';
-import { ICreateInviteRequestDTO } from './CreateInviteRequestServiceDTO';
+import { ICreateInviteRequestDTO } from './ICreateInviteRequestServiceDTO';
 
 @injectable()
 class CreateInviteRequestService {

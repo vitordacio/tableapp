@@ -51,13 +51,9 @@ class CreateEventService {
       this.eventTypeRepository.findById(type_id),
     ]);
 
-    // const author = await this.userRepository.findById(user.id);
-
     if (!author) {
       throw new AppError('Usuário não encontrado.', 404);
     }
-
-    // const type = await this.eventTypeRepository.findById(type_id);
 
     if (!type) {
       throw new AppError('Tipo de evento não encontrado.', 404);

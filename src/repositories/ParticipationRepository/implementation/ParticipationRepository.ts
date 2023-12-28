@@ -1,5 +1,5 @@
 // import { Brackets, getRepository, Repository } from 'typeorm';
-import { getRepository, IsNull, Not, Repository } from 'typeorm';
+import { getRepository, In, IsNull, Not, Repository } from 'typeorm';
 import { IParticipation } from '@entities/Participation/IParticipation';
 import { Participation } from '@entities/Participation/Participation';
 import { IParticipationRepository } from '../IParticipationRepository';
@@ -70,6 +70,18 @@ class ParticipationRepository implements IParticipationRepository {
     return participation;
   }
 
+  async checkUserParticipations(
+    user_id: string,
+    event_ids: string[],
+  ): Promise<Participation[]> {
+    const participations = await this.ormRepository.find({
+      relations: ['type', 'event', 'event.type'],
+      where: { user_id, event_id: In(event_ids) },
+    });
+
+    return participations;
+  }
+
   async findIndex(): Promise<Participation[]> {
     const participations = await this.ormRepository.find({
       // relations: ['user'],
@@ -101,7 +113,7 @@ class ParticipationRepository implements IParticipationRepository {
     limit: number,
   ): Promise<Participation[]> {
     const participations = await this.ormRepository.find({
-      // relations: ['event'],
+      relations: ['type', 'event', 'event.type', 'event.author'],
       where: { user_id, in: true },
       order: { created_at: 'DESC' },
       take: limit,

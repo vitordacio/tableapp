@@ -7,7 +7,7 @@ import { INotificationRepository } from '@repositories/NotificationRepository/IN
 import { IEventRepository } from '@repositories/EventRepository/IEventRepository';
 import { IUserRepository } from '@repositories/UserRepository/IUserRepository';
 import { generateEventControl } from '@utils/handleControl';
-import { ICreateInviteResponseDTO } from './CreateInviteResponseServiceDTO';
+import { ICreateInviteResponseDTO } from './ICreateInviteResponseServiceDTO';
 
 @injectable()
 class CreateInviteResponseService {

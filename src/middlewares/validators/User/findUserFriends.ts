@@ -1,6 +1,6 @@
 import { celebrate, Segments, Joi } from 'celebrate';
 
-export const findFriendsMiddleware = celebrate({
+export const findUserFriendsMiddleware = celebrate({
   [Segments.QUERY]: {
     name: Joi.string().allow(''),
     page: Joi.number().allow(''),

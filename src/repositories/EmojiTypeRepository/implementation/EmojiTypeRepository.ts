@@ -51,7 +51,7 @@ class EmojiTypeRepository implements IEmojiTypeRepository {
 
   async findLastInOrder(): Promise<EmojiType | undefined> {
     const emojiType = await this.ormRepository.findOne({
-      order: { order: 'DESC' },
+      order: { order: 'ASC' },
     });
 
     return emojiType;

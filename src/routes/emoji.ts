@@ -28,14 +28,6 @@ emojiRouter.post(
 );
 
 emojiRouter.get(
-  '/emoji/:emoji_id',
-  [verifyToken, verifyParamEmojiId],
-  async (req: Request, res: Response) => {
-    return findEmojiByIdController.handle(req, res);
-  },
-);
-
-emojiRouter.get(
   '/emoji',
   [verifyToken, verifyPageLimit],
   async (req: Request, res: Response) => {
@@ -80,6 +72,14 @@ emojiRouter.get(
   [verifyToken, verifyPageLimit],
   async (req: Request, res: Response) => {
     return findEmojiSymbolController.handle(req, res);
+  },
+);
+
+emojiRouter.get(
+  '/emoji/:emoji_id',
+  [verifyToken, verifyParamEmojiId],
+  async (req: Request, res: Response) => {
+    return findEmojiByIdController.handle(req, res);
   },
 );
 

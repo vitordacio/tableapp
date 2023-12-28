@@ -23,6 +23,7 @@ class UserRepository implements IUserRepository {
       username: data.username,
       password: data.password,
       name: data.name,
+      name_updated_at: data.name_updated_at,
       bio: data.bio,
       location: data.location,
       gender: data.gender,

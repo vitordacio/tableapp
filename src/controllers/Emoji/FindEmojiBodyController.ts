@@ -14,7 +14,7 @@ class FindEmojiBodyController {
   }
 
   async handle(req: Request, res: Response): Promise<Response> {
-    const { page, limit } = req.params;
+    const { page, limit } = req.query;
 
     if (
       !hasPermission(req.user, userPerm) &&

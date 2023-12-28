@@ -26,7 +26,6 @@ export const verifyCanUpdateDate = ({
   days,
 }: verifyCanUpdateDate): boolean => {
   const daysDifference = verifyDifferenceInDays({ startDate, finishDate });
-
   if (daysDifference < days) return false;
 
   return true;

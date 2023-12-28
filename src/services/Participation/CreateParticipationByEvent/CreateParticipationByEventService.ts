@@ -7,7 +7,7 @@ import { INotificationRepository } from '@repositories/NotificationRepository/IN
 import { IUserRepository } from '@repositories/UserRepository/IUserRepository';
 import { IEventRepository } from '@repositories/EventRepository/IEventRepository';
 import { generateEventControl } from '@utils/handleControl';
-import { ICreateParticipationByEventDTO } from './CreateParticipationByEventServiceDTO';
+import { ICreateParticipationByEventDTO } from './ICreateParticipationByEventServiceDTO';
 
 @injectable()
 class CreateParticipationByEventService {
