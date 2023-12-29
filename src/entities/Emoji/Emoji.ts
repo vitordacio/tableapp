@@ -25,7 +25,7 @@ class Emoji {
   @Column({ unique: true })
   shorthand: string;
 
-  // exclude
+  @Exclude()
   @Column()
   order: number;
 

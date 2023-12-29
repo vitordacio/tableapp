@@ -19,11 +19,16 @@ class EventType {
   @Column({ unique: true })
   name: string;
 
-  @Column({ default: true })
+  @Column({ default: false })
   verified: boolean;
 
+  @Exclude()
   @Column({ default: 0 })
   count: number;
+
+  @Exclude()
+  @Column()
+  order: number;
 
   @OneToMany(() => Event, event => event.type)
   events: Event[];

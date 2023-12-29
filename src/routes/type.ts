@@ -158,6 +158,7 @@ typeRouter.delete(
   },
 );
 
+// fetch everything
 typeRouter.post(
   '/master/fetch',
   verifyToken,

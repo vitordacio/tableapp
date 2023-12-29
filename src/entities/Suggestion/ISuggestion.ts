@@ -1,5 +1,5 @@
 export interface ISuggestion {
-  id_suggestion: string;
+  id: string;
   message: string;
   user_id: string;
 }

@@ -1,9 +1,9 @@
-import { IEmojiType } from '../../entities/EmojiType/IEmojiType';
-import { EmojiType } from '../../entities/EmojiType/EmojiType';
+import { IEmojiType } from '@entities/EmojiType/IEmojiType';
+import { EmojiType } from '@entities/EmojiType/EmojiType';
 
 export interface IEmojiTypeRepository {
   create(data: IEmojiType): EmojiType;
-  save(event: EmojiType): Promise<EmojiType>;
+  save(emojiType: EmojiType): Promise<EmojiType>;
   findById(id: string): Promise<EmojiType | undefined>;
   findIndex(): Promise<EmojiType[]>;
   findByCategory(category: string): Promise<EmojiType | undefined>;

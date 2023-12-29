@@ -19,12 +19,7 @@ import { Report } from '@entities/Report/Report';
 import { Block } from '@entities/Block/Block';
 import { Suggestion } from '@entities/Suggestion/Suggestion';
 import { React } from '@entities/React/React';
-
-export type UserControl = {
-  friendship_id?: string;
-  friendship_status?: 'friends' | 'request_sent' | 'request_received' | '';
-  can_see_content?: boolean;
-};
+import { UserUpdate } from '@entities/UserUpdate/UserUpdate';
 
 @Entity('users')
 class User {
@@ -33,10 +28,6 @@ class User {
 
   @Column()
   email: string;
-
-  @Column({ nullable: true })
-  @Exclude()
-  email_updated_at: Date;
 
   @Column({ unique: true })
   username: string;
@@ -47,10 +38,6 @@ class User {
 
   @Column()
   name: string;
-
-  @Column({ nullable: true })
-  @Exclude()
-  name_updated_at: Date;
 
   @Column({ nullable: true })
   bio: string;
@@ -155,6 +142,9 @@ class User {
   @OneToMany(() => Block, block => block.receiver)
   blocks_received: Block[];
 
+  @OneToMany(() => UserUpdate, userUpdate => userUpdate.user)
+  updates: UserUpdate[];
+
   @CreateDateColumn()
   created_at: Date;
 
@@ -165,7 +155,15 @@ class User {
   @DeleteDateColumn()
   deleted_at: Date;
 
-  control: UserControl;
+  friendship_id: string | '';
+
+  friendship_status: 'friends' | 'request_sent' | 'request_received' | '';
+
+  can_see_content: boolean;
+
+  react_id: string | '';
+
+  blocked: boolean;
 }
 
 export { User };

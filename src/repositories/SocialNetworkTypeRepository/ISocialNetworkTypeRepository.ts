@@ -1,5 +1,5 @@
-import { ISocialNetworkType } from '../../entities/SocialNetworkType/ISocialNetworkType';
-import { SocialNetworkType } from '../../entities/SocialNetworkType/SocialNetworkType';
+import { ISocialNetworkType } from '@entities/SocialNetworkType/ISocialNetworkType';
+import { SocialNetworkType } from '@entities/SocialNetworkType/SocialNetworkType';
 
 export interface ISocialNetworkTypeRepository {
   save(entitie: SocialNetworkType): Promise<SocialNetworkType>;

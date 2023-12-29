@@ -1,5 +1,5 @@
-import { IFriendship } from '../../entities/Friendship/IFriendship';
-import { Friendship } from '../../entities/Friendship/Friendship';
+import { IFriendship } from '@entities/Friendship/IFriendship';
+import { Friendship } from '@entities/Friendship/Friendship';
 
 export interface IFriendshipRepository {
   save(friendship: Friendship): Promise<Friendship>;

@@ -1,11 +1,9 @@
 export interface IUser {
   id: string;
   email: string;
-  email_updated_at?: Date;
   username: string;
   password: string;
   name: string;
-  name_updated_at?: Date;
   bio?: string;
   location?: string;
   gender?: string;

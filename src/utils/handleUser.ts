@@ -1,6 +1,7 @@
 import { container } from 'tsyringe';
 import { UserRepository } from '@repositories/UserRepository/implementation/UserRepository';
 import { User } from '@entities/User/User';
+import { Block } from '@entities/Block/Block';
 
 export function clearUsername(username: string): string {
   username = username
@@ -35,53 +36,20 @@ export async function generateUniqueUsername(username: string) {
 type checkCanSeeUserContent = {
   requester: User;
   user: User;
-  friendship_status: User['control']['friendship_status'];
+  friendship_status: User['friendship_status'];
+  block: Block | undefined;
 };
 
 export const checkCanSeeUserContent = ({
   requester,
   user,
   friendship_status,
+  block,
 }: checkCanSeeUserContent): boolean => {
+  if (block) return false;
   if (requester.id_user === user.id_user) return true;
   if (user.role_name === 'pub' || !user.private) return true;
   if (friendship_status === 'friends') return true;
 
   return false;
 };
-
-// type verifyCanUpdateEmail = {
-//   currentDate: Date;
-//   lastUpdateDate: Date;
-// };
-
-// export const verifyCanUpdateEmail = ({
-//   currentDate,
-//   lastUpdateDate,
-// }: verifyCanUpdateEmail): boolean => {
-//   const timeDifference: number =
-//     currentDate.getTime() - lastUpdateDate.getTime();
-
-//   const daysDifference: number = timeDifference / (1000 * 60 * 60 * 24);
-
-//   if (daysDifference >= 30) return false;
-
-//   return true;
-// };
-
-// export function sortByDate(
-//   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-//   array: any[],
-//   reference: string,
-//   asc?: boolean,
-// ) {
-//   const sorted = array || [];
-
-//   return sorted.sort((a, b) => {
-//     const dateA = new Date(a[reference]).getTime();
-//     const dateB = new Date(b[reference]).getTime();
-
-//     if (asc) return dateA - dateB;
-//     return dateB - dateA;
-//   });
-// }

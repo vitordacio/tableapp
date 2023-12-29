@@ -1,0 +1,67 @@
+import { getRepository, Repository } from 'typeorm';
+import { IBlock } from '@entities/Block/IBlock';
+import { Block } from '@entities/Block/Block';
+import { IBlockRepository } from '../IBlockRepository';
+
+class BlockRepository implements IBlockRepository {
+  private ormRepository: Repository<Block>;
+
+  constructor() {
+    this.ormRepository = getRepository(Block);
+  }
+
+  create(data: IBlock): Block {
+    const block = this.ormRepository.create({
+      id_block: data.id,
+      author_id: data.author_id,
+      receiver_id: data.receiver_id,
+    });
+
+    return block;
+  }
+
+  async save(block: Block): Promise<Block> {
+    const newBlock = await this.ormRepository.save(block);
+
+    return newBlock;
+  }
+
+  async saveMany(entities: Block[]): Promise<Block[]> {
+    const blocks = await this.ormRepository.save(entities);
+
+    return blocks;
+  }
+
+  async findById(id: string): Promise<Block | undefined> {
+    const block = await this.ormRepository.findOne({
+      where: { id_block: id },
+    });
+
+    return block;
+  }
+
+  async findByAuthorAndReceiver(
+    author_id: string,
+    receiver_id: string,
+  ): Promise<Block | undefined> {
+    const block = await this.ormRepository.findOne({
+      where: { author_id, receiver_id },
+    });
+
+    return block;
+  }
+
+  async findByUser(user_id: string): Promise<Block[]> {
+    const block = await this.ormRepository.find({
+      where: { author_id: user_id },
+    });
+
+    return block;
+  }
+
+  async remove(entitie: Block): Promise<void> {
+    await this.ormRepository.softRemove(entitie);
+  }
+}
+
+export { BlockRepository };

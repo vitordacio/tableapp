@@ -1,5 +1,5 @@
-import { ISocialNetwork } from '../../entities/SocialNetwork/ISocialNetwork';
-import { SocialNetwork } from '../../entities/SocialNetwork/SocialNetwork';
+import { ISocialNetwork } from '@entities/SocialNetwork/ISocialNetwork';
+import { SocialNetwork } from '@entities/SocialNetwork/SocialNetwork';
 
 export interface ISocialNetworkRepository {
   save(entitie: SocialNetwork): Promise<SocialNetwork>;

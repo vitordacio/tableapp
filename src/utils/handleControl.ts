@@ -1,5 +1,6 @@
 import { Friendship } from '@entities/Friendship/Friendship';
 import { User, UserControl } from '@entities/User/User';
+import { Block } from '@entities/Block/Block';
 import { Event, EventControl } from '@entities/Event/Event';
 import { Participation } from '@entities/Participation/Participation';
 import { checkFriendship } from './handleFriendship';
@@ -9,12 +10,14 @@ import { checkCanSeeEventContent, checkEventStatus } from './handleEvent';
 
 type generateUserControl = {
   friendship: Friendship | undefined;
+  block: Block | undefined;
   requester: User;
   user: User;
 };
 
 export function generateUserControl({
   friendship,
+  block,
   requester,
   user,
 }: generateUserControl): UserControl {
@@ -31,6 +34,7 @@ export function generateUserControl({
     requester,
     user,
     friendship_status: control.friendship_status,
+    block,
   });
 
   return control;

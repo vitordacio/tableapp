@@ -35,3 +35,15 @@ export const verifyParamReactId = celebrate({
     react_id: Joi.string().uuid().required(),
   },
 });
+
+export const verifyParamSuggestionId = celebrate({
+  [Segments.PARAMS]: {
+    suggestion_id: Joi.string().uuid().required(),
+  },
+});
+
+export const verifyParamReportId = celebrate({
+  [Segments.PARAMS]: {
+    report_id: Joi.string().uuid().required(),
+  },
+});

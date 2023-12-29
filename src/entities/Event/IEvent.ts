@@ -1,3 +1,5 @@
+import { EventControl } from './Event';
+
 export interface IEvent {
   id: string;
   author_id: string;
@@ -19,4 +21,6 @@ export interface IEvent {
   participating_count?: number;
   emojis_count?: number;
   computed?: boolean;
+  control: EventControl;
+  status?: 'awaiting' | 'ongoing' | 'finished';
 }

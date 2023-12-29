@@ -3,4 +3,5 @@ export interface IEventType {
   name: string;
   verified?: boolean;
   count?: number;
+  order?: number;
 }

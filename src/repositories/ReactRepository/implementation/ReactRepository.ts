@@ -39,6 +39,17 @@ class ReactRepository implements IReactRepository {
     return react;
   }
 
+  async findByUsers(
+    author_id: string,
+    receiver_id: string,
+  ): Promise<React | undefined> {
+    const react = await this.ormRepository.findOne({
+      where: { type: 'user', author_id, receiver_id },
+    });
+
+    return react;
+  }
+
   async findToRemove(id: string): Promise<React | undefined> {
     const event = await this.ormRepository.findOne({
       relations: ['notifications', 'emoji', 'author', 'receiver', 'event'],

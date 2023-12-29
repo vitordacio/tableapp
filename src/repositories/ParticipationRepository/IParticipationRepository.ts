@@ -1,8 +1,8 @@
-import { IParticipation } from '../../entities/Participation/IParticipation';
-import { Participation } from '../../entities/Participation/Participation';
+import { IParticipation } from '@entities/Participation/IParticipation';
+import { Participation } from '@entities/Participation/Participation';
 
 export interface IParticipationRepository {
-  save(Participation: Participation): Promise<Participation>;
+  save(participation: Participation): Promise<Participation>;
   create(data: IParticipation): Participation;
   findById(id: string): Promise<Participation | undefined>;
   checkMod(

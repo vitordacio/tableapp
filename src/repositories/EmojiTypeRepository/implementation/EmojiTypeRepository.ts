@@ -11,17 +11,17 @@ class EmojiTypeRepository implements IEmojiTypeRepository {
   }
 
   create(data: IEmojiType): EmojiType {
-    const emoji = this.ormRepository.create({
+    const emojiType = this.ormRepository.create({
       id_emoji_type: data.id,
       category: data.category.trim().toLowerCase(),
       order: data.order,
     });
 
-    return emoji;
+    return emojiType;
   }
 
-  async save(emoji: EmojiType): Promise<EmojiType> {
-    const newEmojiType = await this.ormRepository.save(emoji);
+  async save(emojiType: EmojiType): Promise<EmojiType> {
+    const newEmojiType = await this.ormRepository.save(emojiType);
 
     return newEmojiType;
   }

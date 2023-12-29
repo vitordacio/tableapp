@@ -19,7 +19,7 @@ class EmojiType {
   @Column({ unique: true })
   category: string;
 
-  // exclude
+  @Exclude()
   @Column()
   order: number;
 

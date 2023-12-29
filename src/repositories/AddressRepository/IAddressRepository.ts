@@ -1,5 +1,5 @@
-import { IAddress } from '../../entities/Address/IAddress';
-import { Address } from '../../entities/Address/Address';
+import { IAddress } from '@entities/Address/IAddress';
+import { Address } from '@entities/Address/Address';
 
 export interface IAddressRepository {
   save(address: Address): Promise<Address>;

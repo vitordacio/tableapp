@@ -19,6 +19,9 @@ class Report {
   id_report: string;
 
   @Column()
+  type: string;
+
+  @Column({ nullable: true })
   message: string;
 
   @Column()

@@ -1,3 +1,5 @@
+import { UserUpdate } from '@entities/UserUpdate/UserUpdate';
+
 type verifyDifferenceInDays = {
   startDate: Date;
   finishDate: Date;
@@ -14,19 +16,20 @@ export const verifyDifferenceInDays = ({
   return daysDifference;
 };
 
-type verifyCanUpdateDate = {
-  startDate: Date;
-  finishDate: Date;
+type verifyCanUpdate = {
+  lastUpdate: UserUpdate;
   days: number;
 };
 
-export const verifyCanUpdateDate = ({
-  startDate,
-  finishDate,
+export const verifyCanUpdate = ({
+  lastUpdate,
   days,
-}: verifyCanUpdateDate): boolean => {
-  const daysDifference = verifyDifferenceInDays({ startDate, finishDate });
-  if (daysDifference < days) return false;
+}: verifyCanUpdate): boolean => {
+  const now = new Date();
+  const daysDifference = verifyDifferenceInDays({
+    startDate: lastUpdate.created_at,
+    finishDate: now,
+  });
 
-  return true;
+  return daysDifference >= days;
 };

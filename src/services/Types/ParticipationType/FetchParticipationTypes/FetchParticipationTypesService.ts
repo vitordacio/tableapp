@@ -1,5 +1,6 @@
 import { inject, injectable } from 'tsyringe';
 import { v4 } from 'uuid';
+import participationType from '@config/fetch/participationType';
 import { ParticipationType } from '@entities/ParticipationType/ParticipationType';
 import { IParticipationTypeRepository } from '@repositories/ParticipationTypeRepository/IParticipationTypeRepository';
 
@@ -11,26 +12,11 @@ class FetchParticipationTypesService {
   ) {}
 
   async execute(): Promise<ParticipationType[]> {
-    const fetchData = [
-      {
-        name: 'user',
-      },
-      {
-        name: 'guest',
-      },
-      {
-        name: 'vip',
-      },
-      {
-        name: 'mod',
-      },
-    ];
-
     const newTypes: ParticipationType[] = [];
 
     const types = await this.participationTypeRepository.findIndex();
 
-    fetchData.forEach(data => {
+    participationType.forEach(data => {
       const alreadyExists = types.some(type => type.name === data.name);
 
       if (alreadyExists) return;

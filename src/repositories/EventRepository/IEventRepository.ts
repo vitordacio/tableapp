@@ -1,5 +1,5 @@
-import { IEvent } from '../../entities/Event/IEvent';
-import { Event } from '../../entities/Event/Event';
+import { IEvent } from '@entities/Event/IEvent';
+import { Event } from '@entities/Event/Event';
 
 export interface IEventRepository {
   save(event: Event): Promise<Event>;

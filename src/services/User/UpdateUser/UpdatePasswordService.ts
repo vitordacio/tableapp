@@ -1,9 +1,11 @@
 import { inject, injectable } from 'tsyringe';
+import { v4 } from 'uuid';
 import { User } from '@entities/User/User';
-
 import { IUserRepository } from '@repositories/UserRepository/IUserRepository';
 import { AppError } from '@utils/AppError';
 import { IHashProvider } from '@providers/HashProvider/IHashProvider';
+import { IUserUpdateRepository } from '@repositories/UserUpdateRepository/IUserUpdateRepository';
+import { verifyCanUpdate } from '@utils/handleDate';
 import { IUpdatePasswordDTO } from './GeneralsDTO';
 
 @injectable()
@@ -14,6 +16,9 @@ class UpdatePasswordService {
 
     @inject('HashProvider')
     private hashProvider: IHashProvider,
+
+    @inject('UserUpdateRepository')
+    private userUpdateRepository: IUserUpdateRepository,
   ) {}
 
   async execute({
@@ -21,10 +26,30 @@ class UpdatePasswordService {
     new_password,
     user,
   }: IUpdatePasswordDTO): Promise<User> {
-    const foundUser = await this.userRepository.findById(user.id);
+    const [foundUser, lastUpdate] = await Promise.all([
+      this.userRepository.findById(user.id),
+      this.userUpdateRepository.findLastByTypeAndUserId('password', user.id),
+    ]);
 
     if (!foundUser) {
-      throw new AppError('Usuário não encontrado.', 404);
+      throw new AppError(
+        'Token expirado. Por favor, realize o login novamente.',
+        400,
+      );
+    }
+
+    if (lastUpdate) {
+      const canUpdate = verifyCanUpdate({
+        lastUpdate,
+        days: 7,
+      });
+
+      if (!canUpdate) {
+        throw new AppError(
+          'Operação não permitida. Aguarde 7 dias a partir da última modificação antes de tentar novamente.',
+          403,
+        );
+      }
     }
 
     const verify = await this.hashProvider.validateHash(
@@ -38,9 +63,20 @@ class UpdatePasswordService {
 
     const hashedPassword = await this.hashProvider.generateHash(new_password);
 
+    const newUpdate = this.userUpdateRepository.create({
+      id: v4(),
+      type: 'password',
+      from: foundUser.password,
+      to: hashedPassword,
+      user_id: foundUser.id_user,
+    });
+
     foundUser.password = hashedPassword;
 
-    await this.userRepository.save(foundUser);
+    await Promise.all([
+      this.userRepository.save(foundUser),
+      this.userUpdateRepository.save(newUpdate),
+    ]);
 
     return foundUser;
   }

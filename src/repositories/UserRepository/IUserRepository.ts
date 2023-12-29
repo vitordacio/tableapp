@@ -1,5 +1,5 @@
-import { IUser } from '../../entities/User/IUser';
-import { User } from '../../entities/User/User';
+import { IUser } from '@entities/User/IUser';
+import { User } from '@entities/User/User';
 
 export interface IUserRepository {
   create(data: IUser): User;

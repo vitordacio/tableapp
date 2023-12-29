@@ -12,7 +12,7 @@ import { findUserIndexController } from '../main/User/findUserIndex';
 import { findUserdByIdController } from '../main/User/findUserById';
 import { findUsersByNameMiddleware } from '../middlewares/validators/User/findUsersByName';
 import { findUsersByNameController } from '../main/User/findUsersByName';
-import { findCheckUsernameController } from '../main/User/findCheckUsername';
+
 import { updateUsernameController } from '../main/User/updateGenerals/updateUsername';
 import { updateEmailController } from '../main/User/updateGenerals/updateEmail';
 import { updatePasswordController } from '../main/User/updateGenerals/updatePassword';
@@ -35,8 +35,8 @@ import { findUserFriendsMiddleware } from '../middlewares/validators/User/findUs
 import { findUserFriendsController } from '../main/User/findUserFriends';
 import { createSocialNetworkController } from '../main/User/updateGenerals/createSocialNetwork';
 import { deleteSocialNetworkController } from '../main/User/updateGenerals/deleteSocialNetwork';
-import { findCheckUpdateEmailController } from '../main/User/findCheckUpdateEmail';
-import { findCheckUpdateNameController } from '../main/User/findCheckUpdateName';
+import { findCheckUpdateController } from '../main/User/findCheckUpdate';
+import { findCheckUpdateMiddleware } from '../middlewares/validators/User/findCheckUpdate';
 
 const userRouter = Router();
 
@@ -61,25 +61,10 @@ userRouter.get(
 );
 
 userRouter.get(
-  '/user/check-username/:username',
+  '/user/check-update/:type',
+  [verifyToken, findCheckUpdateMiddleware],
   async (req: Request, res: Response) => {
-    return findCheckUsernameController.handle(req, res);
-  },
-);
-
-userRouter.get(
-  '/user/check-update/name',
-  verifyToken,
-  async (req: Request, res: Response) => {
-    return findCheckUpdateNameController.handle(req, res);
-  },
-);
-
-userRouter.get(
-  '/user/check-update/email',
-  verifyToken,
-  async (req: Request, res: Response) => {
-    return findCheckUpdateEmailController.handle(req, res);
+    return findCheckUpdateController.handle(req, res);
   },
 );
 

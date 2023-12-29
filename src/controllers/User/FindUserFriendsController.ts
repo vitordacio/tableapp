@@ -29,7 +29,6 @@ class FindUserFriendsController {
     const friendshipInstance =
       await this.findUserFriendshipByUserIdService.execute({
         user_id,
-        reqUser: req.user,
         name: name as string,
         page: parseInt(page as string, 10),
         limit: parseInt(limit as string, 10),

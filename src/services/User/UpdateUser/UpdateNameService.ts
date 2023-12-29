@@ -1,10 +1,11 @@
 import { inject, injectable } from 'tsyringe';
+import { v4 } from 'uuid';
 import { User } from '@entities/User/User';
-
 import { IUserRepository } from '@repositories/UserRepository/IUserRepository';
+import { IUserUpdateRepository } from '@repositories/UserUpdateRepository/IUserUpdateRepository';
 import { AppError } from '@utils/AppError';
 import { extractTagsFromText } from '@utils/generateTags';
-import { verifyCanUpdateDate } from '@utils/handleDate';
+import { verifyCanUpdate } from '@utils/handleDate';
 import { IUpdateNameDTO } from './GeneralsDTO';
 
 @injectable()
@@ -12,6 +13,9 @@ class UpdateNameService {
   constructor(
     @inject('UserRepository')
     private userRepository: IUserRepository,
+
+    @inject('UserUpdateRepository')
+    private userUpdateRepository: IUserUpdateRepository,
   ) {}
 
   async execute({ name, user }: IUpdateNameDTO): Promise<User> {
@@ -19,35 +23,49 @@ class UpdateNameService {
       throw new AppError('Primeiro nome precisa ter ao menos 4 dígitos.', 400);
     }
 
-    const foundUser = await this.userRepository.findById(user.id);
+    const [foundUser, lastUpdate] = await Promise.all([
+      this.userRepository.findById(user.id),
+      this.userUpdateRepository.findLastByTypeAndUserId('name', user.id),
+    ]);
 
     if (!foundUser) {
-      throw new AppError('Usuário não encontrado.', 404);
-    }
-
-    const startDate: Date = new Date(foundUser.name_updated_at);
-    const finishDate: Date = new Date();
-
-    const canUpdateName = verifyCanUpdateDate({
-      startDate,
-      finishDate,
-      days: 5,
-    });
-
-    if (!canUpdateName) {
       throw new AppError(
-        `Aguarde 5 dias a partir da última atualização do nome. ${startDate.toLocaleString()}`,
+        'Token expirado. Por favor, realize o login novamente.',
         400,
       );
     }
+
+    if (lastUpdate) {
+      const canUpdate = verifyCanUpdate({
+        lastUpdate,
+        days: 5,
+      });
+
+      if (!canUpdate) {
+        throw new AppError(
+          'Operação não permitida. Aguarde 5 dias a partir da última modificação antes de tentar novamente.',
+          403,
+        );
+      }
+    }
+
+    const newUpdate = this.userUpdateRepository.create({
+      id: v4(),
+      type: 'name',
+      from: foundUser.name,
+      to: name,
+      user_id: foundUser.id_user,
+    });
 
     foundUser.name = name;
     foundUser.tags = extractTagsFromText(
       `${foundUser.username} ${name}`,
     ) as unknown as string;
-    foundUser.name_updated_at = finishDate;
 
-    await this.userRepository.save(foundUser);
+    await Promise.all([
+      this.userRepository.save(foundUser),
+      this.userUpdateRepository.save(newUpdate),
+    ]);
 
     return foundUser;
   }

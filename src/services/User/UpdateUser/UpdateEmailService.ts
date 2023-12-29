@@ -1,8 +1,10 @@
 import { inject, injectable } from 'tsyringe';
+import { v4 } from 'uuid';
 import { User } from '@entities/User/User';
 import { IUserRepository } from '@repositories/UserRepository/IUserRepository';
+import { IUserUpdateRepository } from '@repositories/UserUpdateRepository/IUserUpdateRepository';
 import { AppError } from '@utils/AppError';
-import { verifyCanUpdateDate } from '@utils/handleDate';
+import { verifyCanUpdate } from '@utils/handleDate';
 import { IUpdateEmailDTO } from './GeneralsDTO';
 
 @injectable()
@@ -10,30 +12,21 @@ class UpdateEmailService {
   constructor(
     @inject('UserRepository')
     private userRepository: IUserRepository,
+
+    @inject('UserUpdateRepository')
+    private userUpdateRepository: IUserUpdateRepository,
   ) {}
 
   async execute({ email, user }: IUpdateEmailDTO): Promise<User> {
-    const [foundUser, emailExists] = await Promise.all([
+    const [foundUser, emailExists, lastUpdate] = await Promise.all([
       this.userRepository.findById(user.id),
       this.userRepository.findByEmail(email),
+      this.userUpdateRepository.findLastByTypeAndUserId('email', user.id),
     ]);
 
     if (!foundUser) {
-      throw new AppError('Usuário não encontrado.', 404);
-    }
-
-    const startDate: Date = new Date(foundUser.email_updated_at);
-    const finishDate: Date = new Date();
-
-    const canUpdateEmail = verifyCanUpdateDate({
-      startDate,
-      finishDate,
-      days: 30,
-    });
-
-    if (!canUpdateEmail) {
       throw new AppError(
-        `Aguarde 30 dias a partir da última atualização de e-mail. ${startDate.toLocaleString()}`,
+        'Token expirado. Por favor, realize o login novamente.',
         400,
       );
     }
@@ -42,10 +35,34 @@ class UpdateEmailService {
       throw new AppError('Email já cadastrado no sistema.', 400);
     }
 
-    foundUser.email = email;
-    foundUser.email_updated_at = finishDate;
+    if (lastUpdate) {
+      const canUpdate = verifyCanUpdate({
+        lastUpdate,
+        days: 30,
+      });
 
-    await this.userRepository.save(foundUser);
+      if (!canUpdate) {
+        throw new AppError(
+          'Operação não permitida. Aguarde 30 dias a partir da última modificação antes de tentar novamente.',
+          403,
+        );
+      }
+    }
+
+    const newUpdate = this.userUpdateRepository.create({
+      id: v4(),
+      type: 'email',
+      from: foundUser.email,
+      to: email,
+      user_id: foundUser.id_user,
+    });
+
+    foundUser.email = email;
+
+    await Promise.all([
+      this.userRepository.save(foundUser),
+      this.userUpdateRepository.save(newUpdate),
+    ]);
 
     return foundUser;
   }

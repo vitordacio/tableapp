@@ -21,7 +21,6 @@ import { React } from '@entities/React/React';
 
 export type EventControl = {
   participation_id?: string;
-  status?: 'awaiting' | 'ongoing' | 'finished';
   participation_status?:
     | 'author'
     | 'user_in'
@@ -151,6 +150,8 @@ class Event {
   @Exclude()
   @DeleteDateColumn()
   deleted_at: Date;
+
+  status?: 'awaiting' | 'ongoing' | 'finished';
 
   control: EventControl;
 }

@@ -24,7 +24,6 @@ class FindUsersByNameController {
     }
 
     const userInstance = await this.findUserByNameService.execute({
-      reqUser: req.user,
       name: name as string,
       page: parseInt(page as string, 10),
       limit: parseInt(limit as string, 10),
