@@ -4,19 +4,19 @@ import { container } from 'tsyringe';
 import { userPerm, pubPerm } from '@config/constants';
 import { AppError } from '@utils/AppError';
 import { hasPermission } from '@utils/hasPermission';
-import { UpdateEventPerformerService } from '@services/Event/UpdateEvent/UpdateEventPerformerService';
+import { DeleteEventPerformerService } from '@services/Event/DeleteEvent/DeleteEventPerformerService';
 
-class UpdateEventPerformerController {
-  private updateEventPerformerService: UpdateEventPerformerService;
+class DeleteEventPerformerController {
+  private deleteEventPerformerService: DeleteEventPerformerService;
 
   constructor() {
-    this.updateEventPerformerService = container.resolve(
-      UpdateEventPerformerService,
+    this.deleteEventPerformerService = container.resolve(
+      DeleteEventPerformerService,
     );
   }
 
   async handle(req: Request, res: Response): Promise<Response> {
-    const { event_id, performer } = req.body;
+    const { performer_id } = req.params;
 
     if (
       !hasPermission(req.user, userPerm) &&
@@ -25,14 +25,13 @@ class UpdateEventPerformerController {
       throw new AppError('Operação não permitida.', 403);
     }
 
-    const event = await this.updateEventPerformerService.execute({
-      user: req.user,
-      event_id,
-      performer,
+    const event = await this.deleteEventPerformerService.execute({
+      reqUser: req.user,
+      performer_id,
     });
 
-    return res.status(200).json(instanceToPlain(event));
+    return res.status(201).json(instanceToPlain(event));
   }
 }
 
-export { UpdateEventPerformerController };
+export { DeleteEventPerformerController };

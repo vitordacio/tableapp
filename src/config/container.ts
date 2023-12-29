@@ -36,6 +36,9 @@ import { ParticipationTypeRepository } from '@repositories/ParticipationTypeRepo
 import { IAddressRepository } from '@repositories/AddressRepository/IAddressRepository';
 import { AddressRepository } from '@repositories/AddressRepository/implementation/AddressRepository';
 
+import { IPerformerRepository } from '@repositories/PerformerRepository/IPerformerRepository';
+import { PerformerRepository } from '@repositories/PerformerRepository/implementation/PerformerRepository';
+
 import { IFriendshipRepository } from '@repositories/FriendshipRepository/IFriendshipRepository';
 import { FriendshipRepository } from '@repositories/FriendshipRepository/implementation/FriendshipRepository';
 
@@ -104,6 +107,11 @@ container.registerSingleton<IParticipationTypeRepository>(
 container.registerSingleton<IAddressRepository>(
   'AddressRepository',
   AddressRepository,
+);
+
+container.registerSingleton<IPerformerRepository>(
+  'PerformerRepository',
+  PerformerRepository,
 );
 
 container.registerSingleton<IHashProvider>('HashProvider', HashProvider);

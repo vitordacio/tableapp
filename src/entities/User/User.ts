@@ -20,6 +20,7 @@ import { Block } from '@entities/Block/Block';
 import { Suggestion } from '@entities/Suggestion/Suggestion';
 import { React } from '@entities/React/React';
 import { UserUpdate } from '@entities/UserUpdate/UserUpdate';
+import { Performer } from '@entities/Performer/Performer';
 
 @Entity('users')
 class User {
@@ -144,6 +145,9 @@ class User {
 
   @OneToMany(() => UserUpdate, userUpdate => userUpdate.user)
   updates: UserUpdate[];
+
+  @OneToMany(() => Performer, performer => performer.user)
+  performers: Performer[];
 
   @CreateDateColumn()
   created_at: Date;

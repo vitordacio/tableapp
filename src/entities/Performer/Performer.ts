@@ -11,25 +11,29 @@ import {
 
 import { Exclude } from 'class-transformer';
 import { User } from '@entities/User/User';
+import { Event } from '@entities/Event/Event';
 
-@Entity('artists')
-class Block {
+@Entity('performers')
+class Performer {
   @PrimaryColumn('uuid')
-  id_block: string;
-
-  @Column()
-  author_id: string;
-
-  @ManyToOne(() => User, user => user.reports_sent)
-  @JoinColumn({ name: 'author_id' })
-  author: User;
+  id_performer: string;
 
   @Column({ nullable: true })
-  receiver_id: string;
+  name: string;
 
-  @ManyToOne(() => User, user => user.reports_received)
-  @JoinColumn({ name: 'receiver_id' })
-  receiver: User;
+  @Column({ nullable: true })
+  user_id: string;
+
+  @ManyToOne(() => User, user => user.performers)
+  @JoinColumn({ name: 'user_id' })
+  user: User;
+
+  @Column()
+  event_id: string;
+
+  @ManyToOne(() => Event, event => event.performers)
+  @JoinColumn({ name: 'event_id' })
+  event: Event;
 
   @CreateDateColumn()
   created_at: Date;
@@ -42,4 +46,4 @@ class Block {
   deleted_at: Date;
 }
 
-export { Block };
+export { Performer };

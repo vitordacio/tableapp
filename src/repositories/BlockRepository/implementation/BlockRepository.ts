@@ -26,12 +26,6 @@ class BlockRepository implements IBlockRepository {
     return newBlock;
   }
 
-  async saveMany(entities: Block[]): Promise<Block[]> {
-    const blocks = await this.ormRepository.save(entities);
-
-    return blocks;
-  }
-
   async findById(id: string): Promise<Block | undefined> {
     const block = await this.ormRepository.findOne({
       where: { id_block: id },

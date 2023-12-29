@@ -8,10 +8,16 @@ export interface ICreateEventDTO {
   additional?: string;
   drink_preferences?: string;
   min_amount?: string;
-  performer?: string;
   club_name?: string;
   ticket_value?: string;
   tickets_free?: number;
   address_id?: string;
   user: AuthorizedUser<UserPerm | PubPerm>;
+}
+
+export interface ICreateEventPerformerDTO {
+  event_id: string;
+  user_id?: string;
+  name?: string;
+  reqUser: AuthorizedUser<UserPerm | PubPerm>;
 }

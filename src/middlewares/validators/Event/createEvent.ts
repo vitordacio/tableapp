@@ -12,7 +12,6 @@ export const createEventMiddleware = celebrate({
     drink_preferences: Joi.string().allow(''),
     min_amount: Joi.string().allow(''),
     club_name: Joi.string().allow(''),
-    performer: Joi.string().allow(''),
     ticket_value: Joi.string().allow(''),
     tickets_free: Joi.number().allow(''),
     address_id: Joi.string().allow(''),

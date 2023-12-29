@@ -22,7 +22,7 @@ import { updateEventClubNameController } from '../main/Event/updateEventClubName
 import { updateEventDrinkPreferencesController } from '../main/Event/updateEventDrinkPreferences';
 import { updateEventHoursController } from '../main/Event/updateEventHours';
 import { updateEventMinAmountController } from '../main/Event/updateEventMinAmount';
-import { updateEventPerformerController } from '../main/Event/updateEventPerformer';
+import { deleteEventPerformerController } from '../main/Event/deleteEventPerformer';
 import { updateEventPrivateController } from '../main/Event/updateEventPrivate';
 import { updateEventAddressIdController } from '../main/Event/updateEventTicketsAddressId';
 import { updateEventTicketsFreeController } from '../main/Event/updateEventTicketsFree';
@@ -33,7 +33,7 @@ import { updateEventClubNameMiddleware } from '../middlewares/validators/Event/u
 import { updateEventDrinkPreferencesMiddleware } from '../middlewares/validators/Event/updateEventDrinkPreferences';
 import { updateEventHoursMiddleware } from '../middlewares/validators/Event/updateEventHours';
 import { updateEventMinAmountMiddleware } from '../middlewares/validators/Event/updateEventMinAmount';
-import { updateEventPerformerMiddleware } from '../middlewares/validators/Event/updateEventPerformer';
+import { deleteEventPerformerMiddleware } from '../middlewares/validators/Event/deleteEventPerformer';
 import { updateEventPrivateMiddleware } from '../middlewares/validators/Event/updateEventPrivate';
 import { updateEventTicketsFreeMiddleware } from '../middlewares/validators/Event/updateEventTicketsFree';
 import { updateEventTicketsValueMiddleware } from '../middlewares/validators/Event/updateEventTicketsValue';
@@ -41,6 +41,8 @@ import {
   verifyParamEventId,
   verifyParamUserId,
 } from '../middlewares/verifyParamId';
+import { createEventPerformerController } from '../main/Event/createEventPerformer';
+import { createEventPerformerMiddleware } from '../middlewares/validators/Event/createEventPerformer';
 
 const eventRouter = Router();
 
@@ -146,14 +148,6 @@ eventRouter.put(
 );
 
 eventRouter.put(
-  '/event/performer',
-  [verifyToken, updateEventPerformerMiddleware],
-  async (req: Request, res: Response) => {
-    return updateEventPerformerController.handle(req, res);
-  },
-);
-
-eventRouter.put(
   '/event/club_name',
   [verifyToken, updateEventClubNameMiddleware],
   async (req: Request, res: Response) => {
@@ -182,6 +176,22 @@ eventRouter.put(
   [verifyToken, updateEventAddressIdMiddleware],
   async (req: Request, res: Response) => {
     return updateEventAddressIdController.handle(req, res);
+  },
+);
+
+eventRouter.post(
+  '/event/performer',
+  [verifyToken, createEventPerformerMiddleware],
+  async (req: Request, res: Response) => {
+    return createEventPerformerController.handle(req, res);
+  },
+);
+
+eventRouter.delete(
+  '/event/performer/:performer_id',
+  [verifyToken, deleteEventPerformerMiddleware],
+  async (req: Request, res: Response) => {
+    return deleteEventPerformerController.handle(req, res);
   },
 );
 

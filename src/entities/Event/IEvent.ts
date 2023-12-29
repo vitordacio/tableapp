@@ -1,5 +1,3 @@
-import { EventControl } from './Event';
-
 export interface IEvent {
   id: string;
   author_id: string;
@@ -16,11 +14,7 @@ export interface IEvent {
   tickets_free?: number;
   ticket_value?: string;
   club_name?: string;
-  performer?: string;
   tags: string[];
   participating_count?: number;
-  emojis_count?: number;
-  computed?: boolean;
-  control: EventControl;
-  status?: 'awaiting' | 'ongoing' | 'finished';
+  reacts_count?: number;
 }

@@ -39,7 +39,6 @@ class CreateEventService {
     min_amount,
     is_private,
     club_name,
-    performer,
     address_id,
   }: ICreateEventDTO): Promise<Event> {
     if (name.length < 4) {
@@ -82,7 +81,6 @@ class CreateEventService {
       min_amount: min_amount || undefined,
       private: is_private,
       club_name,
-      performer,
       address_id: address_id || undefined,
       tags: extractTagsFromText(
         `${name} ${location} ${author.name} ${author.username}`,
@@ -96,10 +94,6 @@ class CreateEventService {
       await this.eventRepository.save(event),
       await this.eventTypeRepository.save(type),
     ]);
-
-    // await this.eventRepository.save(event);
-    // type.count += 1;
-    // await this.eventTypeRepository.save(type);
 
     return event;
   }

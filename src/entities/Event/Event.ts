@@ -18,6 +18,7 @@ import { Report } from '@entities/Report/Report';
 import { EventType } from '@entities/EventType/EventType';
 import { EventPicture } from '@entities/EventPicture/EventPicture';
 import { React } from '@entities/React/React';
+import { Performer } from '@entities/Performer/Performer';
 
 export type EventControl = {
   participation_id?: string;
@@ -63,7 +64,7 @@ class Event {
   participating_count: number;
 
   @Column({ default: 0 })
-  emojis_count: number;
+  reacts_count: number;
 
   participation_id?: string;
 
@@ -84,9 +85,6 @@ class Event {
 
   @Column({ nullable: true })
   club_name: string;
-
-  @Column({ nullable: true })
-  performer: string;
 
   @Column({ nullable: true })
   cover_photo: string;
@@ -140,6 +138,9 @@ class Event {
     cascade: true,
   })
   reports: Report[];
+
+  @OneToMany(() => Performer, performer => performer.event)
+  performers: Performer[];
 
   @CreateDateColumn()
   created_at: Date;

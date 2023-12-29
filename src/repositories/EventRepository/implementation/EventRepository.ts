@@ -24,11 +24,10 @@ class EventRepository implements IEventRepository {
       start_time: data.start_time,
       finish_time: data.finish_time,
       participating_count: data.participating_count,
-      emojis_count: data.emojis_count,
+      reacts_count: data.reacts_count,
       address_id: data.address_id,
       additional: data.additional,
       club_name: data.club_name,
-      performer: data.performer,
       drink_preferences: data.drink_preferences,
       min_amount: data.min_amount,
       tickets_free: data.tickets_free,
@@ -48,7 +47,7 @@ class EventRepository implements IEventRepository {
 
   async findById(id: string): Promise<Event | undefined> {
     const event = await this.ormRepository.findOne({
-      relations: ['type', 'address', 'author'],
+      relations: ['type', 'address', 'author', 'performers'],
       where: { id_event: id },
     });
 
@@ -64,22 +63,6 @@ class EventRepository implements IEventRepository {
 
     return events;
   }
-
-  // async findByUserId(
-  //   user_id: string,
-  //   page: number,
-  //   limit: number,
-  // ): Promise<Event[]> {
-  //   const events = await this.ormRepository.find({
-  //     relations: ['type'],
-  //     where: { author_id: user_id },
-  //     order: { created_at: 'DESC' },
-  //     take: limit,
-  //     skip: page && limit ? limit * (page - 1) : undefined,
-  //   });
-
-  //   return events;
-  // }
 
   async findByCoordinates(
     lat: number,
@@ -122,7 +105,7 @@ class EventRepository implements IEventRepository {
         'event.start_time',
         'event.finish_time',
         'event.participating_count',
-        'event.emojis_count',
+        'event.reacts_count',
         'type.name',
       ])
       .addSelect('event.created_at', 'created_at')
@@ -181,7 +164,7 @@ class EventRepository implements IEventRepository {
         'event.start_time',
         'event.finish_time',
         'event.participating_count',
-        'event.emojis_count',
+        'event.reacts_count',
         'author.name',
         'author.username',
         'author.picture',

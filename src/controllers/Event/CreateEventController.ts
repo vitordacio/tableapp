@@ -27,7 +27,6 @@ class CreateEventController {
       ticket_value,
       tickets_free,
       club_name,
-      performer,
       address_id,
     } = req.body;
 
@@ -52,7 +51,6 @@ class CreateEventController {
       ticket_value,
       tickets_free,
       club_name,
-      performer,
       address_id,
     });
 
