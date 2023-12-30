@@ -11,7 +11,7 @@ import {
 } from 'typeorm';
 
 import { Exclude } from 'class-transformer';
-import { User, UserControl } from '@entities/User/User';
+import { User } from '@entities/User/User';
 import { Notification } from '@entities/Notification/Notification';
 
 @Entity('friendships')
@@ -51,7 +51,11 @@ class Friendship {
   @DeleteDateColumn()
   deleted_at: Date;
 
-  control: UserControl;
+  friendship_id: string | '';
+
+  friendship_status: 'friends' | 'request_sent' | 'request_received' | '';
+
+  can_see_content: boolean;
 }
 
 export { Friendship };

@@ -11,7 +11,7 @@ import {
 } from 'typeorm';
 import { Exclude } from 'class-transformer';
 import { User } from '@entities/User/User';
-import { Event, EventControl } from '@entities/Event/Event';
+import { Event } from '@entities/Event/Event';
 import { ParticipationType } from '@entities/ParticipationType/ParticipationType';
 import { Notification } from '@entities/Notification/Notification';
 
@@ -72,7 +72,23 @@ class Participation {
   @DeleteDateColumn()
   deleted_at: Date;
 
-  control: EventControl;
+  event_status: 'awaiting' | 'ongoing' | 'finished';
+
+  participation_id: string | '';
+
+  participation_status:
+    | 'author'
+    | 'user_in'
+    | 'user_out'
+    | 'guest_in'
+    | 'guest_out'
+    | 'mod_in'
+    | 'mod_out'
+    | 'vip_in'
+    | 'vip_out'
+    | '';
+
+  can_see_content: boolean;
 }
 
 export { Participation };

@@ -6,7 +6,8 @@ import { Friendship } from '@entities/Friendship/Friendship';
 import { IFriendshipRepository } from '@repositories/FriendshipRepository/IFriendshipRepository';
 import { IUserRepository } from '@repositories/UserRepository/IUserRepository';
 import { INotificationRepository } from '@repositories/NotificationRepository/INotificationRepository';
-import { generateUserControl } from '@utils/handleControl';
+import { IBlockRepository } from '@repositories/BlockRepository/IBlockRepository';
+import { checkCanSeeUserContent } from '@utils/handleUser';
 import { ICreateRequestDTO } from './CreateRequestServiceDTO';
 
 @injectable()
@@ -20,6 +21,9 @@ class CreateRequestService {
 
     @inject('NotificationRepository')
     private notificationRepository: INotificationRepository,
+
+    @inject('BlockRepository')
+    private blockRepository: IBlockRepository,
   ) {}
 
   async execute({ user_id, reqUser }: ICreateRequestDTO): Promise<Friendship> {
@@ -30,10 +34,11 @@ class CreateRequestService {
       );
     }
 
-    const [requester, user, alreadyFriendship] = await Promise.all([
+    const [requester, user, alreadyFriendship, block] = await Promise.all([
       this.userRepository.findById(reqUser.id),
       this.userRepository.findById(user_id),
       this.friendshipRepository.findByUserIds(reqUser.id, user_id),
+      this.blockRepository.findByAuthorAndReceiver(user_id, reqUser.id),
     ]);
 
     if (!requester) {
@@ -70,11 +75,15 @@ class CreateRequestService {
 
     await this.notificationRepository.save(notification);
 
-    friendship.control = generateUserControl({
-      friendship,
-      requester,
-      user,
-    });
+    friendship.friendship_id = friendship.id_friendship;
+    friendship.friendship_status = 'request_sent';
+    friendship.can_see_content = !block
+      ? checkCanSeeUserContent({
+          friendship_status: friendship.friendship_status,
+          requester,
+          user,
+        })
+      : false;
 
     return friendship;
   }

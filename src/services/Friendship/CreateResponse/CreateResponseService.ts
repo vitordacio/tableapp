@@ -6,6 +6,8 @@ import { AppError } from '@utils/AppError';
 import { IFriendshipRepository } from '@repositories/FriendshipRepository/IFriendshipRepository';
 import { IUserRepository } from '@repositories/UserRepository/IUserRepository';
 import { INotificationRepository } from '@repositories/NotificationRepository/INotificationRepository';
+import { IBlockRepository } from '@repositories/BlockRepository/IBlockRepository';
+import { checkCanSeeUserContent } from '@utils/handleUser';
 import { Friendship } from '@entities/Friendship/Friendship';
 import { ICreateResponseDTO } from './CreateResponseServiceDTO';
 
@@ -20,6 +22,9 @@ class CreateResponseService {
 
     @inject('NotificationRepository')
     private notificationRepository: INotificationRepository,
+
+    @inject('BlockRepository')
+    private blockRepository: IBlockRepository,
   ) {}
 
   async execute({
@@ -33,10 +38,15 @@ class CreateResponseService {
       );
     }
 
-    const friendship = await this.friendshipRepository.findByUserIds(
-      reqUser.id,
-      user_id,
-    );
+    const [friendship, block] = await Promise.all([
+      this.friendshipRepository.findByUserIds(reqUser.id, user_id),
+      this.blockRepository.findByAuthorAndReceiver(user_id, reqUser.id),
+    ]);
+
+    // const friendship = await this.friendshipRepository.findByUserIds(
+    //   reqUser.id,
+    //   user_id,
+    // );
 
     if (!friendship) {
       throw new AppError('Solicitação não encontrada.', 404);
@@ -66,11 +76,15 @@ class CreateResponseService {
       await this.notificationRepository.save(notification),
     ]);
 
-    friendship.control = {
-      friendship_id: friendship.id_friendship,
-      friendship_status: 'friends',
-      can_see_content: true,
-    };
+    friendship.friendship_id = friendship.id_friendship;
+    friendship.friendship_status = 'friends';
+    friendship.can_see_content = !block
+      ? checkCanSeeUserContent({
+          friendship_status: friendship.friendship_status,
+          requester: friendship.receiver,
+          user: friendship.author,
+        })
+      : false;
 
     return friendship;
   }

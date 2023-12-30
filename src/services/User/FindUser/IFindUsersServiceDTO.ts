@@ -7,7 +7,7 @@ export interface IFindUsersServiceDTO {
 
 export interface IFindUserFriendsServiceDTO {
   user_id: string;
-  // reqUser: AuthorizedUser<UserPerm | PubPerm>;
+  reqUser: AuthorizedUser<UserPerm | PubPerm>;
   name?: string;
   page?: number;
   limit?: number;

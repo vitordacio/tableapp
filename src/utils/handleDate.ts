@@ -9,7 +9,8 @@ export const verifyDifferenceInDays = ({
   startDate,
   finishDate,
 }: verifyDifferenceInDays): number => {
-  const timeDifference: number = startDate.getTime() - finishDate.getTime();
+  // const timeDifference: number = startDate.getTime() - finishDate.getTime();
+  const timeDifference: number = finishDate.getTime() - startDate.getTime();
 
   const daysDifference: number = timeDifference / (1000 * 60 * 60 * 24);
 

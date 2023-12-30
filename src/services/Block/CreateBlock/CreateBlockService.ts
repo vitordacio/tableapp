@@ -20,7 +20,7 @@ class CreateBlockService {
       user_id,
     );
 
-    if (!alreadyBlocked) {
+    if (alreadyBlocked) {
       throw new AppError('Usuário já está bloqueado.', 400);
     }
 

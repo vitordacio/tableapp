@@ -1,7 +1,6 @@
 import { container } from 'tsyringe';
 import { UserRepository } from '@repositories/UserRepository/implementation/UserRepository';
 import { User } from '@entities/User/User';
-import { Block } from '@entities/Block/Block';
 
 export function clearUsername(username: string): string {
   username = username
@@ -37,16 +36,13 @@ type checkCanSeeUserContent = {
   requester: User;
   user: User;
   friendship_status: User['friendship_status'];
-  block: Block | undefined;
 };
 
 export const checkCanSeeUserContent = ({
   requester,
   user,
   friendship_status,
-  block,
 }: checkCanSeeUserContent): boolean => {
-  if (block) return false;
   if (requester.id_user === user.id_user) return true;
   if (user.role_name === 'pub' || !user.private) return true;
   if (friendship_status === 'friends') return true;

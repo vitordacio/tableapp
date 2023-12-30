@@ -13,6 +13,7 @@ class UserUpdateRepository implements IUserUpdateRepository {
   create(data: IUserUpdate): UserUpdate {
     const userUpdate = this.ormRepository.create({
       id_user_update: data.id,
+      type: data.type,
       from: data.from,
       to: data.to,
       user_id: data.user_id,

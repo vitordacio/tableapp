@@ -38,12 +38,12 @@ class UpdateNameService {
     if (lastUpdate) {
       const canUpdate = verifyCanUpdate({
         lastUpdate,
-        days: 5,
+        days: 7,
       });
 
       if (!canUpdate) {
         throw new AppError(
-          'Operação não permitida. Aguarde 5 dias a partir da última modificação antes de tentar novamente.',
+          'Operação não permitida. Aguarde 7 dias a partir da última modificação antes de tentar novamente.',
           403,
         );
       }

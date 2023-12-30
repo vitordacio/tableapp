@@ -53,6 +53,21 @@ class BlockRepository implements IBlockRepository {
     return block;
   }
 
+  async checkBlocks(user_id: string, friend_ids: string[]): Promise<Block[]> {
+    const friendships = await this.ormRepository
+      .createQueryBuilder('block')
+      .where(
+        '(block.author_id IN(:...friend_ids) AND block.receiver_id = :user_id)',
+        {
+          user_id,
+          friend_ids,
+        },
+      )
+      .getMany();
+
+    return friendships;
+  }
+
   async remove(entitie: Block): Promise<void> {
     await this.ormRepository.softRemove(entitie);
   }

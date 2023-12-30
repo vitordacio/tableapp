@@ -54,12 +54,13 @@ class FindUserByIdService {
       user_id: requester.id_user,
       friendship,
     });
-    user.can_see_content = checkCanSeeUserContent({
-      friendship_status: user.friendship_status,
-      block,
-      requester,
-      user,
-    });
+    user.can_see_content = !block
+      ? checkCanSeeUserContent({
+          friendship_status: user.friendship_status,
+          requester,
+          user,
+        })
+      : false;
 
     return user;
   }

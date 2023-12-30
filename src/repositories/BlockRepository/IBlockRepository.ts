@@ -10,5 +10,6 @@ export interface IBlockRepository {
     receiver_id: string,
   ): Promise<Block | undefined>;
   findByUser(user_id: string): Promise<Block[]>;
+  checkBlocks(user_id: string, friend_ids: string[]): Promise<Block[]>;
   remove(entitie: Block): Promise<void>;
 }

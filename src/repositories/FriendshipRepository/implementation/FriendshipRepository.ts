@@ -130,9 +130,10 @@ class FriendshipRepository implements IFriendshipRepository {
   ): Promise<Friendship[]> {
     const friendships = await this.ormRepository
       .createQueryBuilder('friendship')
-      .leftJoinAndSelect('friendship.author', 'author')
-      .leftJoinAndSelect('friendship.receiver', 'receiver')
-      // .where('friendship.confirmed = true')
+      // .leftJoinAndSelect('friendship.author', 'author')
+      // .leftJoinAndSelect('friendship.receiver', 'receiver')
+      .leftJoin('friendship.author', 'author')
+      .leftJoin('friendship.receiver', 'receiver')
       .where(
         '(friendship.author_id = :user_id AND friendship.receiver_id IN(:...friend_ids)) OR (friendship.author_id IN(:...friend_ids) AND friendship.receiver_id = :user_id)',
         {
@@ -140,12 +141,12 @@ class FriendshipRepository implements IFriendshipRepository {
           friend_ids,
         },
       )
-      .select([
-        'friendship.id_friendship',
-        'friendship.confirmed',
-        'author',
-        'receiver',
-      ])
+      // .select([
+      //   'friendship.id_friendship',
+      //   'friendship.confirmed',
+      //   'author',
+      //   'receiver',
+      // ])
       .getMany();
 
     return friendships;

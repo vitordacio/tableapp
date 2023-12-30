@@ -1,14 +1,14 @@
 import { inject, injectable } from 'tsyringe';
 import { IUserRepository } from '@repositories/UserRepository/IUserRepository';
 import { IUserUpdateRepository } from '@repositories/UserUpdateRepository/IUserUpdateRepository';
-import { verifyCanUpdateDate } from '@utils/handleDate';
+import { verifyCanUpdate } from '@utils/handleDate';
 import { AppError } from '@utils/AppError';
 import { UserUpdate } from '@entities/UserUpdate/UserUpdate';
 import { IFindCheckUpdateServiceDTO } from './IFindUsersServiceDTO';
 
 type CheckUpdateResponse = {
   canUpdate: boolean;
-  update: UserUpdate | undefined;
+  update: UserUpdate | null;
 };
 
 @injectable()
@@ -25,7 +25,11 @@ class FindCheckUpdateService {
     type,
     reqUser,
   }: IFindCheckUpdateServiceDTO): Promise<CheckUpdateResponse> {
-    let update: UserUpdate | undefined;
+    const response: CheckUpdateResponse = {
+      canUpdate: false,
+      update: null,
+    };
+
     const [user, lastUpdate] = await Promise.all([
       this.userRepository.findById(reqUser.id),
       this.userUpdateRepository.findLastByTypeAndUserId(type, reqUser.id),
@@ -38,19 +42,22 @@ class FindCheckUpdateService {
       );
     }
 
-    const canUpdate = lastUpdate
-      ? verifyCanUpdateDate({
-          lastUpdate: lastUpdate.created_at,
-          days: 5,
+    let days = 0;
+    if (type === 'name') days = 7;
+    if (type === 'email') days = 30;
+    if (type === 'username') days = 30;
+    if (type === 'password') days = 5;
+
+    response.canUpdate = lastUpdate
+      ? verifyCanUpdate({
+          lastUpdate,
+          days,
         })
       : true;
 
-    if (lastUpdate) update = lastUpdate;
+    if (lastUpdate) response.update = lastUpdate;
 
-    return {
-      canUpdate,
-      update,
-    };
+    return response;
   }
 }
 

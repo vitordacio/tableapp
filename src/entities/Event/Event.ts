@@ -20,21 +20,21 @@ import { EventPicture } from '@entities/EventPicture/EventPicture';
 import { React } from '@entities/React/React';
 import { Performer } from '@entities/Performer/Performer';
 
-export type EventControl = {
-  participation_id?: string;
-  participation_status?:
-    | 'author'
-    | 'user_in'
-    | 'user_out'
-    | 'guest_in'
-    | 'guest_out'
-    | 'mod_in'
-    | 'mod_out'
-    | 'vip_in'
-    | 'vip_out'
-    | '';
-  can_see_content?: boolean;
-};
+// export type EventControl = {
+//   participation_id?: string;
+//   participation_status?:
+//     | 'author'
+//     | 'user_in'
+//     | 'user_out'
+//     | 'guest_in'
+//     | 'guest_out'
+//     | 'mod_in'
+//     | 'mod_out'
+//     | 'vip_in'
+//     | 'vip_out'
+//     | '';
+//   can_see_content?: boolean;
+// };
 
 @Entity('events')
 class Event {
@@ -65,8 +65,6 @@ class Event {
 
   @Column({ default: 0 })
   reacts_count: number;
-
-  participation_id?: string;
 
   @Column({ nullable: true })
   additional: string;
@@ -152,9 +150,25 @@ class Event {
   @DeleteDateColumn()
   deleted_at: Date;
 
-  status?: 'awaiting' | 'ongoing' | 'finished';
+  event_status: 'awaiting' | 'ongoing' | 'finished';
 
-  control: EventControl;
+  participation_id: string | '';
+
+  participation_status:
+    | 'author'
+    | 'user_in'
+    | 'user_out'
+    | 'guest_in'
+    | 'guest_out'
+    | 'mod_in'
+    | 'mod_out'
+    | 'vip_in'
+    | 'vip_out'
+    | '';
+
+  can_see_content: boolean;
+
+  react_id: string | '';
 }
 
 export { Event };
