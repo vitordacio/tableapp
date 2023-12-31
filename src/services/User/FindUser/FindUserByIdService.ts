@@ -44,11 +44,11 @@ class FindUserByIdService {
     const [friendship, block, react] = await Promise.all([
       this.friendshipRepository.findByUserIds(reqUser.id, user_id),
       this.blockRepository.findByAuthorAndReceiver(user_id, reqUser.id),
-      this.reactRepository.findByUsers(requester.id_user, user.id_user),
+      this.reactRepository.findReactUser(requester.id_user, user.id_user),
     ]);
 
     user.blocked = !!block;
-    user.react_id = react?.id_react || '';
+    user.user_react = react;
     user.friendship_id = friendship?.id_friendship || '';
     user.friendship_status = checkFriendship({
       user_id: requester.id_user,

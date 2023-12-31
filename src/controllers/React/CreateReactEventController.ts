@@ -14,8 +14,7 @@ class CreateReactEventController {
   }
 
   async handle(req: Request, res: Response): Promise<Response> {
-    const { emoji_id, message } = req.body;
-    const { event_id } = req.params;
+    const { event_id, emoji_id, message } = req.body;
 
     if (
       !hasPermission(req.user, userPerm) &&

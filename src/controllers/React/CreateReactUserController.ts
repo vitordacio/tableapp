@@ -14,8 +14,7 @@ class CreateReactUserController {
   }
 
   async handle(req: Request, res: Response): Promise<Response> {
-    const { emoji_id, message } = req.body;
-    const { user_id } = req.params;
+    const { user_id, emoji_id, message } = req.body;
 
     if (
       !hasPermission(req.user, userPerm) &&

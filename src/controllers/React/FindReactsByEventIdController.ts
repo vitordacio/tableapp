@@ -3,18 +3,20 @@ import { Request, Response } from 'express';
 import { instanceToPlain } from 'class-transformer';
 import { hasPermission } from '@utils/hasPermission';
 import { AppError } from '@utils/AppError';
-import { userPerm, pubPerm } from '@config/constants';
-import { FindEventsByUserIdService } from '@services/Event/FindEvent/FindEventsByUserIdService';
+import { pubPerm, userPerm } from '@config/constants';
+import { FindReactsByEventIdService } from '@services/React/FindReact/FindReactsByEventIdService';
 
-class FindEventsByUserIdController {
-  private findEventByUserService: FindEventsByUserIdService;
+class FindReactsByEventIdController {
+  private findReactsByEventIdService: FindReactsByEventIdService;
 
   constructor() {
-    this.findEventByUserService = container.resolve(FindEventsByUserIdService);
+    this.findReactsByEventIdService = container.resolve(
+      FindReactsByEventIdService,
+    );
   }
 
   async handle(req: Request, res: Response): Promise<Response> {
-    const { user_id } = req.params;
+    const { event_id } = req.params;
     const { page, limit } = req.query;
 
     if (
@@ -24,14 +26,14 @@ class FindEventsByUserIdController {
       throw new AppError('Operação não permitida.', 403);
     }
 
-    const eventInstance = await this.findEventByUserService.execute({
-      user_id,
+    const reactInstance = await this.findReactsByEventIdService.execute({
+      event_id,
       page: parseInt(page as string, 10),
       limit: parseInt(limit as string, 10),
     });
 
-    return res.status(200).json(instanceToPlain(eventInstance));
+    return res.status(200).json(instanceToPlain(reactInstance));
   }
 }
 
-export { FindEventsByUserIdController };
+export { FindReactsByEventIdController };

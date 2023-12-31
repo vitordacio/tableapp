@@ -34,11 +34,16 @@ class CreateReactUserService {
     user_id,
     reqUser,
   }: ICreateReactUserDTO): Promise<React> {
-    const [requester, user, emoji] = await Promise.all([
+    const [requester, user, emoji, alreadyExists] = await Promise.all([
       this.userRepository.findById(reqUser.id),
       this.userRepository.findById(user_id),
       this.emojiRepository.findById(emoji_id),
+      this.reactRepository.findReactUser(reqUser.id, user_id),
     ]);
+
+    if (alreadyExists) {
+      throw new AppError('Reação já cadastrada.', 400);
+    }
 
     if (!requester) {
       throw new AppError('Login expirado, realize o login novamente.', 400);
@@ -72,7 +77,14 @@ class CreateReactUserService {
       react_id: react.id_react,
     });
 
-    await this.notificationRepository.save(notification);
+    user.reacts_count += 1;
+    await Promise.all([
+      this.userRepository.save(user),
+      this.notificationRepository.save(notification),
+    ]);
+
+    react.emoji = emoji;
+    react.receiver = user;
 
     return react;
   }

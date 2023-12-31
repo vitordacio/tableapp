@@ -1,7 +1,10 @@
-import { getRepository, Repository } from 'typeorm';
+import { Brackets, getRepository, Repository } from 'typeorm';
 import { IReact } from '@entities/React/IReact';
 import { React } from '@entities/React/React';
+import { extractTagsFromText } from '@utils/generateTags';
 import { IReactRepository } from '../IReactRepository';
+
+const similarity = 0.3;
 
 class ReactRepository implements IReactRepository {
   private ormRepository: Repository<React>;
@@ -39,15 +42,129 @@ class ReactRepository implements IReactRepository {
     return react;
   }
 
-  async findByUsers(
+  async findReactUser(
     author_id: string,
     receiver_id: string,
   ): Promise<React | undefined> {
     const react = await this.ormRepository.findOne({
+      relations: ['emoji', 'receiver'],
       where: { type: 'user', author_id, receiver_id },
     });
 
     return react;
+  }
+
+  async findReactEvent(
+    author_id: string,
+    event_id: string,
+  ): Promise<React | undefined> {
+    const react = await this.ormRepository.findOne({
+      relations: ['emoji'],
+      where: { type: 'event', author_id, event_id },
+    });
+
+    return react;
+  }
+
+  async findByUserId(
+    user_id: string,
+    page: number,
+    limit: number,
+  ): Promise<React[]> {
+    const reacts = await this.ormRepository.find({
+      relations: ['emoji', 'receiver', 'event', 'event.type'],
+      where: { author_id: user_id },
+      order: { created_at: 'DESC' },
+      take: limit,
+      skip: page && limit ? limit * (page - 1) : undefined,
+    });
+
+    return reacts;
+  }
+
+  async findReceivedsByUserId(
+    user_id: string,
+    page: number,
+    limit: number,
+  ): Promise<React[]> {
+    const reacts = await this.ormRepository.find({
+      relations: ['emoji', 'author'],
+      where: { type: 'user', receiver_id: user_id },
+      order: { created_at: 'DESC' },
+      take: limit,
+      skip: page && limit ? limit * (page - 1) : undefined,
+    });
+
+    return reacts;
+  }
+
+  async findReceivedsByEventId(
+    event_id: string,
+    page: number,
+    limit: number,
+  ): Promise<React[]> {
+    const reacts = await this.ormRepository.find({
+      relations: ['emoji', 'author'],
+      where: { type: 'event', event_id },
+      order: { created_at: 'DESC' },
+      take: limit,
+      skip: page && limit ? limit * (page - 1) : undefined,
+    });
+
+    return reacts;
+  }
+
+  async findByUserIdAndName(
+    id: string,
+    page: number,
+    limit: number,
+    name: string,
+  ): Promise<React[]> {
+    let tagName: string[] = [];
+    tagName = extractTagsFromText(name);
+
+    const conditions =
+      tagName.length !== 0
+        ? tagName
+            .map(
+              word =>
+                `similarity(unaccent(LOWER(tag)), unaccent(lower('${word}'))) > ${similarity}`,
+            )
+            .join(' OR ')
+        : null;
+
+    const reacts = await this.ormRepository
+      .createQueryBuilder('react')
+      .leftJoinAndSelect('react.emoji', 'emoji')
+      .leftJoinAndSelect('react.author', 'author')
+      .where(
+        new Brackets(qb => {
+          qb.where(
+            `${
+              conditions
+                ? `(react.receiver_id = :user_id AND EXISTS (SELECT 1 FROM unnest(author.tags) tag WHERE ${conditions}))`
+                : '(react.receiver_id = :user_id AND (:nullName::text IS NULL OR EXISTS (SELECT 1 FROM unnest(author.tags) tag WHERE unaccent(LOWER(tag)) ~~ unaccent(:query))))'
+            }`,
+            {
+              user_id: id,
+              query: `%${name}%`,
+              nullName: name,
+            },
+          );
+
+          return qb;
+        }),
+      )
+      .addSelect(
+        `(SELECT count(*) FROM unnest(author.tags) as tag WHERE ${conditions})`,
+        'qtd',
+      )
+      .orderBy('qtd', 'DESC')
+      .take(limit)
+      .skip((page - 1) * limit)
+      .getMany();
+
+    return reacts;
   }
 
   async findToRemove(id: string): Promise<React | undefined> {

@@ -34,11 +34,16 @@ class CreateReactEventService {
     event_id,
     reqUser,
   }: ICreateReactEventDTO): Promise<React> {
-    const [user, event, emoji] = await Promise.all([
+    const [user, event, emoji, alreadyExists] = await Promise.all([
       this.userRepository.findById(reqUser.id),
       this.eventRepository.findById(event_id),
       this.emojiRepository.findById(emoji_id),
+      this.reactRepository.findReactEvent(reqUser.id, event_id),
     ]);
+
+    if (alreadyExists) {
+      throw new AppError('Reação já cadastrada.', 400);
+    }
 
     if (!user) {
       throw new AppError('Login expirado, realize o login novamente.', 400);
@@ -61,7 +66,14 @@ class CreateReactEventService {
       event_id: event.id_event,
     });
 
-    await this.reactRepository.save(react);
+    event.reacts_count += 1;
+    await Promise.all([
+      this.reactRepository.save(react),
+      this.eventRepository.save(event),
+    ]);
+
+    react.emoji = emoji;
+    react.event = event;
 
     return react;
   }

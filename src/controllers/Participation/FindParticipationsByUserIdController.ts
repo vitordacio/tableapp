@@ -31,7 +31,6 @@ class FindParticipationsByUserIdController {
         user_id,
         page: parseInt(page as string, 10),
         limit: parseInt(limit as string, 10),
-        reqUser: req.user,
       });
 
     return res.status(200).json(instanceToPlain(participationInstance));
