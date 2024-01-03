@@ -20,37 +20,30 @@ class FindRequestsPendingService {
     event_id,
     page,
     limit,
-    user,
+    reqUser,
   }: IFindRequestsDTO): Promise<Participation[]> {
-    let participations: Participation[] = [];
-    const event = await this.eventRepository.findById(event_id);
+    const [event, participations] = await Promise.all([
+      this.eventRepository.findById(event_id),
+      this.participationRepository.findRequestsReviwed(
+        event_id,
+        page || 1,
+        limit || 20,
+      ),
+    ]);
 
     if (!event) {
       throw new AppError('Evento não encontrado.', 404);
     }
 
-    if (user.id !== event.author_id) {
+    if (reqUser.id !== event.author_id) {
       const hasAuth = await this.participationRepository.checkMod(
-        user.id,
+        reqUser.id,
         event.id_event,
       );
 
       if (!hasAuth) {
         throw new AppError('Não autorizado.', 403);
       }
-    }
-
-    participations = await this.participationRepository.findRequestsPending(
-      event.id_event,
-      page || 1,
-      limit || 20,
-    );
-
-    if (participations.length !== 0) {
-      participations = participations.map(participation => ({
-        ...participation,
-        participation_status: 'user_out',
-      }));
     }
 
     return participations;

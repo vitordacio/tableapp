@@ -72,23 +72,15 @@ class Participation {
   @DeleteDateColumn()
   deleted_at: Date;
 
-  event_status: 'awaiting' | 'ongoing' | 'finished';
+  event_status: Event['event_status'];
 
-  participation_id: string | '';
+  participation_id: Event['participation_id'];
 
-  participation_status:
-    | 'author'
-    | 'user_in'
-    | 'user_out'
-    | 'guest_in'
-    | 'guest_out'
-    | 'mod_in'
-    | 'mod_out'
-    | 'vip_in'
-    | 'vip_out'
-    | '';
+  participation_status: Event['participation_status'];
 
-  can_see_content: boolean;
+  participating: Event['participating'];
+
+  can_see_content: Event['can_see_content'];
 }
 
 export { Participation };

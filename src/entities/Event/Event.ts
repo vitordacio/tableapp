@@ -154,7 +154,7 @@ class Event {
 
   can_see_content: boolean;
 
-  react_id: string | '';
+  user_react: React | undefined;
 }
 
 export { Event };

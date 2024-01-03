@@ -29,7 +29,7 @@ class CreateParticipationByEventController {
       await this.createParticipationByEventService.execute({
         participation_id,
         confirm,
-        user: req.user,
+        reqUser: req.user,
       });
 
     return res.status(201).json(instanceToPlain(participationInstance));

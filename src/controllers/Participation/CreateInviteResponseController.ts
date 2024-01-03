@@ -28,7 +28,7 @@ class CreateInviteResponseController {
     const participationInstance =
       await this.createInviteResponseService.execute({
         event_id,
-        user: req.user,
+        reqUser: req.user,
       });
 
     return res.status(201).json(instanceToPlain(participationInstance));

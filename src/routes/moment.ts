@@ -8,9 +8,9 @@ import {
 import { createMomentController } from '../main/Moment/createMoment';
 import { deleteMomentController } from '../main/Moment/deleteMoment';
 import { findMomentsByEventController } from '../main/Moment/findMomentsByEvent';
-import { createMomentMiddleware } from '../middlewares/Moment/createMoment';
+import { createMomentMiddleware } from '../middlewares/validators/Moment/createMoment';
 import { updateMomentController } from '../main/Moment/updateMoment';
-import { updateMomentMiddleware } from '../middlewares/Moment/updateMoment';
+import { updateMomentMiddleware } from '../middlewares/validators/Moment/updateMoment';
 
 const momentRouter = Router();
 

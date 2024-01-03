@@ -1,5 +1,6 @@
 import { Router } from 'express';
 
+import { achievementRouter } from './routes/achievement';
 import { addressRouter } from './routes/address';
 import { authRouter } from './routes/auth';
 import { blockRouter } from './routes/block';
@@ -17,6 +18,7 @@ import { userRouter } from './routes/user';
 
 const router = Router();
 
+router.use(achievementRouter);
 router.use(addressRouter);
 router.use(authRouter);
 router.use(blockRouter);

@@ -5,8 +5,16 @@ export interface IAchievementRepository {
   save(entitie: Achievement): Promise<Achievement>;
   create(data: IAchievement): Achievement;
   findById(id: string): Promise<Achievement | undefined>;
-  findByUserId(user_id: string): Promise<Achievement | undefined>;
-  findByEventId(event_id: string): Promise<Achievement | undefined>;
+  findByUserId(
+    user_id: string,
+    page: number,
+    limit: number,
+  ): Promise<Achievement[]>;
+  findByEventId(
+    event_id: string,
+    page: number,
+    limit: number,
+  ): Promise<Achievement[]>;
   findByEventIdCategoryName(
     event_id: string,
     category: string,

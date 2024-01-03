@@ -1,15 +1,13 @@
 import { inject, injectable } from 'tsyringe';
 import { v4 } from 'uuid';
-
 import { Participation } from '@entities/Participation/Participation';
 import { IEventRepository } from '@repositories/EventRepository/IEventRepository';
 import { IUserRepository } from '@repositories/UserRepository/IUserRepository';
 import { IParticipationRepository } from '@repositories/ParticipationRepository/IParticipationRepository';
-
 import { AppError } from '@utils/AppError';
 import { INotificationRepository } from '@repositories/NotificationRepository/INotificationRepository';
 import { IParticipationTypeRepository } from '@repositories/ParticipationTypeRepository/IParticipationTypeRepository';
-import { generateEventControl } from '@utils/handleControl';
+import { handleEventControl } from '@utils/handleEvent';
 import { ICreateParticipationByUserDTO } from './ICreateParticipationByUserServiceDTO';
 
 @injectable()
@@ -33,33 +31,30 @@ class CreateParticipationByUserService {
 
   async execute({
     event_id,
-    user,
+    reqUser,
   }: ICreateParticipationByUserDTO): Promise<Participation> {
-    let participation: Participation | undefined;
-
-    const [foundUser, event] = await Promise.all([
-      await this.userRepository.findById(user.id),
-      await this.eventRepository.findById(event_id),
+    const [user, event, alreadyExists] = await Promise.all([
+      this.userRepository.findById(reqUser.id),
+      this.eventRepository.findById(event_id),
+      this.participationRepository.findByUserAndEvent(reqUser.id, event_id),
     ]);
 
-    if (!foundUser) {
-      throw new AppError('Usuário não encontrado.', 404);
+    if (!user) {
+      throw new AppError(
+        'Token expirado, por favor realize login novamente.',
+        400,
+      );
     }
 
     if (!event) {
       throw new AppError('Evento não encontrado.', 404);
     }
 
-    if (user.id === event.author_id) {
+    if (user.id_user === event.author_id) {
       throw new AppError('Usuário é autor do evento.', 400);
     }
 
-    participation = await this.participationRepository.findByUserAndEvent(
-      user.id,
-      event.id_event,
-    );
-
-    if (participation) {
+    if (alreadyExists) {
       throw new AppError('Participação já cadastrada.', 400);
     }
 
@@ -76,36 +71,40 @@ class CreateParticipationByUserService {
       await this.participationTypeRepository.save(participationType);
     }
 
-    participation = this.participationRepository.create({
+    const participation = this.participationRepository.create({
       id: v4(),
       type_id: participationType.id_participation_type,
-      user_id: foundUser.id_user,
+      user_id: user.id_user,
       event_id: event.id_event,
       confirmed_by_user: true,
     });
 
     const notification = this.notificationRepository.create({
       id: v4(),
-      message: `${foundUser.name} quer participar de ${event.name}! 🎉`,
+      message: `${user.name} quer participar de ${event.name}! 🎉`,
       type: 'participation',
-      author_id: foundUser.id_user,
       user_id: event.author_id,
       participation_id: participation.id_participation,
     });
 
     await Promise.all([
       await this.participationRepository.save(participation),
-
       await this.notificationRepository.save(notification),
     ]);
 
     if (!participation.type) participation.type = participationType;
 
-    participation.control = generateEventControl({
+    const eventControl = handleEventControl({
       event,
+      user,
       participation,
-      user: foundUser,
     });
+
+    participation.event_status = eventControl.event_status;
+    participation.participation_id = eventControl.participation_id;
+    participation.participation_status = eventControl.participation_status;
+    participation.participating = eventControl.participating;
+    participation.can_see_content = eventControl.can_see_content;
 
     return participation;
   }

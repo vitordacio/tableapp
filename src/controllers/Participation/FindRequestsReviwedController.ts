@@ -31,7 +31,7 @@ class FindRequestsReviwedController {
         event_id,
         page: parseInt(page as string, 10),
         limit: parseInt(limit as string, 10),
-        user: req.user,
+        reqUser: req.user,
       },
     );
 

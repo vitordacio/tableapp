@@ -28,7 +28,7 @@ class CreateParticipationByUserController {
     const participationInstance =
       await this.createParticipationByUserService.execute({
         event_id,
-        user: req.user,
+        reqUser: req.user,
       });
 
     return res.status(201).json(instanceToPlain(participationInstance));

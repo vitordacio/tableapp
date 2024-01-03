@@ -21,6 +21,7 @@ import { findRequestsReviwedController } from '../main/Participation/findRequest
 import { createParticipationResponseMiddleware } from '../middlewares/validators/Participation/createParticipationResponse';
 import {
   verifyParamEventId,
+  verifyParamParticipationId,
   verifyParamUserId,
 } from '../middlewares/verifyParamId';
 
@@ -99,16 +100,16 @@ participationRouter.get(
 );
 
 participationRouter.get(
-  '/participation/:id',
-  verifyToken,
+  '/participation/:participation_id',
+  [verifyToken, verifyParamParticipationId],
   async (req: Request, res: Response) => {
     return findParticipationByIdController.handle(req, res);
   },
 );
 
 participationRouter.delete(
-  '/participation/:id',
-  verifyToken,
+  '/participation/:participation_id',
+  [verifyToken, verifyParamParticipationId],
   async (req: Request, res: Response) => {
     return deleteParticipationController.handle(req, res);
   },

@@ -11,7 +11,7 @@ export interface IReactRepository {
   ): Promise<React | undefined>;
   findReactEvent(
     author_id: string,
-    receiver_id: string,
+    event_id: string,
   ): Promise<React | undefined>;
   findByUserId(user_id: string, page: number, limit: number): Promise<React[]>;
   findReceivedsByUserId(

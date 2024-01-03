@@ -6,7 +6,6 @@ import { AppError } from '@utils/AppError';
 import { INotificationRepository } from '@repositories/NotificationRepository/INotificationRepository';
 import { IUserRepository } from '@repositories/UserRepository/IUserRepository';
 import { IEventRepository } from '@repositories/EventRepository/IEventRepository';
-import { generateEventControl } from '@utils/handleControl';
 import { ICreateParticipationByEventDTO } from './ICreateParticipationByEventServiceDTO';
 
 @injectable()
@@ -28,28 +27,31 @@ class CreateParticipationByEventService {
   async execute({
     participation_id,
     confirm,
-    user,
+    reqUser,
   }: ICreateParticipationByEventDTO): Promise<Participation> {
-    const [participation, foundUser] = await Promise.all([
+    const [user, participation] = await Promise.all([
+      this.userRepository.findById(reqUser.id),
       this.participationRepository.findById(participation_id),
-      this.userRepository.findById(user.id),
     ]);
+
+    if (!user) {
+      throw new AppError(
+        'Token expirado, por favor realize login novamente.',
+        400,
+      );
+    }
 
     if (!participation) {
       throw new AppError('Solicitação não encontrada.', 404);
-    }
-
-    if (!foundUser) {
-      throw new AppError('Usuário não encontrado.', 404);
     }
 
     if (participation.reviwer_id) {
       throw new AppError('Essa participação já foi revisada.', 404);
     }
 
-    if (user.id !== participation.event.author_id) {
+    if (user.id_user !== participation.event.author_id) {
       const hasAuth = await this.participationRepository.checkMod(
-        user.id,
+        user.id_user,
         participation.event_id,
       );
 
@@ -58,36 +60,31 @@ class CreateParticipationByEventService {
       }
     }
 
-    participation.reviwer_id = foundUser.id_user;
+    participation.reviwer_id = user.id_user;
     participation.confirmed_by_event = confirm;
     participation.in =
       participation.confirmed_by_user && participation.confirmed_by_event;
 
-    participation.event.participating_count += 1;
+    await this.participationRepository.save(participation);
 
-    await Promise.all([
-      this.participationRepository.save(participation),
-      this.eventRepository.save(participation.event),
-    ]);
+    const { event } = participation;
 
     if (participation.in) {
+      event.participating_count += 1;
+
       const notification = this.notificationRepository.create({
         id: v4(),
-        message: `${foundUser.name} confirmou sua participação no evento ${participation.event.name}! 🎉`,
+        message: `${user.name} confirmou sua participação no evento ${event.name}! 🎉`,
         type: 'participation',
-        author_id: foundUser.id_user,
         user_id: participation.user_id,
         participation_id: participation.id_participation,
       });
 
-      await this.notificationRepository.save(notification);
+      await Promise.all([
+        this.eventRepository.save(event),
+        this.notificationRepository.save(notification),
+      ]);
     }
-
-    participation.control = generateEventControl({
-      event: participation.event,
-      participation,
-      user: foundUser,
-    });
 
     return participation;
   }

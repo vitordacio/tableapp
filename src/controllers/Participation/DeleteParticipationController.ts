@@ -16,7 +16,7 @@ class DeleteParticipationController {
   }
 
   async handle(req: Request, res: Response): Promise<Response> {
-    const { id } = req.params;
+    const { participation_id } = req.params;
 
     if (
       !hasPermission(req.user, userPerm) &&
@@ -26,7 +26,7 @@ class DeleteParticipationController {
     }
 
     const participationInstance = await this.deleteParticipationService.execute(
-      id,
+      participation_id,
       req.user,
     );
 

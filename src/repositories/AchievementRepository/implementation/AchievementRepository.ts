@@ -36,24 +36,36 @@ class AchievementRepository implements IAchievementRepository {
     return achievement;
   }
 
-  async findByUserId(user_id: string): Promise<Achievement | undefined> {
-    const achievement = await this.ormRepository.findOne({
+  async findByUserId(
+    user_id: string,
+    page: number,
+    limit: number,
+  ): Promise<Achievement[]> {
+    const achievements = await this.ormRepository.find({
       relations: ['type'],
       where: { user_id },
       order: { created_at: 'DESC' },
+      take: limit,
+      skip: page && limit ? limit * (page - 1) : undefined,
     });
 
-    return achievement;
+    return achievements;
   }
 
-  async findByEventId(event_id: string): Promise<Achievement | undefined> {
-    const achievement = await this.ormRepository.findOne({
+  async findByEventId(
+    event_id: string,
+    page: number,
+    limit: number,
+  ): Promise<Achievement[]> {
+    const achievements = await this.ormRepository.find({
       relations: ['type'],
       where: { event_id },
       order: { created_at: 'DESC' },
+      take: limit,
+      skip: page && limit ? limit * (page - 1) : undefined,
     });
 
-    return achievement;
+    return achievements;
   }
 
   async findByUserIdCategoryName(

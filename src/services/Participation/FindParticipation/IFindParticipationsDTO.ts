@@ -20,5 +20,5 @@ export interface IFindRequestsDTO {
   event_id: string;
   page?: number;
   limit?: number;
-  user: AuthorizedUser<UserPerm | PubPerm>;
+  reqUser: AuthorizedUser<UserPerm | PubPerm>;
 }

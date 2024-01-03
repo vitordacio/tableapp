@@ -16,7 +16,7 @@ class FindParticipationByIdController {
   }
 
   async handle(req: Request, res: Response): Promise<Response> {
-    const { id } = req.params;
+    const { participation_id } = req.params;
 
     if (
       !hasPermission(req.user, userPerm) &&
@@ -26,7 +26,7 @@ class FindParticipationByIdController {
     }
 
     const participationInstance =
-      await this.findParticipationByIdService.execute(id);
+      await this.findParticipationByIdService.execute(participation_id);
 
     return res.status(201).json(instanceToPlain(participationInstance));
   }

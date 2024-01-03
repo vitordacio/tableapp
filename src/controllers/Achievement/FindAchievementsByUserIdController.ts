@@ -4,19 +4,19 @@ import { instanceToPlain } from 'class-transformer';
 import { hasPermission } from '@utils/hasPermission';
 import { AppError } from '@utils/AppError';
 import { pubPerm, userPerm } from '@config/constants';
-import { FindRequestsPendingService } from '@services/Participation/FindParticipation/FindRequestsPendingService';
+import { FindAchievementsByUserIdService } from '@services/Achievement/FindAchievementsByUserIdService';
 
-class FindRequestsPendingController {
-  private findRequestsPendingService: FindRequestsPendingService;
+class FindAchievementsByUserIdController {
+  private findAchievementsByUserIdService: FindAchievementsByUserIdService;
 
   constructor() {
-    this.findRequestsPendingService = container.resolve(
-      FindRequestsPendingService,
+    this.findAchievementsByUserIdService = container.resolve(
+      FindAchievementsByUserIdService,
     );
   }
 
   async handle(req: Request, res: Response): Promise<Response> {
-    const { event_id } = req.params;
+    const { user_id } = req.params;
     const { page, limit } = req.query;
 
     if (
@@ -26,17 +26,15 @@ class FindRequestsPendingController {
       throw new AppError('Operação não permitida.', 403);
     }
 
-    const participationInstance = await this.findRequestsPendingService.execute(
-      {
-        event_id,
+    const achievementInstance =
+      await this.findAchievementsByUserIdService.execute({
+        user_id,
         page: parseInt(page as string, 10),
         limit: parseInt(limit as string, 10),
-        reqUser: req.user,
-      },
-    );
+      });
 
-    return res.status(201).json(instanceToPlain(participationInstance));
+    return res.status(200).json(instanceToPlain(achievementInstance));
   }
 }
 
-export { FindRequestsPendingController };
+export { FindAchievementsByUserIdController };

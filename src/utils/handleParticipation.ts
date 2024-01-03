@@ -12,7 +12,7 @@ export const checkParticipationStatus = ({
   user,
   event,
   participation,
-}: checkParticipation): Event['control']['participation_status'] => {
+}: checkParticipation): Event['participation_status'] => {
   if (user.id_user === event.author_id) return 'author';
 
   if (!participation) return '';

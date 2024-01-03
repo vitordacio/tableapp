@@ -51,11 +51,11 @@ class Friendship {
   @DeleteDateColumn()
   deleted_at: Date;
 
-  friendship_id: string | '';
+  friendship_id: User['friendship_id'];
 
-  friendship_status: 'friends' | 'request_sent' | 'request_received' | '';
+  friendship_status: User['friendship_status'];
 
-  can_see_content: boolean;
+  can_see_content: User['can_see_content'];
 }
 
 export { Friendship };
