@@ -6,6 +6,7 @@ export interface IEventRepository {
   create(data: IEvent): Event;
   findById(id: string): Promise<Event | undefined>;
   findIndexByType(type: string): Promise<Event[]>;
+  countByAuthor(author_id: string): Promise<number>;
   findIndex(): Promise<Event[]>;
   findByCoordinates(
     lat: number,

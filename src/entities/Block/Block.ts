@@ -12,7 +12,7 @@ import {
 import { Exclude } from 'class-transformer';
 import { User } from '@entities/User/User';
 
-@Entity('artists')
+@Entity('blocks')
 class Block {
   @PrimaryColumn('uuid')
   id_block: string;

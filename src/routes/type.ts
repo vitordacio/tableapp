@@ -23,6 +23,11 @@ import { fetchEmojiTypesController } from '../main/Type/EmojiType/fetchEmojiType
 import { findEmojiTypesController } from '../main/Type/EmojiType/findEmojiTypes';
 import { createEmojiTypeMiddleware } from '../middlewares/validators/Type/EmojiType/createEmojiType';
 import { fetchMasterController } from '../main/Type/fetchMaster';
+import { createAchievementTypeController } from '../main/Type/AchievementType/createAchievementType';
+import { deleteAchievementTypeController } from '../main/Type/AchievementType/deleteAchievementType';
+import { fetchAchievementTypesController } from '../main/Type/AchievementType/fetchAchievementTypes';
+import { findAchievementTypesController } from '../main/Type/AchievementType/findAchievementTypes';
+import { createAchievementTypeMiddleware } from '../middlewares/validators/Type/AchievementType/createAchievementType';
 
 const typeRouter = Router();
 
@@ -155,6 +160,39 @@ typeRouter.delete(
   verifyToken,
   async (req: Request, res: Response) => {
     return deleteSocialNetworkTypeController.handle(req, res);
+  },
+);
+
+// Achievements
+typeRouter.get(
+  '/type/achievement',
+  verifyToken,
+  async (req: Request, res: Response) => {
+    return findAchievementTypesController.handle(req, res);
+  },
+);
+
+typeRouter.post(
+  '/type/achievement',
+  [verifyToken, createAchievementTypeMiddleware],
+  async (req: Request, res: Response) => {
+    return createAchievementTypeController.handle(req, res);
+  },
+);
+
+typeRouter.post(
+  '/type/achievement/fetch',
+  verifyToken,
+  async (req: Request, res: Response) => {
+    return fetchAchievementTypesController.handle(req, res);
+  },
+);
+
+typeRouter.delete(
+  '/type/achievement/:id',
+  verifyToken,
+  async (req: Request, res: Response) => {
+    return deleteAchievementTypeController.handle(req, res);
   },
 );
 

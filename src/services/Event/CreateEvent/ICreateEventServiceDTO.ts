@@ -1,3 +1,6 @@
+import { User } from '@entities/User/User';
+import { Event } from '@entities/Event/Event';
+
 export interface ICreateEventDTO {
   type_id: string;
   name: string;
@@ -20,4 +23,9 @@ export interface ICreateEventPerformerDTO {
   user_id?: string;
   name?: string;
   reqUser: AuthorizedUser<UserPerm | PubPerm>;
+}
+
+export interface IAchievementHandlerServiceDTO {
+  user: User;
+  event: Event;
 }

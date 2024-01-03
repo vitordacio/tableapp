@@ -1,7 +1,8 @@
 export interface IAchievementType {
   id: string;
-  author_id: string;
-  receiver_id: string;
-  reviwed_by_receiver?: boolean;
-  accepted?: boolean;
+  type: string;
+  category: string;
+  name: string;
+  difficulty?: number;
+  min_value?: number;
 }

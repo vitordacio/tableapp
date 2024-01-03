@@ -15,11 +15,20 @@ import { EventRepository } from '@repositories/EventRepository/implementation/Ev
 import { IEventTypeRepository } from '@repositories/EventTypeRepository/IEventTypeRepository';
 import { EventTypeRepository } from '@repositories/EventTypeRepository/implementation/EventTypeRepository';
 
+import { IMomentRepository } from '@repositories/MomentRepository/IMomentRepository';
+import { MomentRepository } from '@repositories/MomentRepository/implementation/MomentRepository';
+
 import { IEmojiRepository } from '@repositories/EmojiRepository/IEmojiRepository';
 import { EmojiRepository } from '@repositories/EmojiRepository/implementation/EmojiRepository';
 
 import { IEmojiTypeRepository } from '@repositories/EmojiTypeRepository/IEmojiTypeRepository';
 import { EmojiTypeRepository } from '@repositories/EmojiTypeRepository/implementation/EmojiTypeRepository';
+
+import { IAchievementRepository } from '@repositories/AchievementRepository/IAchievementRepository';
+import { AchievementRepository } from '@repositories/AchievementRepository/implementation/AchievementRepository';
+
+import { IAchievementTypeRepository } from '@repositories/AchievementTypeRepository/IAchievementTypeRepository';
+import { AchievementTypeRepository } from '@repositories/AchievementTypeRepository/implementation/AchievementTypeRepository';
 
 import { IReactRepository } from '@repositories/ReactRepository/IReactRepository';
 import { ReactRepository } from '@repositories/ReactRepository/implementation/ReactRepository';
@@ -74,6 +83,11 @@ container.registerSingleton<IEventTypeRepository>(
   EventTypeRepository,
 );
 
+container.registerSingleton<IMomentRepository>(
+  'MomentRepository',
+  MomentRepository,
+);
+
 container.registerSingleton<IEmojiRepository>(
   'EmojiRepository',
   EmojiRepository,
@@ -82,6 +96,16 @@ container.registerSingleton<IEmojiRepository>(
 container.registerSingleton<IEmojiTypeRepository>(
   'EmojiTypeRepository',
   EmojiTypeRepository,
+);
+
+container.registerSingleton<IAchievementRepository>(
+  'AchievementRepository',
+  AchievementRepository,
+);
+
+container.registerSingleton<IAchievementTypeRepository>(
+  'AchievementTypeRepository',
+  AchievementTypeRepository,
 );
 
 container.registerSingleton<IReactRepository>(

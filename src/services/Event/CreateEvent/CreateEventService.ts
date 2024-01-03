@@ -1,4 +1,4 @@
-import { inject, injectable } from 'tsyringe';
+import { container, inject, injectable } from 'tsyringe';
 import { v4 } from 'uuid';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
@@ -9,6 +9,7 @@ import { IEventRepository } from '@repositories/EventRepository/IEventRepository
 import { extractTagsFromText } from '@utils/generateTags';
 import { IEventTypeRepository } from '@repositories/EventTypeRepository/IEventTypeRepository';
 import { ICreateEventDTO } from './ICreateEventServiceDTO';
+import { AchievementHandlerService } from './AchievementHandlerService';
 
 dayjs.extend(utc);
 
@@ -23,7 +24,13 @@ class CreateEventService {
 
     @inject('EventTypeRepository')
     private eventTypeRepository: IEventTypeRepository,
-  ) {}
+
+    private achievementHandlerService: AchievementHandlerService,
+  ) {
+    this.achievementHandlerService = container.resolve(
+      AchievementHandlerService,
+    );
+  }
 
   async execute({
     type_id,
@@ -48,6 +55,7 @@ class CreateEventService {
     const [author, type] = await Promise.all([
       this.userRepository.findById(user.id),
       this.eventTypeRepository.findById(type_id),
+      this.eventRepository.countByAuthor(user.id),
     ]);
 
     if (!author) {
@@ -91,9 +99,11 @@ class CreateEventService {
     type.count += 1;
 
     await Promise.all([
-      await this.eventRepository.save(event),
-      await this.eventTypeRepository.save(type),
+      this.eventRepository.save(event),
+      this.eventTypeRepository.save(type),
     ]);
+
+    await this.achievementHandlerService.execute({ user: author, event });
 
     return event;
   }

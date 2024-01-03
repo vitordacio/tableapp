@@ -36,7 +36,7 @@ class Notification {
   @JoinColumn({ name: 'user_id' })
   user: User;
 
-  @Column()
+  @Column({ nullable: true })
   author_id: string;
 
   @ManyToOne(() => User, user => user.notifications_sent)

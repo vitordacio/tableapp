@@ -7,6 +7,7 @@ interface INotification {
   friendship_id?: string;
   participation_id?: string;
   react_id?: string;
+  achievement_id?: string;
   read?: boolean;
 }
 

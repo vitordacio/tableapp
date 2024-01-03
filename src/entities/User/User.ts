@@ -16,6 +16,7 @@ import { Notification } from '@entities/Notification/Notification';
 import { SocialNetwork } from '@entities/SocialNetwork/SocialNetwork';
 import { Achievement } from '@entities/Achievement/Achievement';
 import { Report } from '@entities/Report/Report';
+import { Moment } from '@entities/Moment/Moment';
 import { Block } from '@entities/Block/Block';
 import { Suggestion } from '@entities/Suggestion/Suggestion';
 import { React } from '@entities/React/React';
@@ -127,6 +128,11 @@ class User {
 
   @OneToMany(() => React, react => react.author)
   reacts_sent: React[];
+
+  @OneToMany(() => Moment, moment => moment.author, {
+    cascade: true,
+  })
+  moments: Moment[];
 
   @OneToMany(() => React, react => react.receiver)
   reacts_received: React[];

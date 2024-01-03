@@ -1,7 +1,6 @@
 export interface IAchievement {
   id: string;
-  author_id: string;
-  receiver_id: string;
-  reviwed_by_receiver?: boolean;
-  accepted?: boolean;
+  type_id: string;
+  user_id?: string;
+  event_id?: string;
 }

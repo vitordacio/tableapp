@@ -47,3 +47,9 @@ export const verifyParamReportId = celebrate({
     report_id: Joi.string().uuid().required(),
   },
 });
+
+export const verifyParamMomentId = celebrate({
+  [Segments.PARAMS]: {
+    moment_id: Joi.string().uuid().required(),
+  },
+});

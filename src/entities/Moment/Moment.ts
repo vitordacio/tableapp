@@ -10,15 +10,19 @@ import {
 } from 'typeorm';
 
 import { Exclude } from 'class-transformer';
+import { User } from '@entities/User/User';
 import { Event } from '@entities/Event/Event';
 
-@Entity('event_pictures')
-class EventPicture {
+@Entity('moments')
+class Moment {
   @PrimaryColumn('uuid')
-  id_event_picture: string;
+  id_moment: string;
 
   @Column()
-  url: string;
+  thumb_url: string;
+
+  @Column()
+  img_url: string;
 
   @Column({ nullable: true })
   title: string;
@@ -26,12 +30,19 @@ class EventPicture {
   @Column({ nullable: true })
   description: string;
 
-  @Column({ nullable: true })
+  @Column()
   event_id: string;
 
-  @ManyToOne(() => Event, event => event.pictures)
+  @ManyToOne(() => Event, event => event.moments)
   @JoinColumn({ name: 'event_id' })
   event: Event;
+
+  @Column()
+  author_id: string;
+
+  @ManyToOne(() => User, user => user.moments)
+  @JoinColumn({ name: 'author_id' })
+  author: User;
 
   @CreateDateColumn()
   created_at: Date;
@@ -44,4 +55,4 @@ class EventPicture {
   deleted_at: Date;
 }
 
-export { EventPicture };
+export { Moment };

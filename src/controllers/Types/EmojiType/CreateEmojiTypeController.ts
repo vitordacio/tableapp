@@ -20,11 +20,11 @@ class CreateEmojiTypeController {
       throw new AppError('Operação não permitida.', 403);
     }
 
-    const eventTypeInstance = await this.createEmojiTypeService.execute(
+    const emojiTypeInstance = await this.createEmojiTypeService.execute(
       category,
     );
 
-    return res.status(201).json(instanceToPlain(eventTypeInstance));
+    return res.status(201).json(instanceToPlain(emojiTypeInstance));
   }
 }
 

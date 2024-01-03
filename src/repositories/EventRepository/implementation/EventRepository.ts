@@ -54,6 +54,11 @@ class EventRepository implements IEventRepository {
     return event;
   }
 
+  async countByAuthor(author_id: string): Promise<number> {
+    const count = await this.ormRepository.count({ author_id });
+    return count;
+  }
+
   async findIndexByType(type: string): Promise<Event[]> {
     const events = await this.ormRepository.find({
       relations: ['participations'],

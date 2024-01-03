@@ -10,7 +10,6 @@ import { INotificationRepository } from '@repositories/NotificationRepository/IN
 import { IEventRepository } from '@repositories/EventRepository/IEventRepository';
 import { IUserRepository } from '@repositories/UserRepository/IUserRepository';
 import { IParticipationTypeRepository } from '@repositories/ParticipationTypeRepository/IParticipationTypeRepository';
-import { generateEventControl } from '@utils/handleControl';
 import { ICreateInviteRequestDTO } from './ICreateInviteRequestServiceDTO';
 
 @injectable()
@@ -130,12 +129,6 @@ class CreateInviteRequestService {
     await this.notificationRepository.save(notification);
 
     if (!participation.type) participation.type = participationType;
-
-    participation.control = generateEventControl({
-      event,
-      participation,
-      user: foundUser,
-    });
 
     return participation;
   }

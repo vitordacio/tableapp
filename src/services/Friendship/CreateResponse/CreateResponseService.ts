@@ -43,11 +43,6 @@ class CreateResponseService {
       this.blockRepository.findByAuthorAndReceiver(user_id, reqUser.id),
     ]);
 
-    // const friendship = await this.friendshipRepository.findByUserIds(
-    //   reqUser.id,
-    //   user_id,
-    // );
-
     if (!friendship) {
       throw new AppError('Solicitação não encontrada.', 404);
     }

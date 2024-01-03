@@ -16,17 +16,20 @@ class AchievementType {
   @PrimaryColumn('uuid')
   id_achievement_type: string;
 
-  @Column({ unique: true })
-  name: string;
+  @Column()
+  type: string;
 
   @Column()
-  title: string;
+  category: string;
 
-  @Column({ nullable: true })
-  description: string;
+  @Column()
+  name: string;
 
   @Column({ default: 0 })
   difficulty: number;
+
+  @Column({ default: 0 })
+  min_value: number;
 
   @OneToMany(() => Achievement, achievement => achievement.type)
   achievements: Achievement[];

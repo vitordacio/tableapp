@@ -67,7 +67,7 @@ class EmojiRepository implements IEmojiRepository {
     page: number,
     limit: number,
   ): Promise<Emoji[]> {
-    const users = this.ormRepository
+    const emojis = this.ormRepository
       .createQueryBuilder('emoji')
       .leftJoin('emoji.type', 'type')
       .where('type.category = :category', { category })
@@ -76,7 +76,7 @@ class EmojiRepository implements IEmojiRepository {
       .skip(page && limit ? limit * (page - 1) : undefined)
       .getMany();
 
-    return users;
+    return emojis;
   }
 
   async findLastInOrder(): Promise<Emoji | undefined> {

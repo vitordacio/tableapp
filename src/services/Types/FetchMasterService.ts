@@ -4,6 +4,7 @@ import { FetchEventTypesService } from './EventType/FetchEventTypes/FetchEventTy
 import { FetchParticipationTypesService } from './ParticipationType/FetchParticipationTypes/FetchParticipationTypesService';
 import { FetchSocialNetworkTypesService } from './SocialNetworkType/FetchSocialNetworkTypes/FetchSocialNetworkTypesService';
 import { FetchEmojiTypesService } from './EmojiType/FetchEmojiTypes/FetchEmojiTypesService';
+import { FetchAchievementTypesService } from './AchievementType/FetchAchievementTypes/FetchAchievementTypesService';
 
 @injectable()
 class FetchMasterService {
@@ -14,6 +15,8 @@ class FetchMasterService {
   private fetchSocialNetworkTypesService: FetchSocialNetworkTypesService;
 
   private fetchEmojiTypesService: FetchEmojiTypesService;
+
+  private fetchAchievementTypesService: FetchAchievementTypesService;
 
   private fetchEmojiService: FetchEmojiService;
 
@@ -35,6 +38,7 @@ class FetchMasterService {
       this.fetchParticipationTypesService.execute(),
       this.fetchSocialNetworkTypesService.execute(),
       this.fetchEmojiTypesService.execute(),
+      this.fetchAchievementTypesService.execute(),
     ]);
 
     await this.fetchEmojiService.execute();

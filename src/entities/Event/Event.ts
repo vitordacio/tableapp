@@ -16,25 +16,9 @@ import { Address } from '@entities/Address/Address';
 import { Achievement } from '@entities/Achievement/Achievement';
 import { Report } from '@entities/Report/Report';
 import { EventType } from '@entities/EventType/EventType';
-import { EventPicture } from '@entities/EventPicture/EventPicture';
+import { Moment } from '@entities/Moment/Moment';
 import { React } from '@entities/React/React';
 import { Performer } from '@entities/Performer/Performer';
-
-// export type EventControl = {
-//   participation_id?: string;
-//   participation_status?:
-//     | 'author'
-//     | 'user_in'
-//     | 'user_out'
-//     | 'guest_in'
-//     | 'guest_out'
-//     | 'mod_in'
-//     | 'mod_out'
-//     | 'vip_in'
-//     | 'vip_out'
-//     | '';
-//   can_see_content?: boolean;
-// };
 
 @Entity('events')
 class Event {
@@ -117,10 +101,10 @@ class Event {
   })
   achievements: Achievement[];
 
-  @OneToMany(() => EventPicture, picture => picture.event, {
+  @OneToMany(() => Moment, moment => moment.event, {
     cascade: true,
   })
-  pictures: EventPicture[];
+  moments: Moment[];
 
   @OneToMany(() => Participation, participation => participation.event, {
     cascade: true,
@@ -165,6 +149,8 @@ class Event {
     | 'vip_in'
     | 'vip_out'
     | '';
+
+  participating: boolean;
 
   can_see_content: boolean;
 
