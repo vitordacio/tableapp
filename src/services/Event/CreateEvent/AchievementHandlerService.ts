@@ -128,6 +128,7 @@ class AchievementHandlerService {
             'event',
             'event',
             'host_first',
+            3,
           );
 
         if (firstEventAchievementType) {

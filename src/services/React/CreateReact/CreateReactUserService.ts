@@ -34,6 +34,10 @@ class CreateReactUserService {
     user_id,
     reqUser,
   }: ICreateReactUserDTO): Promise<React> {
+    if (user_id === reqUser.id) {
+      throw new AppError('Informe um usuário diferente.', 400);
+    }
+
     const [requester, user, emoji, alreadyExists] = await Promise.all([
       this.userRepository.findById(reqUser.id),
       this.userRepository.findById(user_id),

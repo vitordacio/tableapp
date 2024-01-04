@@ -29,6 +29,9 @@ class FetchMasterService {
       FetchSocialNetworkTypesService,
     );
     this.fetchEmojiTypesService = container.resolve(FetchEmojiTypesService);
+    this.fetchAchievementTypesService = container.resolve(
+      FetchAchievementTypesService,
+    );
     this.fetchEmojiService = container.resolve(FetchEmojiService);
   }
 

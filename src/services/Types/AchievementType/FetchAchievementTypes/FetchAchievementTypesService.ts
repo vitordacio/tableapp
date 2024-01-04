@@ -22,6 +22,7 @@ class FetchAchievementTypesService {
           type.type === data.category &&
           type.category === data.category &&
           type.name === data.name &&
+          type.min_value === data.min_value &&
           type.difficulty === (data.difficulty || 0),
       );
 
@@ -33,6 +34,7 @@ class FetchAchievementTypesService {
         category: data.category,
         name: data.name,
         difficulty: data.difficulty,
+        min_value: data.min_value,
       });
 
       newTypes.push(newType);

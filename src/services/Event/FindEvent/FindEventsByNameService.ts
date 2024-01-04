@@ -1,23 +1,18 @@
 import { inject, injectable } from 'tsyringe';
 import { Event } from '@entities/Event/Event';
 import { IEventRepository } from '@repositories/EventRepository/IEventRepository';
-import { IUserRepository } from '@repositories/UserRepository/IUserRepository';
-import { IParticipationRepository } from '@repositories/ParticipationRepository/IParticipationRepository';
-import { generateEventControl } from '@utils/handleControl';
-import { AppError } from '@utils/AppError';
+import { IBlockRepository } from '@repositories/BlockRepository/IBlockRepository';
+import { checkEventStatus } from '@utils/handleEvent';
 import { IFindEventsServiceDTO } from './IFindEventsServiceDTO';
 
 @injectable()
 class FindEventsByNameService {
   constructor(
-    @inject('UserRepository')
-    private userRepository: IUserRepository,
-
     @inject('EventRepository')
     private eventRepository: IEventRepository,
 
-    @inject('ParticipationRepository')
-    private participationRepository: IParticipationRepository,
+    @inject('BlockRepository')
+    private blockRepository: IBlockRepository,
   ) {}
 
   async execute({
@@ -26,34 +21,35 @@ class FindEventsByNameService {
     limit,
     reqUser,
   }: IFindEventsServiceDTO): Promise<Event[]> {
-    const [user, events] = await Promise.all([
-      this.userRepository.findById(reqUser.id),
-      this.eventRepository.findByName(name || '', page || 1, limit || 20),
-    ]);
-
-    if (!user) {
-      throw new AppError('Token expirado, realize login novamente.', 403);
-    }
+    let events = await this.eventRepository.findByName(
+      name || '',
+      page || 1,
+      limit || 20,
+    );
 
     if (events.length !== 0) {
-      const event_ids = events.map(event => event.id_event);
-      const userParticipations =
-        await this.participationRepository.checkUserParticipations(
-          user.id_user,
-          event_ids,
-        );
+      const user_ids = events.map(event => event.author_id);
+      let blocked_ids: string[];
+      const userBlocks = await this.blockRepository.checkBlocks(
+        reqUser.id,
+        user_ids,
+      );
+
+      if (userBlocks.length !== 0)
+        blocked_ids = userBlocks.map(block => block.author_id);
+
+      const filtered: Event[] = [];
 
       events.forEach(event => {
-        const participation = userParticipations.find(
-          userParticipation => userParticipation.event_id === event.id_event,
-        );
+        if (blocked_ids && blocked_ids.includes(event.author_id)) return null;
 
-        event.control = generateEventControl({
-          event,
-          participation,
-          user,
+        return filtered.push({
+          ...event,
+          event_status: checkEventStatus(event),
         });
       });
+
+      events = [...filtered];
     }
 
     return events;

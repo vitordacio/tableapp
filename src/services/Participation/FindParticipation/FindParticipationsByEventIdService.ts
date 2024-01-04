@@ -20,19 +20,20 @@ class FindParticipationsByEventIdService {
     limit,
     page,
   }: IFindByEventIdDTO): Promise<Participation[]> {
-    const event = await this.eventRepository.findById(event_id);
+    const [event, participations] = await Promise.all([
+      this.eventRepository.findById(event_id),
+      this.participationRepository.findByEventId(
+        event_id,
+        page || 1,
+        limit || 20,
+      ),
+    ]);
 
     if (!event) {
       throw new AppError('Evento não encontrado', 404);
     }
 
-    const participation = await this.participationRepository.findByEventId(
-      event.id_event,
-      page || 1,
-      limit || 20,
-    );
-
-    return participation;
+    return participations;
   }
 }
 
