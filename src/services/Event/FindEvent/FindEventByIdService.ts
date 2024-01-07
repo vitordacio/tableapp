@@ -45,14 +45,13 @@ class FindEventByIdService {
       throw new AppError('Evento não encontrado.', 404);
     }
 
-    event.user_react = react;
-
     const eventControl = handleEventControl({
       event,
       user,
       participation,
     });
 
+    event.user_react = react;
     event.event_status = eventControl.event_status;
     event.participation_id = eventControl.participation_id;
     event.participation_status = eventControl.participation_status;

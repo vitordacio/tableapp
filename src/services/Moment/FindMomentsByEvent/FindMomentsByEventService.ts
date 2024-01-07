@@ -1,6 +1,7 @@
 import { inject, injectable } from 'tsyringe';
 import { Moment } from '@entities/Moment/Moment';
 import { IMomentRepository } from '@repositories/MomentRepository/IMomentRepository';
+import { IFindByEventIdDTO } from './IFindMomentsByEventDTO';
 
 @injectable()
 class FindMomentsByEventService {
@@ -9,8 +10,16 @@ class FindMomentsByEventService {
     private momentRepository: IMomentRepository,
   ) {}
 
-  async execute(event_id: string): Promise<Moment[]> {
-    const moments = await this.momentRepository.findByEvent(event_id);
+  async execute({
+    event_id,
+    page,
+    limit,
+  }: IFindByEventIdDTO): Promise<Moment[]> {
+    const moments = await this.momentRepository.findByEventId(
+      event_id,
+      page || 1,
+      limit || 20,
+    );
 
     return moments;
   }

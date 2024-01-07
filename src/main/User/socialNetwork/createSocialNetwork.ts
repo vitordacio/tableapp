@@ -1,4 +1,4 @@
-import { CreateSocialNetworkController } from '@controllers/User/UpdateGenerals/CreateSocialNetworkController';
+import { CreateSocialNetworkController } from '@controllers/User/SocialNetwork/CreateSocialNetworkController';
 
 function CreateSocialNetworkControllerFactory() {
   const createSocialNetworkController = new CreateSocialNetworkController();

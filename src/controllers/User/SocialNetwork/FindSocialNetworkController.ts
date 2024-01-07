@@ -4,20 +4,16 @@ import { instanceToPlain } from 'class-transformer';
 import { pubPerm, userPerm } from '@config/constants';
 import { hasPermission } from '@utils/hasPermission';
 import { AppError } from '@utils/AppError';
-import { DeleteSocialNetworkService } from '@services/User/UpdateUser/DeleteSocialNetworkService';
+import { FindSocialNetworkService } from '@services/User/SocialNetwork/FindSocialNetworkService';
 
-class DeleteSocialNetworkController {
-  private deleteSocialNetworkService: DeleteSocialNetworkService;
+class FindSocialNetworkController {
+  private findSocialNetworkService: FindSocialNetworkService;
 
   constructor() {
-    this.deleteSocialNetworkService = container.resolve(
-      DeleteSocialNetworkService,
-    );
+    this.findSocialNetworkService = container.resolve(FindSocialNetworkService);
   }
 
   async handle(req: Request, res: Response): Promise<Response> {
-    const { id } = req.params;
-
     if (
       !hasPermission(req.user, userPerm) &&
       !hasPermission(req.user, pubPerm)
@@ -25,8 +21,7 @@ class DeleteSocialNetworkController {
       throw new AppError('Operação não permitida.', 403);
     }
 
-    const socialNetworkInstance = await this.deleteSocialNetworkService.execute(
-      id,
+    const socialNetworkInstance = await this.findSocialNetworkService.execute(
       req.user,
     );
 
@@ -34,4 +29,4 @@ class DeleteSocialNetworkController {
   }
 }
 
-export { DeleteSocialNetworkController };
+export { FindSocialNetworkController };

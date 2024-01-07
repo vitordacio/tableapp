@@ -23,12 +23,6 @@ export interface IUpdateGenderDTO {
   user: AuthorizedUser<UserPerm>;
 }
 
-export interface IUpdateSocialDTO {
-  social: string;
-  username: string;
-  user: AuthorizedUser<UserPerm>;
-}
-
 export interface IUpdatePrivateDTO {
   set_private: boolean;
   user: AuthorizedUser<UserPerm>;
@@ -53,10 +47,4 @@ export interface IUpdatePictureDTO {
 export interface IUpdateCoverPhotoDTO {
   cover_photo: string;
   user: AuthorizedUser<UserPerm>;
-}
-
-export interface ICreateSocialNetworkDTO {
-  username: string;
-  user: AuthorizedUser<UserPerm | PubPerm>;
-  type_id: string;
 }

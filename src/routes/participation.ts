@@ -1,9 +1,6 @@
 import { Request, Response, Router } from 'express';
 
 import { verifyToken } from '../middlewares/verifyToken';
-import { findRequestsMiddleware } from '../middlewares/validators/Participation/findRequests';
-import { findParticipationsByUserIdMiddleware } from '../middlewares/validators/Participation/findParticipationsByUserId';
-import { findParticipationsByEventIdMiddleware } from '../middlewares/validators/Participation/findParticipationsByEventId';
 import { createInviteRequestMiddleware } from '../middlewares/validators/Participation/createInviteRequest';
 import { findParticipationByEventAndUserMiddleware } from '../middlewares/validators/Participation/findParticipationByEventAndUser';
 
@@ -19,6 +16,7 @@ import { findParticipationByEventAndUserController } from '../main/Participation
 import { findRequestsPendingController } from '../main/Participation/findRequestsPending';
 import { findRequestsReviwedController } from '../main/Participation/findRequestsReviwed';
 import { createParticipationResponseMiddleware } from '../middlewares/validators/Participation/createParticipationResponse';
+import { verifyPageLimit } from '../middlewares/verifyPageLimit';
 import {
   verifyParamEventId,
   verifyParamParticipationId,
@@ -69,7 +67,7 @@ participationRouter.get(
 
 participationRouter.get(
   '/participation/user/:user_id',
-  [verifyToken, verifyParamUserId, findParticipationsByUserIdMiddleware],
+  [verifyToken, verifyParamUserId, verifyPageLimit],
   async (req: Request, res: Response) => {
     return findParticipationsByUserIdController.handle(req, res);
   },
@@ -77,7 +75,7 @@ participationRouter.get(
 
 participationRouter.get(
   '/participation/event/:event_id',
-  [verifyToken, findParticipationsByEventIdMiddleware],
+  [verifyToken, verifyParamEventId, verifyPageLimit],
   async (req: Request, res: Response) => {
     return findParticipationsByEventIdController.handle(req, res);
   },
@@ -85,7 +83,7 @@ participationRouter.get(
 
 participationRouter.get(
   '/participation/requests/pending/:event_id',
-  [verifyToken, findRequestsMiddleware],
+  [verifyToken, verifyParamEventId, verifyPageLimit],
   async (req: Request, res: Response) => {
     return findRequestsPendingController.handle(req, res);
   },
@@ -93,7 +91,7 @@ participationRouter.get(
 
 participationRouter.get(
   '/participation/requests/reviwed/:event_id',
-  [verifyToken, findRequestsMiddleware],
+  [verifyToken, verifyParamEventId, verifyPageLimit],
   async (req: Request, res: Response) => {
     return findRequestsReviwedController.handle(req, res);
   },

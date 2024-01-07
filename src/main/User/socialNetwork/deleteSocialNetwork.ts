@@ -1,4 +1,4 @@
-import { DeleteSocialNetworkController } from '@controllers/User/UpdateGenerals/DeleteSocialNetworkController';
+import { DeleteSocialNetworkController } from '@controllers/User/SocialNetwork/DeleteSocialNetworkController';
 
 function DeleteSocialNetworkControllerFactory() {
   const deleteSocialNetworkController = new DeleteSocialNetworkController();

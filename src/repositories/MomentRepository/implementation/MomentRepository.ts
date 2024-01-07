@@ -39,11 +39,17 @@ class MomentRepository implements IMomentRepository {
     return moment;
   }
 
-  async findByEvent(event_id: string): Promise<Moment[]> {
+  async findByEventId(
+    event_id: string,
+    page: number,
+    limit: number,
+  ): Promise<Moment[]> {
     const moment = await this.ormRepository.find({
       relations: ['author'],
       where: { event_id },
       order: { created_at: 'DESC' },
+      take: limit,
+      skip: page && limit ? limit * (page - 1) : undefined,
     });
 
     return moment;

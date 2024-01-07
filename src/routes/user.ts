@@ -33,8 +33,9 @@ import { updateGenderController } from '../main/User/updateGenerals/updateGender
 import { updateNameController } from '../main/User/updateGenerals/updateName';
 import { findUserFriendsMiddleware } from '../middlewares/validators/User/findUserFriends';
 import { findUserFriendsController } from '../main/User/findUserFriends';
-import { createSocialNetworkController } from '../main/User/updateGenerals/createSocialNetwork';
-import { deleteSocialNetworkController } from '../main/User/updateGenerals/deleteSocialNetwork';
+import { createSocialNetworkController } from '../main/User/socialNetwork/createSocialNetwork';
+import { findSocialNetworkController } from '../main/User/socialNetwork/findSocialNetwork';
+import { deleteSocialNetworkController } from '../main/User/socialNetwork/deleteSocialNetwork';
 import { findCheckUpdateController } from '../main/User/findCheckUpdate';
 import { findCheckUpdateMiddleware } from '../middlewares/validators/User/findCheckUpdate';
 import { findCheckUsernameController } from '../main/User/findCheckUsername';
@@ -155,6 +156,14 @@ userRouter.put(
   [verifyToken, updatePrivateMiddleware],
   async (req: Request, res: Response) => {
     return updatePrivateController.handle(req, res);
+  },
+);
+
+userRouter.get(
+  '/self/social',
+  verifyToken,
+  async (req: Request, res: Response) => {
+    return findSocialNetworkController.handle(req, res);
   },
 );
 

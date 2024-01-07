@@ -11,12 +11,13 @@ import { findMomentsByEventController } from '../main/Moment/findMomentsByEvent'
 import { createMomentMiddleware } from '../middlewares/validators/Moment/createMoment';
 import { updateMomentController } from '../main/Moment/updateMoment';
 import { updateMomentMiddleware } from '../middlewares/validators/Moment/updateMoment';
+import { verifyPageLimit } from '../middlewares/verifyPageLimit';
 
 const momentRouter = Router();
 
 momentRouter.get(
   '/moment/:event_id',
-  [verifyToken, verifyParamEventId],
+  [verifyToken, verifyParamEventId, verifyPageLimit],
   async (req: Request, res: Response) => {
     return findMomentsByEventController.handle(req, res);
   },

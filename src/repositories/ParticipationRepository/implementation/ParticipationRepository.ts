@@ -97,7 +97,7 @@ class ParticipationRepository implements IParticipationRepository {
     limit: number,
   ): Promise<Participation[]> {
     const participations = await this.ormRepository.find({
-      // relations: ['user'],
+      relations: ['type', 'user'],
       where: { event_id, in: true },
       order: { created_at: 'DESC' },
       take: limit,

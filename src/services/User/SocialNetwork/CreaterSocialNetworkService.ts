@@ -6,7 +6,7 @@ import { AppError } from '@utils/AppError';
 import { IUserRepository } from '@repositories/UserRepository/IUserRepository';
 import { SocialNetwork } from '@entities/SocialNetwork/SocialNetwork';
 import { User } from '@entities/User/User';
-import { ICreateSocialNetworkDTO } from './GeneralsDTO';
+import { ICreateSocialNetworkDTO } from './ISocialNetworkDTO';
 
 @injectable()
 class CreateSocialNetworkService {
