@@ -18,16 +18,6 @@ class LoginUserController {
       password,
     });
 
-    // res.cookie('autocenter.access-token', accessToken, {
-    //   path: '/',
-    //   maxAge: 60 * 60 * 24 * 7 * 360, // 6h -- 1 year
-    // });
-
-    // res.cookie('JID', refreshToken, {
-    //   path: '/',
-    //   httpOnly: true,
-    //   maxAge: 60 * 60 * 24 * 7 * 360, // 1 week -- 1 year
-    // });
     return res.status(200).json({
       user: instanceToInstance(user),
       accessToken,

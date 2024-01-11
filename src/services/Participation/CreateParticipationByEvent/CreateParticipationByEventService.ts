@@ -6,6 +6,7 @@ import { AppError } from '@utils/AppError';
 import { INotificationRepository } from '@repositories/NotificationRepository/INotificationRepository';
 import { IUserRepository } from '@repositories/UserRepository/IUserRepository';
 import { IEventRepository } from '@repositories/EventRepository/IEventRepository';
+import { handleEventControl } from '@utils/handleEvent';
 import { ICreateParticipationByEventDTO } from './ICreateParticipationByEventServiceDTO';
 
 @injectable()
@@ -85,6 +86,19 @@ class CreateParticipationByEventService {
         this.notificationRepository.save(notification),
       ]);
     }
+
+    const eventControl = handleEventControl({
+      event,
+      user: participation.user,
+      participation,
+    });
+
+    if (!participation.reviwer) participation.reviwer = user;
+    participation.event_status = eventControl.event_status;
+    participation.participation_id = eventControl.participation_id;
+    participation.participation_status = eventControl.participation_status;
+    participation.participating = eventControl.participating;
+    participation.can_see_content = eventControl.can_see_content;
 
     return participation;
   }

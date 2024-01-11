@@ -24,7 +24,7 @@ class FindRequestsPendingService {
   }: IFindRequestsDTO): Promise<Participation[]> {
     const [event, participations] = await Promise.all([
       this.eventRepository.findById(event_id),
-      this.participationRepository.findRequestsReviwed(
+      this.participationRepository.findRequestsPending(
         event_id,
         page || 1,
         limit || 20,

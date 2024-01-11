@@ -7,7 +7,7 @@ import { generateAccessToken } from '@providers/Token/AccessTokenProvider';
 import { IUserRepository } from '@repositories/UserRepository/IUserRepository';
 import { AppError } from '@utils/AppError';
 import { User } from '@entities/User/User';
-
+import { extractTagsFromText } from '@utils/generateTags';
 import { generateUniqueUsername } from '@utils/handleUser';
 import { IGoogleDTO, ILoginResponse } from './LoginDTO';
 
@@ -48,10 +48,14 @@ class LoginGoogleService {
         picture: googleUser.picture,
         locale: googleUser.locale,
         google_id: googleUser.sub,
+        tags: extractTagsFromText(`${newUsername} ${googleUser.name}`),
       });
     } else {
       user.name = googleUser.name;
       user.picture = googleUser.picture;
+      user.tags = extractTagsFromText(
+        `${user.username} ${googleUser.name}`,
+      ) as unknown as string;
     }
 
     await this.userRepository.save(user);

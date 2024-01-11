@@ -1,15 +1,14 @@
 import { inject, injectable } from 'tsyringe';
 import { v4 } from 'uuid';
-
 import { Participation } from '@entities/Participation/Participation';
 import { Notification } from '@entities/Notification/Notification';
 import { IParticipationRepository } from '@repositories/ParticipationRepository/IParticipationRepository';
-
 import { AppError } from '@utils/AppError';
 import { INotificationRepository } from '@repositories/NotificationRepository/INotificationRepository';
 import { IEventRepository } from '@repositories/EventRepository/IEventRepository';
 import { IUserRepository } from '@repositories/UserRepository/IUserRepository';
 import { IParticipationTypeRepository } from '@repositories/ParticipationTypeRepository/IParticipationTypeRepository';
+import { handleEventControl } from '@utils/handleEvent';
 import { ICreateInviteRequestDTO } from './ICreateInviteRequestServiceDTO';
 
 @injectable()
@@ -52,7 +51,10 @@ class CreateInviteRequestService {
     ]);
 
     if (!foundUser) {
-      throw new AppError('Usuário não encontrado.', 404);
+      throw new AppError(
+        'Token expirado, por favor realize o login novamente.',
+        400,
+      );
     }
 
     if (!user) {
@@ -129,6 +131,18 @@ class CreateInviteRequestService {
     await this.notificationRepository.save(notification);
 
     if (!participation.type) participation.type = participationType;
+
+    const eventControl = handleEventControl({
+      event,
+      user,
+      participation,
+    });
+
+    participation.event_status = eventControl.event_status;
+    participation.participation_id = eventControl.participation_id;
+    participation.participation_status = eventControl.participation_status;
+    participation.participating = eventControl.participating;
+    participation.can_see_content = eventControl.can_see_content;
 
     return participation;
   }

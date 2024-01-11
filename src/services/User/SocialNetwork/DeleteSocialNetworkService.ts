@@ -21,33 +21,34 @@ class DeleteSocialNetworkService {
 
   async execute(
     social_network_id: string,
-    user: AuthorizedUser<UserPerm | PubPerm>,
+    reqUser: AuthorizedUser<UserPerm | PubPerm>,
   ): Promise<User> {
-    const foundUser = await this.userRepository.findById(user.id);
+    const [user, social] = await Promise.all([
+      this.userRepository.findById(reqUser.id),
+      this.socialNetworkRepository.findById(social_network_id),
+    ]);
 
-    if (!foundUser) {
+    if (!user) {
       throw new AppError('Usuário não encontrado.', 404);
     }
 
-    const social = await this.socialNetworkRepository.findById(
-      social_network_id,
-    );
-
-    if (!social || social.user_id !== foundUser.id_user) {
+    if (!social || social.user_id !== user.id_user) {
       throw new AppError('Rede social não encontrada.', 404);
     }
 
-    await this.socialNetworkRepository.remove(social);
-
     const socialType = social.type;
     socialType.count -= 1;
-    await this.socialNetworkTypeRepository.remove(socialType);
 
-    foundUser.social_networks = foundUser.social_networks.filter(
+    await Promise.all([
+      this.socialNetworkRepository.remove(social),
+      this.socialNetworkTypeRepository.save(socialType),
+    ]);
+
+    user.social_networks = user.social_networks.filter(
       userSocial => userSocial.id_social_network !== social_network_id,
     );
 
-    return foundUser;
+    return user;
   }
 }
 

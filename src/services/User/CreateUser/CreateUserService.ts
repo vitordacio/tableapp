@@ -50,9 +50,7 @@ class CreateUserService {
     const user = this.userRepository.create({
       id: v4(),
       name,
-      name_updated_at: new Date(),
       email,
-      email_updated_at: new Date(),
       username,
       password: hashedPassword,
       tags: extractTagsFromText(`${username} ${name}`),

@@ -20,7 +20,7 @@ class LoginPubService {
 
   async execute({ login, password }: ILoginDTO): Promise<ILoginResponse> {
     const user = isEmail(login)
-      ? await this.userRepository.findByEmail(login, 'pub')
+      ? await this.userRepository.findByEmail(login)
       : await this.userRepository.findByUsername(login);
 
     if (!user) {

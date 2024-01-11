@@ -1,8 +1,4 @@
 import { inject, injectable } from 'tsyringe';
-
-import { Block } from '@entities/Block/Block';
-
-import { AppError } from '@utils/AppError';
 import { IBlockRepository } from '@repositories/BlockRepository/IBlockRepository';
 import { IBlockDTO } from '../IBlockServiceDTO';
 
@@ -13,17 +9,13 @@ class FindBlockService {
     private blockRepository: IBlockRepository,
   ) {}
 
-  async execute({ user_id, reqUser }: IBlockDTO): Promise<Block> {
+  async execute({ user_id, reqUser }: IBlockDTO): Promise<boolean> {
     const block = await this.blockRepository.findByAuthorAndReceiver(
       reqUser.id,
       user_id,
     );
 
-    if (!block) {
-      throw new AppError('Bloqueio não encontrado.', 404);
-    }
-
-    return block;
+    return !!block;
   }
 }
 
