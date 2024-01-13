@@ -5,7 +5,7 @@ import { Event } from '@entities/Event/Event';
 import { extractTagsFromText } from '@utils/generateTags';
 import { IEventRepository } from '../IEventRepository';
 
-const similarity = 0.3;
+const similarity = 0.27;
 
 class EventRepository implements IEventRepository {
   private ormRepository: Repository<Event>;
@@ -47,7 +47,7 @@ class EventRepository implements IEventRepository {
 
   async findById(id: string): Promise<Event | undefined> {
     const event = await this.ormRepository.findOne({
-      relations: ['type', 'address', 'author', 'performers'],
+      relations: ['type', 'address', 'author', 'performers', 'performers.user'],
       where: { id_event: id },
     });
 
@@ -125,13 +125,103 @@ class EventRepository implements IEventRepository {
     return events;
   }
 
+  // async findByName(
+  //   name: string,
+  //   page: number,
+  //   limit: number,
+  // ): Promise<Event[]> {
+  //   let tagName: string[] = [];
+  //   tagName = extractTagsFromText(name);
+
+  //   const conditions =
+  //     tagName.length !== 0
+  //       ? tagName
+  //           .map(
+  //             word =>
+  //               `similarity(unaccent(LOWER(tag)), unaccent(lower('${word}'))) > ${similarity}`,
+  //           )
+  //           .join(' OR ')
+  //       : null;
+
+  //   const events = this.ormRepository
+  //     .createQueryBuilder('event')
+  //     .leftJoin('event.author', 'author')
+  //     .leftJoin('event.type', 'type')
+  //     .where(
+  //       new Brackets(qb => {
+  //         qb.where(
+  //           `${
+  //             conditions
+  //               ? `EXISTS (SELECT 1 FROM unnest(event.tags) tag WHERE ${conditions})`
+  //               : '(:nullName::text IS NULL OR EXISTS (SELECT 1 FROM unnest(event.tags) tag WHERE unaccent(LOWER(tag)) ~~ unaccent(:query)))'
+  //           }`,
+  //           {
+  //             query: `%${name}%`,
+  //             nullName: name,
+  //           },
+  //         );
+
+  //         return qb;
+  //       }),
+  //     )
+  //     .select([
+  //       'event.id_event',
+  //       'event.name',
+  //       'event.location',
+  //       'event.cover_photo',
+  //       'event.start_time',
+  //       'event.finish_time',
+  //       'event.additional',
+  //       'event.drink_preferences',
+  //       'event.min_amount',
+  //       'event.participating_count',
+  //       'event.reacts_count',
+  //       'author.name',
+  //       'author.username',
+  //       'author.picture',
+  //       'author.locale',
+  //       'type.name',
+  //     ])
+  //     .addSelect(
+  //       `(SELECT count(*) FROM unnest(event.tags) as tag WHERE ${conditions})`,
+  //       'qtd',
+  //     )
+  //     .orderBy('qtd', 'DESC')
+  //     .take(limit)
+  //     .skip(page && limit ? limit * (page - 1) : undefined)
+  //     .getMany();
+
+  //   return events;
+  // }
+
   async findByName(
     name: string,
     page: number,
     limit: number,
   ): Promise<Event[]> {
     let tagName: string[] = [];
-    tagName = extractTagsFromText(name);
+    if (name) tagName = extractTagsFromText(name);
+
+    function buildQuery(tagArray: string[]) {
+      let dynamicQuery = 'SELECT SUM(';
+
+      tagArray.forEach((tag: string, index: number) => {
+        if (index > 0) {
+          dynamicQuery += ' + ';
+        }
+
+        dynamicQuery += `CASE
+        WHEN SIMILARITY('${tag}', tag) > ${similarity} THEN SIMILARITY('${tag}', tag)
+        ELSE 0
+      END`;
+      });
+
+      dynamicQuery += ')';
+
+      return dynamicQuery;
+    }
+
+    const sum = buildQuery(tagName);
 
     const conditions =
       tagName.length !== 0
@@ -143,10 +233,12 @@ class EventRepository implements IEventRepository {
             .join(' OR ')
         : null;
 
-    const events = this.ormRepository
+    const queryEvents = this.ormRepository
       .createQueryBuilder('event')
-      .leftJoin('event.author', 'author')
-      .leftJoin('event.type', 'type')
+      .leftJoinAndSelect('event.author', 'author')
+      .leftJoinAndSelect('event.type', 'type')
+      .leftJoinAndSelect('event.performers', 'performers')
+      .leftJoinAndSelect('performers.user', 'performer')
       .where(
         new Brackets(qb => {
           qb.where(
@@ -163,32 +255,23 @@ class EventRepository implements IEventRepository {
 
           return qb;
         }),
-      )
-      .select([
-        'event.id_event',
-        'event.name',
-        'event.location',
-        'event.cover_photo',
-        'event.start_time',
-        'event.finish_time',
-        'event.additional',
-        'event.drink_preferences',
-        'event.min_amount',
-        'event.participating_count',
-        'event.reacts_count',
-        'author.name',
-        'author.username',
-        'author.picture',
-        'author.locale',
-        'type.name',
-      ])
-      .addSelect(
-        `(SELECT count(*) FROM unnest(event.tags) as tag WHERE ${conditions})`,
-        'qtd',
-      )
-      .orderBy('qtd', 'DESC')
+      );
+
+    if (conditions) {
+      queryEvents
+        .addSelect(`(${sum} FROM unnest(event.tags) as tag)`, 'similarity')
+        .addSelect(
+          `(SELECT count(*) FROM unnest(event.tags) as tag WHERE ${conditions})`,
+          'qtd',
+        )
+        .orderBy('similarity', 'DESC')
+        .addOrderBy('qtd', 'DESC');
+    }
+
+    const events = await queryEvents
       .take(limit)
-      .skip(page && limit ? limit * (page - 1) : undefined)
+      .skip((page - 1) * limit)
+      // .getRawMany();
       .getMany();
 
     return events;

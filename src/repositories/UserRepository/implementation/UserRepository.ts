@@ -7,7 +7,7 @@ import { clearUsername } from '@utils/handleUser';
 import { extractTagsFromText } from '@utils/generateTags';
 import { IUserRepository } from '../IUserRepository';
 
-const similarity = 0.3;
+const similarity = 0.27;
 
 class UserRepository implements IUserRepository {
   private ormRepository: Repository<User>;
@@ -63,7 +63,28 @@ class UserRepository implements IUserRepository {
 
   async findByName(name: string, page: number, limit: number): Promise<User[]> {
     let tagName: string[] = [];
-    tagName = extractTagsFromText(name);
+    if (name) tagName = extractTagsFromText(name);
+
+    function buildQuery(tagArray: string[]) {
+      let dynamicQuery = 'SELECT SUM(';
+
+      tagArray.forEach((tag: string, index: number) => {
+        if (index > 0) {
+          dynamicQuery += ' + ';
+        }
+
+        dynamicQuery += `CASE
+        WHEN SIMILARITY('${tag}', tag) > ${similarity} THEN SIMILARITY('${tag}', tag)
+        ELSE 0
+      END`;
+      });
+
+      dynamicQuery += ')';
+
+      return dynamicQuery;
+    }
+
+    const sum = buildQuery(tagName);
 
     const conditions =
       tagName.length !== 0
@@ -75,43 +96,86 @@ class UserRepository implements IUserRepository {
             .join(' OR ')
         : null;
 
-    const users = this.ormRepository
-      .createQueryBuilder('user')
-      .where(
-        new Brackets(qb => {
-          qb.where(
-            `${
-              conditions
-                ? `EXISTS (SELECT 1 FROM unnest(user.tags) tag WHERE ${conditions})`
-                : '(:nullName::text IS NULL OR EXISTS (SELECT 1 FROM unnest(user.tags) tag WHERE unaccent(LOWER(tag)) ~~ unaccent(:query)))'
-            }`,
-            {
-              query: `%${name}%`,
-              nullName: name,
-            },
-          );
+    const queryUsers = this.ormRepository.createQueryBuilder('user').where(
+      new Brackets(qb => {
+        qb.where(
+          `${
+            conditions
+              ? `EXISTS (SELECT 1 FROM unnest(user.tags) tag WHERE ${conditions})`
+              : '(:nullName::text IS NULL OR EXISTS (SELECT 1 FROM unnest(user.tags) tag WHERE unaccent(LOWER(tag)) ~~ unaccent(:query)))'
+          }`,
+          {
+            query: `%${name}%`,
+            nullName: name,
+          },
+        );
 
-          return qb;
-        }),
-      )
-      .addSelect(
-        `(SELECT count(*) FROM unnest(user.tags) as tag WHERE ${conditions}) as qtd`,
-      )
-      .orderBy('qtd', 'DESC')
-      // .select([
-      //   'user.id_user',
-      //   'user.name',
-      //   'user.username',
-      //   'user.picture',
-      //   `(SELECT count(*) FROM unnest(user.tags) as tag WHERE ${conditions}) as qtd`,
-      // ])
-      // .orderBy('qtd', 'DESC')
+        return qb;
+      }),
+    );
+
+    if (conditions) {
+      queryUsers
+        .addSelect(`(${sum} FROM unnest(user.tags) as tag)`, 'similarity')
+        .addSelect(
+          `(SELECT count(*) FROM unnest(user.tags) as tag WHERE ${conditions})`,
+          'qtd',
+        )
+        .orderBy('similarity', 'DESC')
+        .addOrderBy('qtd', 'DESC');
+    }
+
+    const users = await queryUsers
       .take(limit)
-      .skip(page && limit ? limit * (page - 1) : undefined)
+      .skip((page - 1) * limit)
       .getMany();
 
     return users;
   }
+
+  // async findByName(name: string, page: number, limit: number): Promise<User[]> {
+  //   let tagName: string[] = [];
+  //   tagName = extractTagsFromText(name);
+
+  //   const conditions =
+  //     tagName.length !== 0
+  //       ? tagName
+  //           .map(
+  //             word =>
+  //               `similarity(unaccent(LOWER(tag)), unaccent(lower('${word}'))) > ${similarity}`,
+  //           )
+  //           .join(' OR ')
+  //       : null;
+
+  //   const users = this.ormRepository
+  //     .createQueryBuilder('user')
+  //     .where(
+  //       new Brackets(qb => {
+  //         qb.where(
+  //           `${
+  //             conditions
+  //               ? `EXISTS (SELECT 1 FROM unnest(user.tags) tag WHERE ${conditions})`
+  //               : '(:nullName::text IS NULL OR EXISTS (SELECT 1 FROM unnest(user.tags) tag WHERE unaccent(LOWER(tag)) ~~ unaccent(:query)))'
+  //           }`,
+  //           {
+  //             query: `%${name}%`,
+  //             nullName: name,
+  //           },
+  //         );
+
+  //         return qb;
+  //       }),
+  //     )
+  //     .addSelect(
+  //       `(SELECT count(*) FROM unnest(user.tags) as tag WHERE ${conditions}) as qtd`,
+  //     )
+  //     .orderBy('qtd', 'DESC')
+  //     .take(limit)
+  //     .skip(page && limit ? limit * (page - 1) : undefined)
+  //     .getMany();
+
+  //   return users;
+  // }
 
   async findLatest(): Promise<User[]> {
     const users = await this.ormRepository.find({

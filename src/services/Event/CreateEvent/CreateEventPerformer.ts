@@ -39,7 +39,6 @@ class CreateEventPerformerService {
     if (!name && !user_id) {
       throw new AppError('Informe um nome ou usuário', 400);
     }
-
     const [requester, event] = await Promise.all([
       this.userRepository.findById(reqUser.id),
       this.eventRepository.findById(event_id),
@@ -85,14 +84,23 @@ class CreateEventPerformerService {
 
     const performer = this.performerRepository.create({
       id: v4(),
-      name,
       event_id,
-      user_id,
     });
+
+    if (user) {
+      performer.name = user.name;
+      performer.user_id = user.id_user;
+    } else {
+      performer.name = name || '';
+    }
 
     await this.performerRepository.save(performer);
 
-    event.performers = [...event.performers, performer];
+    if (user) performer.user = user;
+
+    event.performers = [...event.performers, performer].sort(
+      (a, b) => b.created_at.getDate() - a.created_at.getDate(),
+    );
 
     return event;
   }
