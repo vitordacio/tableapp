@@ -43,7 +43,7 @@ class UpdateEventLocationService {
 
     event.tags = extractTagsFromText(
       `${event.name} ${location} ${event.author.name} ${event.author.username}`,
-    ).toString();
+    ) as unknown as string;
 
     await this.eventRepository.save(event);
 
